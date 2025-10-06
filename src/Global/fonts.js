@@ -1,0 +1,7 @@
+export const Fonts = {
+  FONT_LIGHT: "FONT_LIGHT",
+  FONT_REGULAR: "FONT_REGULAR",
+  FONT_Semi: "FONT_MEDIUM",
+  FONT_MEDIUM: "FONT_MEDIUM",
+  FONT_BOLD: "FONT_BOLD",
+};
