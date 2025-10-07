@@ -1,32 +1,42 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Colors } from "../../../Global/colors";
 import { Fonts } from "../../../Global/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import * as SecureStore from "expo-secure-store";
+import moment from "moment";
+import { useNavigation } from "@react-navigation/native";
 
 const HomeHeader = () => {
+  const [userInfo, setUserInfo] = useState(null);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        const storedUserInfo = await SecureStore.getItemAsync("userInfo");
+        if (storedUserInfo) {
+          setUserInfo(JSON.parse(storedUserInfo));
+        }
+      } catch (error) {
+        console.error("Error loading user info:", error);
+      }
+    };
+    loadUserInfo();
+  }, []);
+
   const getCurrentTime = () => {
-    const now = new Date();
-    return now.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+    return moment().format("hh:mm A");
   };
 
   const getCurrentDate = () => {
-    const now = new Date();
-    return now.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
-    });
+    return moment().format("dddd, MMM D");
   };
 
   const getGreeting = () => {
-    const hour = new Date().getHours();
+    const hour = moment().hour();
     if (hour < 12) return "Good Morning";
     if (hour < 17) return "Good Afternoon";
     return "Good Evening";
@@ -43,8 +53,14 @@ const HomeHeader = () => {
         <View style={styles.header}>
           <View style={styles.leftSection}>
             <Text style={styles.greeting}>{getGreeting()}</Text>
-            <Text style={styles.username}>John Doe</Text>
-            <Text style={styles.userRole}>Operations Manager</Text>
+            <Text style={styles.username}>
+              {userInfo?.user?.firstName && userInfo?.user?.lastName
+                ? `${userInfo.user.firstName} ${userInfo.user.lastName}`
+                : userInfo?.user?.email || "User"}
+            </Text>
+            <Text style={styles.userRole}>
+              {userInfo?.user?.role || "Operations Manager"}
+            </Text>
           </View>
 
           <View style={styles.rightSection}>
@@ -58,7 +74,10 @@ const HomeHeader = () => {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.notificationContainer}>
+            <TouchableOpacity
+              style={styles.notificationContainer}
+              onPress={() => navigation.navigate("NotificationScreen")}
+            >
               <View style={styles.notificationIconContainer}>
                 <Ionicons
                   name="notifications-outline"
@@ -114,7 +133,7 @@ const styles = StyleSheet.create({
   },
   rightSection: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 12,
   },
   timeContainer: {
@@ -125,6 +144,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    minHeight: 44,
   },
   timeIconContainer: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -134,7 +154,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   timeInfo: {
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   time: {
     fontSize: 16,
@@ -152,17 +172,22 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   notificationContainer: {
-    position: "relative",
     backgroundColor: "rgba(255, 255, 255, 0.15)",
     borderRadius: 16,
     padding: 10,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: "center",
+    alignItems: "center",
   },
   notificationIconContainer: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderRadius: 8,
-    padding: 6,
+    padding: 4,
     justifyContent: "center",
     alignItems: "center",
+    width: 24,
+    height: 24,
   },
 });
 

@@ -2,7 +2,7 @@ import { Get, Post, PostC } from "./Gate";
 
 // login apis
 const login = async (data) => {
-  return await Post("login", data, "POST", true);
+  return await Post("auth/login", data, "POST", true);
 };
 const reset_password = async (data) => {
   return await Post("users/reset-password", data, "POST", true);
@@ -70,6 +70,20 @@ const getGuestById = async (id, data) => {
   return await Get(`guests/${id}`, data);
 };
 
+// events apis
+const events = async (data = {}) => {
+  return await Get("events", data);
+};
+
+const getEventById = async (id, data) => {
+  return await Get(`events/${id}`, data);
+};
+
+// flights apis
+const flights = async (eventId, data) => {
+  return await Get(`participants/events/${eventId}/flights`, data);
+};
+
 export {
   login,
   register,
@@ -86,4 +100,7 @@ export {
   show_books,
   guests,
   getGuestById,
+  events,
+  getEventById,
+  flights,
 };

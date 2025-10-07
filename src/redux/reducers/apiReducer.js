@@ -12,6 +12,9 @@ const apiSlice = createSlice({
     showRecommendations: {},
     guests: [],
     selectedGuest: {},
+    events: [],
+    selectedEvent: {},
+    flights: [],
     loading: false,
     error: null,
   },
@@ -61,6 +64,23 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setEvents: (state, action) => {
+      // Handle API response with events array
+      state.events = action.payload?.events || action.payload || [];
+      state.loading = false;
+      state.error = null;
+    },
+    setSelectedEvent: (state, action) => {
+      state.selectedEvent = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setFlights: (state, action) => {
+      // Store the full response object (with flights array and total)
+      state.flights = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
     setLoading: (state) => {
       state.loading = true;
     },
@@ -84,6 +104,9 @@ export const {
   setShowBooks,
   setGuests,
   setSelectedGuest,
+  setEvents,
+  setSelectedEvent,
+  setFlights,
   setLoading,
   setError,
 } = apiSlice.actions;

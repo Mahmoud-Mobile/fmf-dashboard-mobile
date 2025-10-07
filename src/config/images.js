@@ -6,6 +6,8 @@ import Logout_Icon from "../SVG/Logout_Icon";
 import Chat_Icon from "../SVG/Chat_Icon";
 import Flights_Icon from "../SVG/Flights_Icon";
 import CheckIn_Icon from "../SVG/CheckIn_Icon";
+import Calendar_Icon from "../SVG/Calendar_Icon";
+import Location_Icon from "../SVG/Location_Icon";
 
 const images = {
   Home_Tab: <Home_Tab />,
@@ -15,8 +17,17 @@ const images = {
   Chat_Icon: <Chat_Icon />,
   Flights_Icon: <Flights_Icon />,
   CheckIn_Icon: <CheckIn_Icon />,
+  Calendar_Icon: <Calendar_Icon />,
+  Location_Icon: <Location_Icon />,
 };
-export const ImagesWithProps = ({ props, source, color, width, height }) =>
+export const ImagesWithProps = ({
+  props,
+  source,
+  color,
+  width,
+  height,
+  size,
+}) =>
   source == "Home_Tab" ? (
     <Home_Tab color={color} />
   ) : source == "More_Tab" ? (
@@ -31,6 +42,10 @@ export const ImagesWithProps = ({ props, source, color, width, height }) =>
     <Flights_Icon color={color} />
   ) : source == "CheckIn_Icon" ? (
     <CheckIn_Icon color={color} />
+  ) : source == "Calendar_Icon" ? (
+    <Calendar_Icon color={color} size={size} />
+  ) : source == "Location_Icon" ? (
+    <Location_Icon color={color} size={size} />
   ) : null;
 
 export default images;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../screens/Login";
+import Dashboard from "../screens/Dashboard";
 import MyTabs from "../Navigation/MyTabs";
 import NoInternetScreen from "../screens/NoInternetScreen";
 import GuestDetails from "../screens/GuestDetails";
@@ -11,6 +12,7 @@ import ZebraQR from "../screens/ZebraQR";
 import Chat from "../screens/Chat";
 import DesignatedCars from "../screens/DesignatedCars";
 import Hotels from "../screens/Hotels";
+import NotificationScreen from "../screens/NotificationScreen";
 import { Colors } from "../Global/colors";
 import { Fonts } from "../Global/fonts";
 import NetInfo from "@react-native-community/netinfo";
@@ -63,9 +65,14 @@ const NavStack = () => {
 
   return (
     <Stack.Navigator
-      initialRouteName={isLoggedIn ? "MyTabs" : "Login"} // Use the login state to set the initial route
+      initialRouteName={isLoggedIn ? "Dashboard" : "Login"} // Use the login state to set the initial route
       screenOptions={{ headerShown: false }}
     >
+      <Stack.Screen
+        name="Dashboard"
+        component={Dashboard}
+        options={{ headerShown: false, animationEnabled: false }}
+      />
       <Stack.Screen
         name="MyTabs"
         component={MyTabs}
@@ -135,6 +142,13 @@ const NavStack = () => {
       <Stack.Screen
         name="Hotels"
         component={Hotels}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="NotificationScreen"
+        component={NotificationScreen}
         options={{
           headerShown: false,
         }}

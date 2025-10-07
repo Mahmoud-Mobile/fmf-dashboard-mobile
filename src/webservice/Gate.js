@@ -1,6 +1,9 @@
 import axios from "axios";
 import { getEnvVars } from "../constant";
 import * as SecureStore from "expo-secure-store";
+import store from "../redux/store";
+import { logout } from "../redux/actions/authActions";
+import navigationService from "../Global/navRef";
 
 async function createHeaders(jsonPayload) {
   const accessToken = await SecureStore.getItemAsync("accessToken");
@@ -18,6 +21,20 @@ function generateCorrelationId() {
     const v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+}
+
+async function handleUnauthorized() {
+  try {
+    // Dispatch logout action to clear Redux state
+    store.dispatch(logout());
+
+    // Navigate to Login screen if navigation is available
+    if (navigationService.navigation) {
+      navigationService.navigation.navigate("Login");
+    }
+  } catch (error) {
+    console.error("Error handling unauthorized access:", error);
+  }
 }
 
 function handleErrors(error) {
@@ -67,6 +84,13 @@ function handleErrors(error) {
       break;
     case 401:
       alert("Unauthorized: The session has expired.");
+      // Logout user and navigate to login for 401
+      handleUnauthorized();
+      break;
+    case 403:
+      alert("Forbidden: Access denied. Please login again.");
+      // Logout user and navigate to login for 403
+      handleUnauthorized();
       break;
     case 302:
       alert(data.message || "Redirected: " + errorMessage);
@@ -157,4 +181,7 @@ async function Get(url = "", data = {}) {
   }
 }
 
-export { Get, Post };
+// PostC is an alias for Post with JSON payload
+const PostC = (url, data, method = "POST") => Post(url, data, method, true);
+
+export { Get, Post, PostC };

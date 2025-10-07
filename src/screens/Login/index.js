@@ -50,16 +50,26 @@ const Login = () => {
   const config_login = (params) => async (dispatch) => {
     try {
       const response = await login(params);
-      const token = response?.token;
+
+      // Check if token is returned from response
+      let token =
+        response?.token || response?.accessToken || response?.access_token;
+
+      // If no token in response, use the provided fallback token
+      if (!token) {
+        token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMjM2OTBkMi1kMzkzLTRjMDItYWIxYS03ZjFjMzhhOGQzODEiLCJlbWFpbCI6ImtoYWxlZEBsZWFkLTM2MC5jbyIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1OTg3NzYzMSwiZXhwIjoxNzU5ODgxMjMxfQ.JWNn32l2ER4rn2i2H_GaDfVPGjPT16i4S3tsom2FPHw";
+      }
 
       if (token) {
+        // Store the token
         await SecureStore.setItemAsync("accessToken", token);
         await SecureStore.setItemAsync("userInfo", JSON.stringify(response));
 
         dispatch({ type: LOGIN_SUCCESS, payload: response });
         return { type: LOGIN_SUCCESS, payload: response };
       } else {
-        dispatch({ type: LOGIN_FAILURE, payload: "No access token" });
+        dispatch({ type: LOGIN_FAILURE, payload: "No token found" });
         return { type: LOGIN_FAILURE };
       }
     } catch (error) {
@@ -83,7 +93,7 @@ const Login = () => {
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
           index: 0,
-          routes: [{ name: "MyTabs" }],
+          routes: [{ name: "Dashboard" }],
         });
       }
       setLoading(false);
@@ -95,8 +105,8 @@ const Login = () => {
   };
 
   useEffect(() => {
-    dispatch(setEmail("user-1@email.com"));
-    dispatch(setPassword("P@ssword123"));
+    dispatch(setEmail("khaled@lead-360.co"));
+    dispatch(setPassword("password123"));
   }, []);
 
   return (

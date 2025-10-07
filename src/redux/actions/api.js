@@ -1,11 +1,17 @@
-import { profile, guests, getGuestById } from "../../webservice/apiConfig";
+import {
+  profile,
+  events,
+  getEventById,
+  flights,
+} from "../../webservice/apiConfig";
 
 import {
   setLoading,
   setError,
   setProfile,
-  setGuests,
-  setSelectedGuest,
+  setEvents,
+  setSelectedEvent,
+  setFlights,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -16,34 +22,49 @@ export const fetchProfile = (params) => async (dispatch) => {
     dispatch(setProfile(response));
   } catch (error) {
     dispatch(setError("Error fetching profile"));
-    console.error("Error fetching profile: ", error);
+    console.log("Error fetching profile: ", error);
   }
 };
 
-// Fetch all guests
-export const fetchGuests = (params) => async (dispatch) => {
+// Fetch all events
+export const fetchEvents =
+  (params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      const response = await events(params);
+      dispatch(setEvents(response));
+    } catch (error) {
+      dispatch(setError("Error fetching events"));
+      console.log("Error fetching events: ", error);
+    }
+  };
+
+// Fetch event by ID
+export const fetchEventById =
+  (id, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      console.log("Fetching event by ID:", id);
+      const response = await getEventById(id, params);
+      dispatch(setSelectedEvent(response));
+    } catch (error) {
+      dispatch(setError("Error fetching event details"));
+      console.log("Error fetching event details: ", error);
+    }
+  };
+
+// Fetch flights for an event
+export const fetchFlights = (eventId, params) => async (dispatch) => {
   dispatch(setLoading());
   try {
-    console.log("Fetching guests with params:", params);
-    const response = await guests(params);
-    console.log("Guests API response:", response);
-    dispatch(setGuests(response));
+    const response = await flights(eventId, params);
+    dispatch(setFlights(response));
   } catch (error) {
-    dispatch(setError("Error fetching guests"));
-    console.error("Error fetching guests: ", error);
+    console.log("Error in fetchFlights:", error);
+    dispatch(setError("Error fetching flights"));
   }
 };
 
-// Fetch guest by ID
-export const fetchGuestById = (id, params) => async (dispatch) => {
-  dispatch(setLoading());
-  try {
-    console.log("Fetching guest by ID:", id, "with params:", params);
-    const response = await getGuestById(id, params);
-    console.log("Guest details API response:", response);
-    dispatch(setSelectedGuest(response));
-  } catch (error) {
-    dispatch(setError("Error fetching guest details"));
-    console.error("Error fetching guest details: ", error);
-  }
-};
+export { setSelectedEvent };

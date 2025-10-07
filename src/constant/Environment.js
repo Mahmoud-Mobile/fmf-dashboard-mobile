@@ -1,10 +1,10 @@
 import { Storage } from "expo-storage";
 const ENV = {
   prod: {
-    apiUrl: "https://fmf-api.onrender.com/api/",
+    apiUrl: "https://dev-api.lead-360.co/api/v1/",
   },
   dev: {
-    apiUrl: "https://fmf-api.onrender.com/api/",
+    apiUrl: "https://dev-api.lead-360.co/api/v1/",
   },
 };
 

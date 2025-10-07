@@ -2,7 +2,9 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MotiView } from "moti";
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused, useRoute } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { setSelectedEvent } from "../redux/actions/api";
 import Home from "../screens/Home";
 import Flights from "../screens/Flights";
 import CheckIn from "../screens/CheckIn";
@@ -95,6 +97,16 @@ const TabButton = ({ item, onPress, routeName }) => {
 };
 
 const MyTabs = () => {
+  const route = useRoute();
+  const dispatch = useDispatch();
+
+  // Get the selected event from route params and store it in Redux
+  React.useEffect(() => {
+    if (route.params?.selectedEvent) {
+      dispatch(setSelectedEvent(route.params.selectedEvent));
+    }
+  }, [route.params?.selectedEvent, dispatch]);
+
   return (
     <Tab.Navigator
       screenOptions={{

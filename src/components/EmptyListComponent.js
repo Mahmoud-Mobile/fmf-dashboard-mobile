@@ -1,22 +1,42 @@
 import React from "react";
-import { Text } from "react-native";
+import { View, Text } from "react-native";
 import { Colors } from "../Global/colors";
 import { Fonts } from "../Global/fonts";
+import { ImagesWithProps } from "../config/images";
 
-const EmptyListComponent = ({ title }) => {
+const EmptyListComponent = ({ icon, title, description }) => {
   return (
-    <Text
-      style={{
-        color: Colors.Tertiary,
-        fontSize: 16,
-        fontFamily: Fonts.FONT_MEDIUM,
-        alignSelf: "center",
-        marginTop: 250,
-      }}
-    >
-      {title ?? "Empty"}
-    </Text>
+    <View style={styles.emptyContainer}>
+      <ImagesWithProps source={icon} color={Colors.Gray} size={64} />
+      <Text style={styles.emptyTitle}>{title}</Text>
+      <Text style={styles.emptyDescription}>{description}</Text>
+    </View>
   );
+};
+
+const styles = {
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+    marginTop: "40%",
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontFamily: Fonts.FONT_Semi,
+    color: Colors.Gray,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyDescription: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.LightGray,
+    textAlign: "center",
+    marginBottom: 24,
+    paddingHorizontal: 20,
+  },
 };
 
 export default EmptyListComponent;
