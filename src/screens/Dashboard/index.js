@@ -31,12 +31,6 @@ const Dashboard = () => {
     dispatch(fetchEvents());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (error) {
-      Alert.alert("Error", error);
-    }
-  }, [error]);
-
   const onRefresh = async () => {
     setRefreshing(true);
     await dispatch(fetchEvents());
