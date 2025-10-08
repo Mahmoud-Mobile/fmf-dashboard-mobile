@@ -1,13 +1,11 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 import { Colors } from "../../Global/colors";
 import { Fonts } from "../../Global/fonts";
-
-const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.Background,
   },
   keyboardView: {
     flex: 1,
@@ -83,48 +81,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
     lineHeight: 20,
-  },
-  // Legacy styles for backward compatibility
-  loginBorder: {
-    backgroundColor: Colors.WhiteColor,
-    marginTop: 300,
-    flex: 1,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  descText: {
-    color: "#6B6B6B",
-    fontSize: 19,
-    paddingTop: 10,
-    marginBottom: 30,
-    textAlign: "left",
-    fontFamily: Fonts.FONT_REGULAR,
-  },
-  forgetText: {
-    paddingTop: 20,
-    color: "#636363",
-    fontFamily: Fonts.FONT_REGULAR,
-    fontSize: 12,
-  },
-  registerView: {
-    flexDirection: "row",
-    alignSelf: "center",
-    marginBottom: "15%",
-  },
-  registerBtn: {
-    paddingHorizontal: 5,
-  },
-  registerText: {
-    color: Colors.Secondary,
-    fontSize: 14,
-    fontFamily: Fonts.FONT_MEDIUM,
-    paddingTop: 28,
-  },
-  signUpText: {
-    color: Colors.Secondary,
-    fontSize: 14,
-    paddingTop: 28,
-    fontFamily: Fonts.FONT_BOLD,
   },
 });
 export default styles;

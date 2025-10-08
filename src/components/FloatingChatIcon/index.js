@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "../../Global/colors";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
@@ -100,11 +101,18 @@ const FloatingChatIcon = () => {
           onPress={handlePress}
           activeOpacity={0.8}
         >
-          <MaterialIcons
-            name="support-agent"
-            size={28}
-            color={Colors.WhiteColor}
-          />
+          <LinearGradient
+            colors={Colors.PrimaryGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradientButton}
+          >
+            <MaterialIcons
+              name="support-agent"
+              size={28}
+              color={Colors.White}
+            />
+          </LinearGradient>
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -127,9 +135,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.Primary,
-    justifyContent: "center",
-    alignItems: "center",
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: {
@@ -138,6 +143,13 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+  },
+  gradientButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

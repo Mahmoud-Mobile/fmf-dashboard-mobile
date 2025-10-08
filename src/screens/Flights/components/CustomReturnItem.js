@@ -1,17 +1,9 @@
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
-
-const { width } = Dimensions.get("window");
-const isTablet = width > 768;
 
 const CustomReturnItem = ({ flight, onPress }) => {
   const formatDate = (dateString) => {
@@ -44,18 +36,18 @@ const CustomReturnItem = ({ flight, onPress }) => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusGradient = (status) => {
     switch (status) {
       case "SCHEDULED":
-        return Colors.primary;
+        return ["#667eea", "#764ba2"];
       case "DELAYED":
-        return "#FF9500";
+        return ["#FF9500", "#FF7A00"];
       case "CANCELLED":
-        return "#FF3B30";
+        return ["#FF3B30", "#FF1B10"];
       case "DEPARTED":
-        return "#34C759";
+        return ["#34C759", "#30B04F"];
       default:
-        return Colors.primary;
+        return ["#667eea", "#764ba2"];
     }
   };
 
@@ -63,26 +55,28 @@ const CustomReturnItem = ({ flight, onPress }) => {
     <TouchableOpacity
       style={styles.container}
       onPress={() => onPress && onPress(flight)}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
-      <View style={styles.header}>
-        <View style={styles.flightInfo}>
-          <Text style={styles.airlineName}>
-            {flight.returnAirlineName || "N/A"}
-          </Text>
-          <Text style={styles.flightNumber}>{flight.returnFlightNumber}</Text>
-        </View>
-        <View style={styles.statusContainer}>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(flight.returnFlightStatus) },
-            ]}
-          >
-            <Text style={styles.statusText}>{flight.returnFlightStatus}</Text>
+      <LinearGradient
+        colors={getStatusGradient(flight.returnFlightStatus)}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerGradient}
+      >
+        <View style={styles.header}>
+          <View style={styles.flightInfo}>
+            <Text style={styles.airlineName}>
+              {flight.returnAirlineName || "N/A"}
+            </Text>
+            <Text style={styles.flightNumber}>{flight.returnFlightNumber}</Text>
+          </View>
+          <View style={styles.statusContainer}>
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>{flight.returnFlightStatus}</Text>
+            </View>
           </View>
         </View>
-      </View>
+      </LinearGradient>
 
       <View style={styles.content}>
         <View style={styles.routeInfo}>
@@ -97,7 +91,7 @@ const CustomReturnItem = ({ flight, onPress }) => {
 
         <View style={styles.timeInfo}>
           <View style={styles.timeContainer}>
-            <Text style={styles.timeLabel}>Departure Time</Text>
+            <Text style={styles.timeLabel}>🚀 Departure Time</Text>
             <Text style={styles.timeValue}>
               {formatTime(flight.returnDate)}
             </Text>
@@ -108,7 +102,7 @@ const CustomReturnItem = ({ flight, onPress }) => {
 
           {flight.estimatedDepartureTime && (
             <View style={styles.timeContainer}>
-              <Text style={styles.timeLabel}>Estimated</Text>
+              <Text style={styles.timeLabel}>⏰ Estimated</Text>
               <Text style={styles.timeValue}>
                 {formatTime(flight.estimatedDepartureTime)}
               </Text>
@@ -121,14 +115,34 @@ const CustomReturnItem = ({ flight, onPress }) => {
 
         <View style={styles.additionalInfo}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Seat:</Text>
+            <Text style={styles.infoLabel}>💺 Seat:</Text>
             <Text style={styles.infoValue}>{flight.seatNumber || "N/A"}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Booking:</Text>
+            <Text style={styles.infoLabel}>📋 Booking:</Text>
             <Text style={styles.infoValue}>
               {flight.bookingReference || "N/A"}
             </Text>
+          </View>
+        </View>
+
+        {/* User Information Section */}
+        <View style={styles.userInfoSection}>
+          <Text style={styles.userInfoTitle}>Passenger Info</Text>
+          <View style={styles.userInfoContainer}>
+            <View style={styles.userPhotoContainer}>
+              <Image
+                source={{
+                  uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                }}
+                style={styles.userPhoto}
+                resizeMode="cover"
+              />
+            </View>
+            <View style={styles.userDetails}>
+              <Text style={styles.userName}>Mahmoud</Text>
+              <Text style={styles.userMobile}>+96659116100</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -139,60 +153,69 @@ const CustomReturnItem = ({ flight, onPress }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    marginVertical: 8,
-    marginHorizontal: isTablet ? 8 : 16,
+    borderRadius: 24,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 8,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: "#F3F4F6",
-    flex: isTablet ? 1 : undefined,
-    maxWidth: isTablet ? "48%" : "100%",
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 12,
+    marginVertical: 12,
+    marginHorizontal: 12,
+    flex: 1,
+  },
+  headerGradient: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    padding: 18,
   },
   flightInfo: {
     flex: 1,
   },
   airlineName: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: Fonts.FONT_SEMI_BOLD,
-    color: Colors.Primary,
+    color: "#FFFFFF",
     marginBottom: 4,
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   flightNumber: {
     fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
-    color: "#6B7280",
+    color: "rgba(255, 255, 255, 0.9)",
   },
   statusContainer: {
     alignItems: "flex-end",
   },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: Fonts.FONT_MEDIUM,
     color: "#FFFFFF",
     textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   content: {
-    padding: 16,
+    padding: 24,
+    backgroundColor: "#FAFBFC",
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
   routeInfo: {
     marginBottom: 16,
@@ -201,67 +224,150 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   airportCode: {
-    fontSize: 24,
+    fontSize: 32,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.Primary,
-    marginBottom: 4,
+    marginBottom: 8,
+    textShadowColor: "rgba(136, 12, 185, 0.3)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   airportName: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: Fonts.FONT_MEDIUM,
-    color: "#374151",
+    color: "#2D3748",
     textAlign: "center",
-    marginBottom: 2,
+    marginBottom: 3,
   },
   cityCountry: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: Fonts.FONT_REGULAR,
-    color: "#6B7280",
+    color: "#718096",
     textAlign: "center",
   },
   timeInfo: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 16,
+    marginBottom: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: "rgba(136, 12, 185, 0.08)",
   },
   timeContainer: {
     alignItems: "center",
+    flex: 1,
   },
   timeLabel: {
     fontSize: 12,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: "#6B7280",
-    marginBottom: 4,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: "#667eea",
+    marginBottom: 6,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   timeValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: Fonts.FONT_BOLD,
-    color: "#374151",
-    marginBottom: 2,
+    color: "#2D3748",
+    marginBottom: 3,
   },
   dateValue: {
     fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
-    color: "#6B7280",
+    color: "#718096",
   },
   additionalInfo: {
     flexDirection: "row",
     justifyContent: "space-between",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
   },
   infoLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: Fonts.FONT_MEDIUM,
-    color: "#6B7280",
-    marginRight: 4,
+    color: "#667eea",
+    marginRight: 6,
   },
   infoValue: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: Fonts.FONT_REGULAR,
-    color: "#374151",
+    color: "#2D3748",
+  },
+  userInfoSection: {
+    marginTop: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  userInfoTitle: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_SEMI_BOLD,
+    color: "#667eea",
+    marginBottom: 12,
+    textAlign: "center",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  userInfoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  userPhotoContainer: {
+    marginRight: 12,
+  },
+  userPhoto: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: "#667eea",
+  },
+  userDetails: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 16,
+    fontFamily: Fonts.FONT_SEMI_BOLD,
+    color: "#2D3748",
+    marginBottom: 4,
+    textAlign: "right",
+  },
+  userMobile: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: "#718096",
+    textAlign: "right",
   },
 });
 

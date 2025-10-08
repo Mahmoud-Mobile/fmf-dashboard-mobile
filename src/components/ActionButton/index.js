@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Fonts } from "../../Global/fonts";
+import { Colors } from "../../Global/colors";
 
 const ActionButton = ({
   name,
@@ -37,19 +39,24 @@ const ActionButton = ({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={styles.actionButtonIcon}>{renderIcon()}</View>
-      <Text
-        style={[
-          styles.actionButtonText,
-          isCompleted && styles.actionButtonCompletedText,
-        ]}
-      >
-        {name}
-      </Text>
-      {isCompleted && (
-        <View style={styles.actionButtonCheck}>
-          <Text style={styles.checkText}>✓</Text>
-        </View>
+      {isCompleted ? (
+        <LinearGradient
+          colors={Colors.PrimaryGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradientButton}
+        >
+          <View style={styles.actionButtonIcon}>{renderIcon()}</View>
+          <Text style={styles.actionButtonCompletedText}>{name}</Text>
+          <View style={styles.actionButtonCheck}>
+            <Text style={styles.checkText}>✓</Text>
+          </View>
+        </LinearGradient>
+      ) : (
+        <>
+          <View style={styles.actionButtonIcon}>{renderIcon()}</View>
+          <Text style={styles.actionButtonText}>{name}</Text>
+        </>
       )}
     </TouchableOpacity>
   );
@@ -90,7 +97,16 @@ const styles = {
     textAlign: "center",
   },
   actionButtonCompletedText: {
-    color: "#1E40AF",
+    color: Colors.White,
+  },
+  gradientButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginHorizontal: 4,
   },
   actionButtonCheck: {
     width: 16,

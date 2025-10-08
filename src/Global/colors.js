@@ -1,10 +1,9 @@
 export const Colors = {
-  WhiteColor: "#ffffff",
-  BlackColor: "#000000",
   White: "#ffffff",
   Black: "#000000",
 
-  Primary: "#2563EB",
+  Primary: "#880CB9",
+  PrimaryGradient: ["#880CB9", "#368BBA"],
   Secondary: "#020201",
   borderErr: "#E82F2F",
   borderColor: "#E5E5E5",

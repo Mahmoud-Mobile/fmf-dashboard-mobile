@@ -18,14 +18,14 @@ const CustomPressable = ({
       style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }, style]}
     >
       <LinearGradient
-        colors={["#880CB9", "#368BBA"]}
+        colors={Colors.PrimaryGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[styles.button, { borderRadius: 10 }]}
       >
         {isLoading ? (
           <ActivityIndicator
-            color={Colors.WhiteColor}
+            color={Colors.White}
             size="small"
             style={{ paddingVertical: 20 }}
           />

@@ -13,6 +13,7 @@ import styles from "./Styles";
 import CustomMinistryItem from "./components/CustomMinistryItem";
 import CustomArrivalItem from "./components/CustomArrivalItem";
 import CustomReturnItem from "./components/CustomReturnItem";
+import { horizontalMargin } from "../../config/metrics";
 
 const { width } = Dimensions.get("window");
 const isTablet = width > 768;
@@ -101,22 +102,20 @@ const Flights = () => {
         horizontal={true}
         scrollable={true}
       />
-
-      <FlatList
-        data={flights?.flights || []}
-        renderItem={renderFlightItem}
-        keyExtractor={(item) => item.id}
-        ListFooterComponent={renderListFooter}
-        ListEmptyComponent={renderEmptyComponent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        numColumns={isTablet ? 2 : 1}
-        columnWrapperStyle={isTablet ? styles.row : null}
-      />
-
+      <View style={{ marginHorizontal: 12 }}>
+        <FlatList
+          data={flights?.flights || []}
+          renderItem={renderFlightItem}
+          keyExtractor={(item) => item.id}
+          ListFooterComponent={renderListFooter}
+          ListEmptyComponent={renderEmptyComponent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+          numColumns={isTablet ? 2 : 1}
+        />
+      </View>
       <LoadingModal visible={loading} />
       <FloatingChatIcon />
     </SafeAreaView>
