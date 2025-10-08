@@ -6,7 +6,7 @@ import { Fonts } from "../../Global/fonts";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
   },
   backgroundImage: {
     width: "100%",
@@ -27,13 +27,13 @@ const styles = StyleSheet.create({
     borderRadius: 33,
   },
   nameText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 18,
     textAlign: "left",
     fontFamily: Fonts.FONT_BOLD,
   },
   mobileText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 13,
     textAlign: "left",
     fontFamily: Fonts.FONT_MEDIUM,

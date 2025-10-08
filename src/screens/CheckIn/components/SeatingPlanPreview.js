@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContainer: {
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     borderRadius: 12,
     width: "100%",
     maxHeight: "80%",
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   stageText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 16,
     fontFamily: Fonts.FONT_BOLD,
   },
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   closeModalButtonText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 16,
     fontFamily: Fonts.FONT_MEDIUM,
   },

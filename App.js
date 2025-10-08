@@ -8,6 +8,7 @@ import store from "./src/redux/store";
 import navigationService from "./src/Global/navRef";
 import * as Notifications from "expo-notifications";
 import { CommonActions } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -88,18 +89,20 @@ const App = () => {
   };
 
   return (
-    <Provider store={store}>
-      <ToastWrapper>
-        <NavigationContainer
-          ref={navigationRef}
-          onReady={() => {
-            navigationService.navigation = navigationRef.current;
-          }}
-        >
-          <NavStack />
-        </NavigationContainer>
-      </ToastWrapper>
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <ToastWrapper>
+          <NavigationContainer
+            ref={navigationRef}
+            onReady={() => {
+              navigationService.navigation = navigationRef.current;
+            }}
+          >
+            <NavStack />
+          </NavigationContainer>
+        </ToastWrapper>
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 

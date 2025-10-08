@@ -1,13 +1,11 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 import { Colors } from "../../Global/colors";
 import { Fonts } from "../../Global/fonts";
-
-const { width } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
   },
   header: {
     flexDirection: "row",
@@ -28,7 +26,7 @@ export const styles = StyleSheet.create({
   },
   eventInfo: {
     padding: 16,
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderColor,
   },
@@ -165,7 +163,7 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
   tableText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 16,
     fontFamily: Fonts.FONT_BOLD,
   },

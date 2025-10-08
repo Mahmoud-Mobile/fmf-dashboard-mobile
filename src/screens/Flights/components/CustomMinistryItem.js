@@ -1,9 +1,17 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const CustomMinistryItem = ({ flight, onPress }) => {
   const formatDate = (dateString) => {
@@ -175,6 +183,90 @@ const CustomMinistryItem = ({ flight, onPress }) => {
             </View>
           </View>
         </View>
+
+        {/* Modern Action Buttons */}
+        <View style={styles.buttonsContainer}>
+          {/* Plane Landed Button */}
+          <TouchableOpacity
+            style={styles.modernButton}
+            onPress={() => {
+              Alert.alert(
+                "Plane Landed",
+                `Flight ${
+                  flight.arrivalFlightNumber || flight.returnFlightNumber
+                } has landed successfully!`,
+                [{ text: "OK", style: "default" }]
+              );
+            }}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#10B981", "#059669"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.buttonGradient}
+            >
+              <View style={styles.buttonContent}>
+                <MaterialIcons name="flight-land" size={20} color="#FFFFFF" />
+                <Text style={styles.buttonText}>Plane Landed</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Logged Arrived Button */}
+          <TouchableOpacity
+            style={styles.modernButton}
+            onPress={() => {
+              Alert.alert(
+                "Logged Arrived",
+                `Passenger arrival has been logged for flight ${
+                  flight.arrivalFlightNumber || flight.returnFlightNumber
+                }!`,
+                [{ text: "OK", style: "default" }]
+              );
+            }}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#F59E0B", "#D97706"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.buttonGradient}
+            >
+              <View style={styles.buttonContent}>
+                <MaterialIcons name="check-circle" size={20} color="#FFFFFF" />
+                <Text style={styles.buttonText}>Logged Arrived</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Guest Granted Button */}
+          <TouchableOpacity
+            style={styles.modernButton}
+            onPress={() => {
+              Alert.alert(
+                "Guest Granted",
+                `Guest access has been granted for flight ${
+                  flight.arrivalFlightNumber || flight.returnFlightNumber
+                }!`,
+                [{ text: "OK", style: "default" }]
+              );
+            }}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#880CB9", "#368BBA"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.buttonGradient}
+            >
+              <View style={styles.buttonContent}>
+                <MaterialIcons name="verified-user" size={20} color="#FFFFFF" />
+                <Text style={styles.buttonText}>Guest Granted</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -242,7 +334,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   content: {
-    padding: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
     backgroundColor: "#FAFBFC",
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
@@ -319,7 +412,6 @@ const styles = StyleSheet.create({
   additionalInfo: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 16,
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 12,
@@ -418,6 +510,45 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_REGULAR,
     color: "#718096",
     textAlign: "right",
+  },
+  buttonsContainer: {
+    marginTop: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  modernButton: {
+    flex: 1,
+    borderRadius: 20,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    height: 60,
+  },
+  buttonGradient: {
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 50,
+  },
+  buttonContent: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    fontSize: 10,
+    fontFamily: Fonts.FONT_SEMI_BOLD,
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginTop: 4,
   },
 });
 

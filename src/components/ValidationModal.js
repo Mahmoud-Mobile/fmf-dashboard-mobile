@@ -41,7 +41,7 @@ const ValidationModal = ({ visible, icon, color, message, onClose }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     paddingHorizontal: horizontalMargin,
     paddingVertical: 5,
     borderRadius: 12,
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   modalText: {
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontSize: 15,
     fontFamily: Fonts.FONT_MEDIUM,
     textAlign: "center",
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   backText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 16,
     fontFamily: Fonts.FONT_REGULAR,
     paddingVertical: 10,

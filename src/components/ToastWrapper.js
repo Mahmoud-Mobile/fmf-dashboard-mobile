@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   toastMessage: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 14,
     flex: 1,
     fontFamily: Fonts.FONT_MEDIUM,

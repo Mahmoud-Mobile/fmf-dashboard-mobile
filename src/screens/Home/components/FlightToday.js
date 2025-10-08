@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: "800",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_BOLD,
     marginBottom: 4,
   },
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 12,
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontFamily: Fonts.FONT_MEDIUM,
     fontWeight: "600",
   },
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   flightCard: {
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     borderRadius: 20,
     padding: 22,
     width: 280,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   flightNumber: {
     fontSize: 16,
     fontWeight: "700",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_BOLD,
     marginBottom: 2,
   },
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_MEDIUM,
   },
   destinationRow: {
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   },
   destination: {
     fontSize: 14,
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_MEDIUM,
     fontWeight: "500",
     flex: 1,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   code: {
     fontSize: 12,
     fontWeight: "600",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_MEDIUM,
   },
   statusRow: {
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: "600",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_MEDIUM,
   },
   typeBadge: {

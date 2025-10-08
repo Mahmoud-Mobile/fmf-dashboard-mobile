@@ -58,7 +58,7 @@ const Login = () => {
       // If no token in response, use the provided fallback token
       if (!token) {
         token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMjM2OTBkMi1kMzkzLTRjMDItYWIxYS03ZjFjMzhhOGQzODEiLCJlbWFpbCI6ImtoYWxlZEBsZWFkLTM2MC5jbyIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1OTkyNTQ2NiwiZXhwIjoxNzU5OTI5MDY2fQ.7PYsq6dSTrZwLRNC1Z7cuANu3zBiakY5-ShywYUeleE";
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMjM2OTBkMi1kMzkzLTRjMDItYWIxYS03ZjFjMzhhOGQzODEiLCJlbWFpbCI6ImtoYWxlZEBsZWFkLTM2MC5jbyIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1OTkyOTQzMSwiZXhwIjoxNzU5OTMzMDMxfQ.4ld8cF2DgvI1hOqko7d0WGPisZr91y-R_BjYZZkbmQI";
       }
 
       if (token) {

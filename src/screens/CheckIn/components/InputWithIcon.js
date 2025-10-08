@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     borderWidth: 1,
     borderColor: Colors.borderColor,
     borderRadius: 8,

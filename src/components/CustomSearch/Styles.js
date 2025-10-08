@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 6,
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     borderRadius: 10,
     borderBottomWidth: 1.5,
     shadowColor:
@@ -34,13 +34,13 @@ const styles = StyleSheet.create({
   },
 
   filterBtn: {
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     alignItems: "center",
     marginRight: 8,
     width: 50,
     justifyContent: "center",
     borderWidth: 1.5,
-    borderColor: Colors.WhiteColor,
+    borderColor: Colors.White,
     borderRadius: 10,
     shadowColor:
       Platform.OS == "ios" ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0,0.3)",

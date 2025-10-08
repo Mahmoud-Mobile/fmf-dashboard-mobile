@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontFamily: Fonts.FONT_SEMI,
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontWeight: "600",
   },
 });

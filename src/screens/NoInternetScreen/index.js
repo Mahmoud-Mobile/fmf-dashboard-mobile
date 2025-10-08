@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
   },
 });
 export default NoInternetScreen;

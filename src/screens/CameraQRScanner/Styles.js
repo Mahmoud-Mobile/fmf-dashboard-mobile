@@ -5,7 +5,7 @@ import { Fonts } from "../../Global/fonts";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.BlackColor,
+    backgroundColor: Colors.Black,
   },
   header: {
     flexDirection: "row",
@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontFamily: Fonts.FONT_BOLD,
-    color: Colors.WhiteColor,
+    color: Colors.White,
   },
   placeholder: {
     width: 40,
@@ -32,12 +32,12 @@ export const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    backgroundColor: Colors.BlackColor,
+    backgroundColor: Colors.Black,
     justifyContent: "center",
     alignItems: "center",
   },
   loadingText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 16,
     fontFamily: Fonts.FONT_REGULAR,
     marginTop: 16,
@@ -53,7 +53,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.7)",
   },
   processingText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 16,
     fontFamily: Fonts.FONT_REGULAR,
     marginTop: 16,
@@ -77,7 +77,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   scanText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     marginTop: 16,

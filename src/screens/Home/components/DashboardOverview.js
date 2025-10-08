@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 28,
     fontWeight: "800",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_BOLD,
     marginBottom: 4,
   },
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   card: {
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     borderRadius: 20,
     padding: 22,
     width: 160,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   count: {
     fontSize: 28,
     fontWeight: "800",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_BOLD,
     textAlign: "center",
   },

@@ -5,7 +5,7 @@ import { Fonts } from "../../Global/fonts";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
   },
   header: {
     flexDirection: "row",
@@ -59,7 +59,7 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
   },
   processingText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 16,
     fontFamily: Fonts.FONT_MEDIUM,
   },

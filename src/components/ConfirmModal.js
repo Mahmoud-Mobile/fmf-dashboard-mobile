@@ -1,12 +1,10 @@
 import React, { useCallback } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import styles from "./Styles";
-import BottomSheet from "react-native-gesture-bottom-sheet";
 import { Colors } from "../Global/colors";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 const ConfirmModal = ({ ref, onChange, onPress, close, title }) => {
-  // Removed useTranslation - using static English text
   const renderBackdrop = useCallback(
     (props) => (
       <BottomSheetBackdrop
@@ -42,14 +40,14 @@ const ConfirmModal = ({ ref, onChange, onPress, close, title }) => {
             onPress={onPress}
             activeOpacity={0.7}
           >
-            <Text style={styles.btnText}>{t("yes")}</Text>
+            <Text style={styles.btnText}>Yes</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.btnView, { backgroundColor: Colors.gray }]}
             onPress={close}
             activeOpacity={0.7}
           >
-            <Text style={styles.btnText}>{t("no")}</Text>
+            <Text style={styles.btnText}>No</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -5,7 +5,7 @@ import Login from "../screens/Login";
 import Dashboard from "../screens/Dashboard";
 import MyTabs from "../Navigation/MyTabs";
 import NoInternetScreen from "../screens/NoInternetScreen";
-import GuestDetails from "../screens/GuestDetails";
+import FlightDetails from "../screens/GuestDetails";
 import PreviewSeats from "../screens/PreviewSeats";
 import CameraQRScanner from "../screens/CameraQRScanner";
 import ZebraQR from "../screens/ZebraQR";
@@ -98,8 +98,8 @@ const NavStack = () => {
         }}
       />
       <Stack.Screen
-        name="GuestDetails"
-        component={GuestDetails}
+        name="FlightDetails"
+        component={FlightDetails}
         options={{
           headerShown: false,
         }}

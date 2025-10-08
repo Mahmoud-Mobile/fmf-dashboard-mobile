@@ -1,9 +1,17 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const CustomReturnItem = ({ flight, onPress }) => {
   const formatDate = (dateString) => {
@@ -144,6 +152,42 @@ const CustomReturnItem = ({ flight, onPress }) => {
               <Text style={styles.userMobile}>+96659116100</Text>
             </View>
           </View>
+        </View>
+
+        {/* Modern Action Button */}
+        <View style={styles.modernButtonContainer}>
+          <TouchableOpacity
+            style={styles.modernButton}
+            onPress={() => {
+              Alert.alert(
+                "Plane Taken Off",
+                `Flight ${flight.returnFlightNumber} has taken off successfully!`,
+                [{ text: "OK", style: "default" }]
+              );
+              console.log(
+                "Return flight action completed for flight:",
+                flight.id
+              );
+            }}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#EF4444", "#DC2626"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.buttonGradient}
+            >
+              <View style={styles.buttonContent}>
+                <MaterialIcons
+                  name="flight-takeoff"
+                  size={28}
+                  color="#FFFFFF"
+                />
+                <Text style={styles.buttonText}>Plane Taken Off</Text>
+                <MaterialIcons name="arrow-upward" size={20} color="#FFFFFF" />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
@@ -368,6 +412,41 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_REGULAR,
     color: "#718096",
     textAlign: "right",
+  },
+  modernButtonContainer: {
+    marginTop: 16,
+    alignItems: "center",
+  },
+  modernButton: {
+    width: "100%",
+    borderRadius: 25,
+    elevation: 8,
+    shadowColor: "#EF4444",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  buttonGradient: {
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    fontSize: 16,
+    fontFamily: Fonts.FONT_SEMI_BOLD,
+    color: "#FFFFFF",
+    marginHorizontal: 12,
+    textAlign: "center",
   },
 });
 

@@ -74,7 +74,7 @@ const CameraQRScanner = ({ onScanned }) => {
           onLeftButtonPress={handleBack}
         />
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.WhiteColor} />
+          <ActivityIndicator size="large" color={Colors.White} />
           <Text style={styles.loadingText}>
             Requesting camera permission...
           </Text>

@@ -6,7 +6,7 @@ import { horizontalMargin } from "../../config/metrics";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
   },
   scrollView: {
     flex: 1,

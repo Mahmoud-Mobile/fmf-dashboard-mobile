@@ -9,12 +9,12 @@ import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
 import styles from "./Styles";
+
 // Custom Category Components
 import CustomMinistryItem from "./components/CustomMinistryItem";
 import CustomArrivalItem from "./components/CustomArrivalItem";
 import CustomReturnItem from "./components/CustomReturnItem";
-import { horizontalMargin } from "../../config/metrics";
-
+import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 const isTablet = width > 768;
 
@@ -22,7 +22,7 @@ const Flights = () => {
   const dispatch = useDispatch();
   const { flights, loading, error } = useSelector((state) => state.api);
   const { selectedEvent } = useSelector((state) => state.api);
-
+  const navigation = useNavigation();
   const [selectedCategory, setSelectedCategory] = useState("ministry");
   const [refreshing, setRefreshing] = useState(false);
 
@@ -60,7 +60,7 @@ const Flights = () => {
   };
 
   const handleFlightPress = (flight) => {
-    console.log("Flight pressed:", flight);
+    navigation.navigate("FlightDetails", { flight });
   };
 
   const renderFlightItem = ({ item }) => {

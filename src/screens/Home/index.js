@@ -26,7 +26,7 @@ const Home = () => {
   };
   return (
     <LinearGradient
-      colors={["#E5E5E5", Colors.WhiteColor, Colors.WhiteColor]}
+      colors={["#E5E5E5", Colors.White, Colors.White]}
       style={{ flex: 1 }}
     >
       <View style={styles.container}>

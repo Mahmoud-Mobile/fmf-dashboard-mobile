@@ -58,7 +58,7 @@ const EventCard = ({ event, onCheckIn, onPreview }) => {
 
 const styles = StyleSheet.create({
   eventCard: {
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     borderRadius: 12,
     padding: 16,
     margin: 4,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: Colors.Primary,
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     alignItems: "center",
   },
   previewButtonText: {
@@ -138,12 +138,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.Primary,
   },
   checkInButtonText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
     fontSize: 14,
     fontFamily: Fonts.FONT_MEDIUM,
   },
   checkedInButtonText: {
-    color: Colors.WhiteColor,
+    color: Colors.White,
   },
 });
 

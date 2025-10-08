@@ -19,10 +19,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.01)",
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
   },
   activityIndicatorWrapper: {
-    backgroundColor: Colors.WhiteColor,
+    backgroundColor: Colors.White,
     borderRadius: 10,
     padding: 20,
     display: "flex",

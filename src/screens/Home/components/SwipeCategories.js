@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: "800",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_BOLD,
     marginBottom: 4,
   },
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 12,
     fontWeight: "500",
-    color: Colors.BlackColor,
+    color: Colors.Black,
     fontFamily: Fonts.FONT_MEDIUM,
     textAlign: "center",
   },

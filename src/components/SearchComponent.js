@@ -23,9 +23,7 @@ const SearchComponent = ({
         placeholder={placeholder ? placeholder : "Search..."}
         cancelText="Close"
         inputStyle={{
-          backgroundColor: backgroundColor
-            ? backgroundColor
-            : Colors.WhiteColor,
+          backgroundColor: backgroundColor ? backgroundColor : Colors.White,
           textAlign: "left",
           borderRadius: 8,
         }}
@@ -55,7 +53,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    shadowColor: Colors.BlackColor,
+    shadowColor: Colors.Black,
     shadowOffset: {
       width: 0,
       height: 2,
