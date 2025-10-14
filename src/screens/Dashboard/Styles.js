@@ -153,6 +153,30 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.White,
   },
+  searchBarContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    backgroundColor: Colors.Background,
+    marginTop: 10,
+  },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    backgroundColor: Colors.Background,
+    marginTop: 10,
+  },
+  searchBarInRow: {
+    flex: 1,
+    marginRight: 10,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+  dateButtonInRow: {
+    marginHorizontal: 0,
+    marginVertical: 0,
+  },
 });
 
 export default styles;

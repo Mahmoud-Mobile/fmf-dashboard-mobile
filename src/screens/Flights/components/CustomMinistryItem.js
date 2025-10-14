@@ -124,44 +124,6 @@ const CustomMinistryItem = ({ flight, onPress, isTablet = false }) => {
           </View>
         </View>
 
-        <View style={styles.specialServices}>
-          <View style={styles.serviceRow}>
-            {flight.wheelchairRequired && (
-              <LinearGradient
-                colors={["#FFE5E5", "#FFB3BA"]}
-                style={[
-                  styles.serviceBadge,
-                  { marginRight: 8, marginBottom: 4 },
-                ]}
-              >
-                <Text style={styles.serviceText}>♿ Wheelchair</Text>
-              </LinearGradient>
-            )}
-            {flight.mobilityAssistance && (
-              <LinearGradient
-                colors={["#E5F3FF", "#B3D9FF"]}
-                style={[
-                  styles.serviceBadge,
-                  { marginRight: 8, marginBottom: 4 },
-                ]}
-              >
-                <Text style={styles.serviceText}>🚶 Mobility</Text>
-              </LinearGradient>
-            )}
-            {flight.visaRequired && (
-              <LinearGradient
-                colors={["#FFF5E5", "#FFD9B3"]}
-                style={[
-                  styles.serviceBadge,
-                  { marginRight: 8, marginBottom: 4 },
-                ]}
-              >
-                <Text style={styles.serviceText}>📋 Visa Required</Text>
-              </LinearGradient>
-            )}
-          </View>
-        </View>
-
         <View style={styles.userInfoSection}>
           <Text style={styles.userInfoTitle}>Passenger Info</Text>
           <View style={styles.userInfoContainer}>

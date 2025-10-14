@@ -44,12 +44,13 @@ const styles = {
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F8FAFC",
+    backgroundColor: "#ffff",
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
     borderColor: "#E2E8F0",
+    height: 50,
   },
   searchIcon: {
     fontSize: 16,

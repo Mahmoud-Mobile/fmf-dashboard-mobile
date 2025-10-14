@@ -16,12 +16,36 @@ const styles = StyleSheet.create({
   listFooter: {
     padding: 20,
     alignItems: "center",
-    marginBottom: 150,
+    marginBottom: 300,
   },
   footerText: {
     fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: "#6B7280",
+  },
+  searchBarContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    backgroundColor: Colors.Background,
+    marginTop: 10,
+  },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    backgroundColor: Colors.Background,
+    marginTop: 10,
+  },
+  searchBarInRow: {
+    flex: 1,
+    marginRight: 10,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+  dateButtonInRow: {
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
 });
 

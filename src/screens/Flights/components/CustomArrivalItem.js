@@ -156,7 +156,6 @@ const CustomArrivalItem = ({ flight, onPress, isTablet = false }) => {
           </View>
         </View>
 
-        {/* Action Buttons */}
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             style={styles.modernButton}

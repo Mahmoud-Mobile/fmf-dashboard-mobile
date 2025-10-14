@@ -152,7 +152,6 @@ const CustomReturnItem = ({ flight, onPress, isTablet = false }) => {
           </View>
         </View>
 
-        {/* Modern Action Button */}
         <View style={styles.modernButtonContainer}>
           <TouchableOpacity
             style={styles.modernButton}

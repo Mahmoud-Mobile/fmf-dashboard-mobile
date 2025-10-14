@@ -7,9 +7,15 @@ import { ImagesWithProps } from "../config/images";
 const EmptyListComponent = ({ icon, title, description }) => {
   return (
     <View style={styles.emptyContainer}>
-      <ImagesWithProps source={icon} color={Colors.Gray} size={64} />
-      <Text style={styles.emptyTitle}>{title}</Text>
-      <Text style={styles.emptyDescription}>{description}</Text>
+      <ImagesWithProps
+        source={icon ?? "Calendar_Icon"}
+        color={Colors.Gray}
+        size={30}
+      />
+      <Text style={styles.emptyTitle}>{title ?? "Empty List"}</Text>
+      <Text style={styles.emptyDescription}>
+        {description ?? "Check back later for updates"}
+      </Text>
     </View>
   );
 };

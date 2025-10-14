@@ -5,7 +5,7 @@ import { Fonts } from "../../Global/fonts";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.White,
+    backgroundColor: Colors.Background,
     paddingHorizontal: 16,
     paddingVertical: 24,
   },
