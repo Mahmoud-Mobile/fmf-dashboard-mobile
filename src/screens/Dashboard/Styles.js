@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
-    fontFamily: Fonts.FONT_SEMIBOLD,
+    fontFamily: Fonts.FONT_Semi,
     color: Colors.Gray,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   guestCount: {
     fontSize: 15,
-    fontFamily: Fonts.FONT_SEMIBOLD,
+    fontFamily: Fonts.FONT_Semi,
     color: Colors.Primary,
   },
   eventTypeText: {
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
-    fontFamily: Fonts.FONT_SEMIBOLD,
+    fontFamily: Fonts.FONT_Semi,
     color: Colors.Gray,
     marginTop: 16,
     marginBottom: 8,

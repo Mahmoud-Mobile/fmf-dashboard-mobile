@@ -7,7 +7,6 @@ import moment from "moment";
 import styles from "./Styles";
 
 const EventCard = ({ item, onPress }) => {
-  // Format date range
   const formatDateRange = () => {
     if (item.startDate && item.endDate) {
       const startDate = moment(item.startDate);
@@ -24,31 +23,12 @@ const EventCard = ({ item, onPress }) => {
     return "Date TBD";
   };
 
-  // Get status color
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case "active":
+      case "PUBLISHED":
         return "#4CAF50";
-      case "inactive":
-        return "#F44336";
-      case "pending":
+      case "REGISTRATION_OPEN":
         return "#FF9800";
-      case "completed":
-        return "#2196F3";
-      default:
-        return Colors.Gray;
-    }
-  };
-
-  // Get event level color
-  const getEventLevelColor = (level) => {
-    switch (level?.toLowerCase()) {
-      case "high":
-        return "#F44336";
-      case "medium":
-        return "#FF9800";
-      case "low":
-        return "#4CAF50";
       default:
         return Colors.Gray;
     }
@@ -61,7 +41,6 @@ const EventCard = ({ item, onPress }) => {
       activeOpacity={0.7}
     >
       <View style={styles.eventCardContent}>
-        {/* Header with title and status */}
         <View style={styles.eventHeader}>
           <View style={styles.iconContainer}>
             <ImagesWithProps
@@ -92,9 +71,7 @@ const EventCard = ({ item, onPress }) => {
           </View>
         </View>
 
-        {/* Event Details */}
         <View style={styles.eventDetails}>
-          {/* Location */}
           {item.location && (
             <View style={styles.detailRow}>
               <Ionicons name="location-outline" size={16} color={Colors.Gray} />
@@ -102,24 +79,21 @@ const EventCard = ({ item, onPress }) => {
             </View>
           )}
 
-          {/* Date Range */}
           <View style={styles.detailRow}>
             <Ionicons name="calendar-outline" size={16} color={Colors.Gray} />
             <Text style={styles.detailText}>{formatDateRange()}</Text>
           </View>
 
-          {/* Max Attendees */}
-          {item.maxAttendees && (
+          {/* {item.maxAttendees && (
             <View style={styles.detailRow}>
               <Ionicons name="people-outline" size={16} color={Colors.Gray} />
               <Text style={styles.detailText}>
                 Max {item.maxAttendees} attendees
               </Text>
             </View>
-          )}
+          )} */}
         </View>
 
-        {/* Footer with Event Type, Level, and Active Status */}
         <View style={styles.eventFooter}>
           <View style={styles.footerLeft}>
             {item.eventType && (
@@ -131,14 +105,7 @@ const EventCard = ({ item, onPress }) => {
             {item.eventLevel && (
               <View style={styles.levelContainer}>
                 <Text style={styles.levelLabel}>Level:</Text>
-                <Text
-                  style={[
-                    styles.levelValue,
-                    { color: getEventLevelColor(item.eventLevel) },
-                  ]}
-                >
-                  {item.eventLevel}
-                </Text>
+                <Text style={styles.levelValue}>{item.eventLevel}</Text>
               </View>
             )}
           </View>

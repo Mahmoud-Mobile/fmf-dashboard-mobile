@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  RefreshControl,
-} from "react-native";
+import { View, FlatList, Alert, RefreshControl } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { Colors } from "../../Global/colors";
@@ -43,7 +36,6 @@ const Dashboard = () => {
       await dispatch(fetchEventById(item.id));
       navigation.navigate("MyTabs");
     } catch (error) {
-      console.error("Error selecting event:", error);
       Alert.alert("Error", "Failed to load event details");
     }
   };

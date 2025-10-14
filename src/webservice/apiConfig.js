@@ -2,7 +2,7 @@ import { Get, Post, PostC } from "./Gate";
 
 // login apis
 const login = async (data) => {
-  return await Post("auth/login", data, "POST", true);
+  return await Post("mobile/auth/login", data, "POST", true);
 };
 const reset_password = async (data) => {
   return await Post("users/reset-password", data, "POST", true);

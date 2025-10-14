@@ -5,7 +5,7 @@ import Login from "../screens/Login";
 import Dashboard from "../screens/Dashboard";
 import MyTabs from "../Navigation/MyTabs";
 import NoInternetScreen from "../screens/NoInternetScreen";
-import FlightDetails from "../screens/GuestDetails";
+import FlightDetails from "../screens/FlightDetails";
 import PreviewSeats from "../screens/PreviewSeats";
 import CameraQRScanner from "../screens/CameraQRScanner";
 import ZebraQR from "../screens/ZebraQR";

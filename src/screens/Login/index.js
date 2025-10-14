@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import styles from "./Styles";
 import { useNavigation } from "@react-navigation/native";
-import { horizontalMargin } from "../../config/metrics";
 import CustomInput from "../../components/CustomInput";
 import CustomPressable from "../../components/CustomPressable";
 import { setEmail, setPassword } from "../../redux/actions/authActions";
@@ -51,25 +50,23 @@ const Login = () => {
     try {
       const response = await login(params);
 
-      // Check if token is returned from response
-      let token =
-        response?.token || response?.accessToken || response?.access_token;
+      const token = response?.accessToken;
+      console.log(token);
 
-      // If no token in response, use the provided fallback token
-      if (!token) {
-        token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMjM2OTBkMi1kMzkzLTRjMDItYWIxYS03ZjFjMzhhOGQzODEiLCJlbWFpbCI6ImtoYWxlZEBsZWFkLTM2MC5jbyIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1OTkzMTk1OSwiZXhwIjoxNzU5OTM1NTU5fQ.rBO4alavEZn8wJLKnpwbQ-LQomb__kI_8tSFwqQvc8E";
-      }
-
-      if (token) {
-        // Store the token
+      if (token && response?.user) {
         await SecureStore.setItemAsync("accessToken", token);
-        await SecureStore.setItemAsync("userInfo", JSON.stringify(response));
+        await SecureStore.setItemAsync(
+          "userInfo",
+          JSON.stringify(response.user)
+        );
 
         dispatch({ type: LOGIN_SUCCESS, payload: response });
         return { type: LOGIN_SUCCESS, payload: response };
       } else {
-        dispatch({ type: LOGIN_FAILURE, payload: "No token found" });
+        dispatch({
+          type: LOGIN_FAILURE,
+          payload: "Invalid response from server",
+        });
         return { type: LOGIN_FAILURE };
       }
     } catch (error) {
@@ -98,7 +95,6 @@ const Login = () => {
       }
       setLoading(false);
     } catch (error) {
-      // Handle error silently
     } finally {
       setLoading(false);
     }
@@ -120,7 +116,6 @@ const Login = () => {
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
-          {/* Logo Section */}
           <View style={styles.logoSection}>
             <View style={styles.logoContainer}>
               <Image
@@ -133,7 +128,6 @@ const Login = () => {
             <Text style={styles.subtitleText}>Sign in to your FMF account</Text>
           </View>
 
-          {/* Login Form Section */}
           <View style={styles.formSection}>
             <Text style={styles.titleText}>Sign In</Text>
 
@@ -175,7 +169,7 @@ const Login = () => {
               />
             </View>
 
-            <Text style={styles.footerText}>FMF Dashboard - Secure Access</Text>
+            <Text style={styles.footerText}>FMF Dashboard</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

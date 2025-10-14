@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 10,
-    fontFamily: Fonts.FONT_SEMIBOLD,
+    fontFamily: Fonts.FONT_Semi,
     color: Colors.White,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   typeValue: {
     fontSize: 12,
-    fontFamily: Fonts.FONT_SEMIBOLD,
+    fontFamily: Fonts.FONT_Semi,
     color: Colors.Primary,
     textTransform: "uppercase",
   },
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   levelValue: {
     fontSize: 12,
-    fontFamily: Fonts.FONT_SEMIBOLD,
+    fontFamily: Fonts.FONT_Semi,
     textTransform: "uppercase",
   },
   footerRight: {
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   },
   activeText: {
     fontSize: 10,
-    fontFamily: Fonts.FONT_SEMIBOLD,
+    fontFamily: Fonts.FONT_Semi,
     color: Colors.White,
     textTransform: "uppercase",
     letterSpacing: 0.5,
