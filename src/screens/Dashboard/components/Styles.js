@@ -6,6 +6,7 @@ const styles = StyleSheet.create({
   eventCard: {
     backgroundColor: Colors.White,
     borderRadius: 16,
+    marginRight: 10,
     marginBottom: 16,
     shadowColor: "#000",
     shadowOffset: {

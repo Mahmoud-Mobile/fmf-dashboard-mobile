@@ -1,9 +1,15 @@
 import axios from "axios";
 import { getEnvVars } from "../constant";
 import * as SecureStore from "expo-secure-store";
-import store from "../redux/store";
-import { logout } from "../redux/actions/authActions";
 import navigationService from "../Global/navRef";
+
+// Global logout handler - will be set by the application
+let logoutHandler = null;
+
+// Function to set the logout handler from outside this module
+export const setLogoutHandler = (handler) => {
+  logoutHandler = handler;
+};
 
 async function createHeaders(jsonPayload) {
   const accessToken = await SecureStore.getItemAsync("accessToken");
@@ -25,8 +31,10 @@ function generateCorrelationId() {
 
 async function handleUnauthorized() {
   try {
-    // Dispatch logout action to clear Redux state
-    store.dispatch(logout());
+    // Call the logout handler if it's been set
+    if (logoutHandler) {
+      logoutHandler();
+    }
 
     // Navigate to Login screen if navigation is available
     if (navigationService.navigation) {

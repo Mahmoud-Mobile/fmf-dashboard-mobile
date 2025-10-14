@@ -8,24 +8,31 @@ import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 import moment from "moment";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 
 const HomeHeader = () => {
   const [userInfo, setUserInfo] = useState(null);
   const navigation = useNavigation();
+  const authUser = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const loadUserInfo = async () => {
       try {
-        const storedUserInfo = await SecureStore.getItemAsync("userInfo");
-        if (storedUserInfo) {
-          setUserInfo(JSON.parse(storedUserInfo));
+        // Use Redux state first, then fallback to SecureStore
+        if (authUser) {
+          setUserInfo(authUser);
+        } else {
+          const storedUserInfo = await SecureStore.getItemAsync("userInfo");
+          if (storedUserInfo) {
+            setUserInfo(JSON.parse(storedUserInfo));
+          }
         }
       } catch (error) {
         console.error("Error loading user info:", error);
       }
     };
     loadUserInfo();
-  }, []);
+  }, [authUser]);
 
   const getCurrentTime = () => {
     return moment().format("hh:mm A");
@@ -56,10 +63,10 @@ const HomeHeader = () => {
             <Text style={styles.username}>
               {userInfo?.user?.firstName && userInfo?.user?.lastName
                 ? `${userInfo.user.firstName} ${userInfo.user.lastName}`
-                : userInfo?.user?.email || "User"}
+                : userInfo?.user?.email || userInfo?.email || "User"}
             </Text>
             <Text style={styles.userRole}>
-              {userInfo?.user?.role || "Operations Manager"}
+              {userInfo?.user?.role || userInfo?.role || "Operations Manager"}
             </Text>
           </View>
 
@@ -100,7 +107,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    height: 180,
+    height: 170,
   },
   header: {
     flexDirection: "row",

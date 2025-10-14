@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import styles from "./Styles";
 
-const EventCard = ({ item, onPress }) => {
+const EventCard = ({ item, onPress, cardWidth }) => {
   const formatDateRange = () => {
     if (item.startDate && item.endDate) {
       const startDate = moment(item.startDate);
@@ -36,7 +36,7 @@ const EventCard = ({ item, onPress }) => {
 
   return (
     <TouchableOpacity
-      style={styles.eventCard}
+      style={[styles.eventCard, { width: cardWidth }]}
       onPress={() => onPress(item)}
       activeOpacity={0.7}
     >
@@ -83,15 +83,6 @@ const EventCard = ({ item, onPress }) => {
             <Ionicons name="calendar-outline" size={16} color={Colors.Gray} />
             <Text style={styles.detailText}>{formatDateRange()}</Text>
           </View>
-
-          {/* {item.maxAttendees && (
-            <View style={styles.detailRow}>
-              <Ionicons name="people-outline" size={16} color={Colors.Gray} />
-              <Text style={styles.detailText}>
-                Max {item.maxAttendees} attendees
-              </Text>
-            </View>
-          )} */}
         </View>
 
         <View style={styles.eventFooter}>

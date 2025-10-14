@@ -15,8 +15,7 @@ import CustomPressable from "../../components/CustomPressable";
 import { setEmail, setPassword } from "../../redux/actions/authActions";
 import { useDispatch, useSelector } from "react-redux";
 import * as SecureStore from "expo-secure-store";
-import { LOGIN_SUCCESS, LOGIN_FAILURE } from "../../redux/actions/authActions";
-import { login } from "../../webservice/apiConfig";
+import { login } from "../../redux/actions/authActions";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -46,35 +45,6 @@ const Login = () => {
     return isValid;
   };
 
-  const config_login = (params) => async (dispatch) => {
-    try {
-      const response = await login(params);
-
-      const token = response?.accessToken;
-      console.log(token);
-
-      if (token && response?.user) {
-        await SecureStore.setItemAsync("accessToken", token);
-        await SecureStore.setItemAsync(
-          "userInfo",
-          JSON.stringify(response.user)
-        );
-
-        dispatch({ type: LOGIN_SUCCESS, payload: response });
-        return { type: LOGIN_SUCCESS, payload: response };
-      } else {
-        dispatch({
-          type: LOGIN_FAILURE,
-          payload: "Invalid response from server",
-        });
-        return { type: LOGIN_FAILURE };
-      }
-    } catch (error) {
-      dispatch({ type: LOGIN_FAILURE, payload: error.message });
-      return { type: LOGIN_FAILURE };
-    }
-  };
-
   const handleLogin = async () => {
     if (!validateInputs()) {
       return;
@@ -85,7 +55,7 @@ const Login = () => {
     };
     setLoading(true);
     try {
-      const response = await dispatch(config_login(body));
+      const response = await dispatch(login(body));
 
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
@@ -95,7 +65,6 @@ const Login = () => {
       }
       setLoading(false);
     } catch (error) {
-    } finally {
       setLoading(false);
     }
   };
