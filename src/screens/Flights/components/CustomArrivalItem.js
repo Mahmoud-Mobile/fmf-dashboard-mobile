@@ -13,7 +13,7 @@ import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const CustomArrivalItem = ({ flight, onPress }) => {
+const CustomArrivalItem = ({ flight, onPress, isTablet = false }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -61,7 +61,7 @@ const CustomArrivalItem = ({ flight, onPress }) => {
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, { width: isTablet ? "48%" : "100%" }]}
       onPress={() => onPress && onPress(flight)}
       activeOpacity={0.8}
     >
@@ -250,8 +250,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 12,
     marginVertical: 12,
-    marginHorizontal: 12,
-    flex: 1,
+    marginHorizontal: 6,
   },
   headerGradient: {
     borderTopLeftRadius: 24,
@@ -471,7 +470,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 6,
-    height: 60,
   },
   buttonGradient: {
     paddingVertical: 14,
@@ -479,7 +477,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    height: 60,
+    height: 50,
   },
   buttonContent: {
     flexDirection: "column",
@@ -491,7 +489,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_SEMI_BOLD,
     color: Colors.White,
     textAlign: "center",
-    marginTop: 4,
+    marginTop: 2,
   },
 });
 

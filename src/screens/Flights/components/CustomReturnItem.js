@@ -13,11 +13,10 @@ import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const CustomReturnItem = ({ flight, onPress }) => {
+const CustomReturnItem = ({ flight, onPress, isTablet = false }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
-      // Use native Date first to avoid moment warnings
       const nativeDate = new Date(dateString);
       if (!isNaN(nativeDate.getTime())) {
         return moment(nativeDate).format("MMM DD, YYYY");
@@ -32,7 +31,6 @@ const CustomReturnItem = ({ flight, onPress }) => {
   const formatTime = (dateString) => {
     if (!dateString) return "N/A";
     try {
-      // Use native Date first to avoid moment warnings
       const nativeDate = new Date(dateString);
       if (!isNaN(nativeDate.getTime())) {
         return moment(nativeDate).format("HH:mm");
@@ -61,7 +59,7 @@ const CustomReturnItem = ({ flight, onPress }) => {
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, { width: isTablet ? "48%" : "100%" }]}
       onPress={() => onPress && onPress(flight)}
       activeOpacity={0.8}
     >
@@ -207,8 +205,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 12,
     marginVertical: 12,
-    marginHorizontal: 12,
-    flex: 1,
+    marginHorizontal: 6,
   },
   headerGradient: {
     borderTopLeftRadius: 24,
@@ -430,7 +427,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   buttonGradient: {
-    paddingVertical: 18,
+    paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 25,
     alignItems: "center",

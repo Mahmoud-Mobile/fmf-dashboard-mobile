@@ -9,6 +9,10 @@ const styles = StyleSheet.create({
   },
 
   listContainer: {},
+  row: {
+    justifyContent: "space-between",
+    paddingHorizontal: 0,
+  },
   listFooter: {
     padding: 20,
     alignItems: "center",

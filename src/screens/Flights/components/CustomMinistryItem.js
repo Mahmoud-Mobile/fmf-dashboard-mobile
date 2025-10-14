@@ -13,11 +13,10 @@ import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const CustomMinistryItem = ({ flight, onPress }) => {
+const CustomMinistryItem = ({ flight, onPress, isTablet = false }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
-      // Use native Date first to avoid moment warnings
       const nativeDate = new Date(dateString);
       if (!isNaN(nativeDate.getTime())) {
         return moment(nativeDate).format("MMM DD, YYYY");
@@ -32,7 +31,6 @@ const CustomMinistryItem = ({ flight, onPress }) => {
   const formatTime = (dateString) => {
     if (!dateString) return "N/A";
     try {
-      // Use native Date first to avoid moment warnings
       const nativeDate = new Date(dateString);
       if (!isNaN(nativeDate.getTime())) {
         return moment(nativeDate).format("HH:mm");
@@ -46,7 +44,7 @@ const CustomMinistryItem = ({ flight, onPress }) => {
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, { width: isTablet ? "48%" : "100%" }]}
       onPress={() => onPress && onPress(flight)}
       activeOpacity={0.8}
     >
@@ -164,7 +162,6 @@ const CustomMinistryItem = ({ flight, onPress }) => {
           </View>
         </View>
 
-        {/* User Information Section */}
         <View style={styles.userInfoSection}>
           <Text style={styles.userInfoTitle}>Passenger Info</Text>
           <View style={styles.userInfoContainer}>
@@ -184,9 +181,7 @@ const CustomMinistryItem = ({ flight, onPress }) => {
           </View>
         </View>
 
-        {/* Modern Action Buttons */}
         <View style={styles.buttonsContainer}>
-          {/* Plane Landed Button */}
           <TouchableOpacity
             style={styles.modernButton}
             onPress={() => {
@@ -213,7 +208,6 @@ const CustomMinistryItem = ({ flight, onPress }) => {
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Logged Arrived Button */}
           <TouchableOpacity
             style={styles.modernButton}
             onPress={() => {
@@ -240,7 +234,6 @@ const CustomMinistryItem = ({ flight, onPress }) => {
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Guest Granted Button */}
           <TouchableOpacity
             style={styles.modernButton}
             onPress={() => {
@@ -285,8 +278,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 12,
     marginVertical: 12,
-    marginHorizontal: 12,
-    flex: 1,
+    marginHorizontal: 6,
   },
   headerGradient: {
     borderTopLeftRadius: 24,
@@ -528,7 +520,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 6,
-    height: 60,
+    height: 50,
   },
   buttonGradient: {
     paddingVertical: 14,

@@ -66,13 +66,37 @@ const Flights = () => {
   const renderFlightItem = ({ item }) => {
     switch (selectedCategory) {
       case "ministry":
-        return <CustomMinistryItem flight={item} onPress={handleFlightPress} />;
+        return (
+          <CustomMinistryItem
+            flight={item}
+            onPress={handleFlightPress}
+            isTablet={isTablet}
+          />
+        );
       case "arrival":
-        return <CustomArrivalItem flight={item} onPress={handleFlightPress} />;
+        return (
+          <CustomArrivalItem
+            flight={item}
+            onPress={handleFlightPress}
+            isTablet={isTablet}
+          />
+        );
       case "return":
-        return <CustomReturnItem flight={item} onPress={handleFlightPress} />;
+        return (
+          <CustomReturnItem
+            flight={item}
+            onPress={handleFlightPress}
+            isTablet={isTablet}
+          />
+        );
       default:
-        return <CustomMinistryItem flight={item} onPress={handleFlightPress} />;
+        return (
+          <CustomMinistryItem
+            flight={item}
+            onPress={handleFlightPress}
+            isTablet={isTablet}
+          />
+        );
     }
   };
 
@@ -114,6 +138,7 @@ const Flights = () => {
           }
           showsVerticalScrollIndicator={false}
           numColumns={isTablet ? 2 : 1}
+          columnWrapperStyle={isTablet ? styles.row : null}
         />
       </View>
       <LoadingModal visible={loading} />
