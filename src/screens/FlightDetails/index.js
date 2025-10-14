@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { LinearGradient } from "expo-linear-gradient";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
@@ -41,7 +42,7 @@ const FlightDetails = ({ route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={{ top: "additive" }}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <CustomHeader
         title="Flight Details"
         onLeftButtonPress={() => navigation.goBack()}

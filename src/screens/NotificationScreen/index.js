@@ -5,6 +5,7 @@ import { styles } from "./Styles";
 import { NotificationItem } from "./components";
 import { componentStyles } from "./components/Styles";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { useNavigation } from "@react-navigation/native";
 
 const NotificationScreen = () => {

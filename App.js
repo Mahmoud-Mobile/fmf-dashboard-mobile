@@ -9,6 +9,7 @@ import navigationService from "./src/Global/navRef";
 import * as Notifications from "expo-notifications";
 import { CommonActions } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -89,20 +90,22 @@ const App = () => {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Provider store={store}>
-        <ToastWrapper>
-          <NavigationContainer
-            ref={navigationRef}
-            onReady={() => {
-              navigationService.navigation = navigationRef.current;
-            }}
-          >
-            <NavStack />
-          </NavigationContainer>
-        </ToastWrapper>
-      </Provider>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Provider store={store}>
+          <ToastWrapper>
+            <NavigationContainer
+              ref={navigationRef}
+              onReady={() => {
+                navigationService.navigation = navigationRef.current;
+              }}
+            >
+              <NavStack />
+            </NavigationContainer>
+          </ToastWrapper>
+        </Provider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 };
 

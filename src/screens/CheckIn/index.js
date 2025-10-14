@@ -137,7 +137,7 @@ const CheckInScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={{ top: "additive" }}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <CustomHeader title="Check In" center={true} top={0} />
 
       <View style={styles.searchContainer}>

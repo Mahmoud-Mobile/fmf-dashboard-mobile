@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import CustomHeader from "../../components/CustomHeader";
 import FloatingChatIcon from "../../components/FloatingChatIcon";
 import { Colors } from "../../Global/colors";
@@ -15,7 +16,7 @@ const Trips = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={{ top: "additive" }}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <CustomHeader title="Trips" center={true} top={0} />
       <ScrollView
         showsVerticalScrollIndicator={false}

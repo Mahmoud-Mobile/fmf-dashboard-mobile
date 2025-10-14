@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, Platform, Text, TextInput, View, Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { MaterialIcons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
@@ -114,7 +115,7 @@ const ZebraQR = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={{ top: "additive" }}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <CustomHeader
         title="Zebra Scanner"
         center={false}

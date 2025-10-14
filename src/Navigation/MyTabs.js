@@ -1,7 +1,11 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { MotiView } from "moti";
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 import { useIsFocused, useRoute } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { setSelectedEvent } from "../redux/actions/api";
@@ -59,6 +63,20 @@ const TabButton = ({ item, onPress, routeName }) => {
   const focused = routeName === item.route && isFocused;
   const [pressed, setPressed] = React.useState(false);
 
+  const scale = useSharedValue(1);
+  const translateY = useSharedValue(1);
+
+  React.useEffect(() => {
+    scale.value = withTiming(pressed ? 1.1 : focused ? 1.05 : 1, {
+      duration: 500,
+    });
+    translateY.value = withTiming(focused ? 5 : 1, { duration: 500 });
+  }, [pressed, focused]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
+  }));
+
   const handlePress = () => {
     setPressed(true);
     onPress?.();
@@ -71,14 +89,7 @@ const TabButton = ({ item, onPress, routeName }) => {
       activeOpacity={1}
       style={styles.container}
     >
-      <MotiView
-        animate={{
-          scale: pressed ? 1.1 : focused ? 1.05 : 1,
-          translateY: focused ? 5 : 1,
-        }}
-        transition={{ type: "timing", duration: 500 }}
-        style={styles.iconContainer}
-      >
+      <Animated.View style={[styles.iconContainer, animatedStyle]}>
         <ImagesWithProps
           source={item.icon}
           color={focused ? Colors.Primary : "rgba(0,0,0,0.4)"}
@@ -91,7 +102,7 @@ const TabButton = ({ item, onPress, routeName }) => {
         >
           {item.titleText}
         </Text>
-      </MotiView>
+      </Animated.View>
     </TouchableOpacity>
   );
 };

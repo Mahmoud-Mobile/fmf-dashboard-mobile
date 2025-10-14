@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, ActivityIndicator, StyleSheet, Text, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useIsFocused } from "@react-navigation/native";
 import { Colors } from "../../Global/colors";
@@ -84,7 +85,7 @@ const CameraQRScanner = ({ onScanned }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={{ top: "additive" }}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <CustomHeader
         title="Camera Scanner"
         center={false}

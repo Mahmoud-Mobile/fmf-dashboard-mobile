@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { Colors } from "../../Global/colors";
 import CustomHeader from "../../components/CustomHeader";
 import FloatingChatIcon from "../../components/FloatingChatIcon";
@@ -72,7 +73,7 @@ const SeatingPlanPreview = ({ route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={{ top: "additive" }}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <CustomHeader
         title="Seating Plan Preview"
         center={false}
