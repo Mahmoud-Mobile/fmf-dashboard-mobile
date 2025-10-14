@@ -6,13 +6,11 @@ import { Colors } from "../../Global/colors";
 import ValidationModal from "../../components/ValidationModal";
 import CustomPressable from "../../components/CustomPressable";
 import { MaterialIcons } from "@expo/vector-icons";
-// Removed i18n - using static English text
 
 const NoInternetScreen = () => {
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
-  // Removed useTranslation - using static English text
 
   const handleCheckConnection = () => {
     NetInfo.fetch().then((state) => {
@@ -43,6 +41,7 @@ const NoInternetScreen = () => {
         style={{
           marginBottom: 30,
           paddingHorizontal: 40,
+          width: "60%",
         }}
       />
     </View>

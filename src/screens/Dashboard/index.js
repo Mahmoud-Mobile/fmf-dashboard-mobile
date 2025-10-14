@@ -1,7 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { View, FlatList, Alert, RefreshControl } from "react-native";
+import {
+  View,
+  FlatList,
+  Alert,
+  RefreshControl,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import * as Print from "expo-print";
+import { shareAsync } from "expo-sharing";
 import { Colors } from "../../Global/colors";
 import LoadingModal from "../../components/LoadingModal";
 import SearchBar from "../../components/SearchBar";
@@ -15,10 +24,12 @@ import {
 import HomeHeader from "./components/HomeHeader";
 import EventCard from "./components";
 import EmptyListComponent from "../../components/EmptyListComponent";
+import PDFGenerator from "./components/PDFGenerator";
 import {
   getGridColumns,
   getDeviceDimensions,
 } from "../../constant/deviceUtils";
+import { Fonts } from "../../Global/fonts";
 import styles from "./Styles";
 
 const Dashboard = () => {
@@ -29,6 +40,7 @@ const Dashboard = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   const { width: screenWidth } = getDeviceDimensions();
   const numColumns = getGridColumns();
@@ -114,6 +126,62 @@ const Dashboard = () => {
     setShowDateModal(false);
   };
 
+  const printToFile = async () => {
+    try {
+      setIsPrinting(true);
+
+      // Check if there are events to print
+      if (filteredEvents.length === 0) {
+        Alert.alert(
+          "No Events to Print",
+          "There are no events to generate a PDF report. Please adjust your search filters or refresh the data.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("PDF generation timeout")), 30000); // 30 seconds timeout
+      });
+
+      const generatePromise = async () => {
+        const html = PDFGenerator.generateHTML(
+          filteredEvents,
+          searchText,
+          selectedDate
+        );
+        const { uri } = await Print.printToFileAsync({ html });
+        console.log("File has been saved to:", uri);
+        await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
+        return uri;
+      };
+
+      await Promise.race([generatePromise(), timeoutPromise]);
+
+      Alert.alert(
+        "Success",
+        `PDF generated successfully with ${filteredEvents.length} event${
+          filteredEvents.length !== 1 ? "s" : ""
+        }!`
+      );
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      let errorMessage = "Failed to generate PDF. Please try again.";
+
+      if (error.message === "PDF generation timeout") {
+        errorMessage = "PDF generation is taking too long. Please try again.";
+      } else if (error.message?.includes("sharing")) {
+        errorMessage =
+          "PDF was generated but couldn't be shared. Please check your device settings.";
+      }
+
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <HomeHeader />
@@ -125,6 +193,14 @@ const Dashboard = () => {
           onClear={handleSearchClear}
           style={styles.searchBarInRow}
         />
+        <TouchableOpacity
+          style={[styles.printButton, isPrinting && styles.printButtonDisabled]}
+          onPress={printToFile}
+          activeOpacity={0.7}
+          disabled={isPrinting}
+        >
+          <Text style={styles.printButtonText}>{isPrinting ? "⏳" : "📄"}</Text>
+        </TouchableOpacity>
         <DateSearchButton
           onPress={() => setShowDateModal(true)}
           selectedDate={selectedDate}

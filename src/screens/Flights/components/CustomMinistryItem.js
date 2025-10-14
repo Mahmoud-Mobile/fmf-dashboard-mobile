@@ -100,14 +100,14 @@ const CustomMinistryItem = ({ flight, onPress, isTablet = false }) => {
             </View>
           )}
 
-          {flight.returnDate && (
+          {flight.estimatedArrivalTime && (
             <View style={styles.timeContainer}>
-              <Text style={styles.timeLabel}>Return</Text>
+              <Text style={styles.timeLabel}>⏰ Estimated</Text>
               <Text style={styles.timeValue}>
-                {formatTime(flight.returnDate)}
+                {formatTime(flight.estimatedArrivalTime)}
               </Text>
               <Text style={styles.dateValue}>
-                {formatDate(flight.returnDate)}
+                {formatDate(flight.estimatedArrivalTime)}
               </Text>
             </View>
           )}

@@ -173,6 +173,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
+  printButton: {
+    backgroundColor: Colors.Primary,
+    borderRadius: 12,
+    padding: 12,
+    marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    minWidth: 44,
+    minHeight: 44,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  printButtonText: {
+    fontSize: 18,
+    color: Colors.White,
+  },
+  printButtonDisabled: {
+    backgroundColor: Colors.LightGray,
+    opacity: 0.6,
+  },
   dateButtonInRow: {
     marginHorizontal: 0,
     marginVertical: 0,

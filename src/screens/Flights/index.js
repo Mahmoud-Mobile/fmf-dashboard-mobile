@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, FlatList, Dimensions, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Dimensions,
+  RefreshControl,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Print from "expo-print";
+import { shareAsync } from "expo-sharing";
 
 import { useDispatch, useSelector } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
@@ -18,6 +28,7 @@ import styles from "./Styles";
 import CustomMinistryItem from "./components/CustomMinistryItem";
 import CustomArrivalItem from "./components/CustomArrivalItem";
 import CustomReturnItem from "./components/CustomReturnItem";
+import PDFGenerator from "./components/PDFGenerator";
 import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 const isTablet = width > 768;
@@ -32,6 +43,7 @@ const Flights = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   const categories = [
     { id: "ministry", label: "Ministry", key: "ministry" },
@@ -172,6 +184,62 @@ const Flights = () => {
     setShowDateModal(false);
   };
 
+  const printToFile = async () => {
+    try {
+      setIsPrinting(true);
+
+      // Check if there are flights to print
+      if (filteredFlights.length === 0) {
+        Alert.alert(
+          "No Flights to Print",
+          "There are no flights to generate a PDF report. Please adjust your search filters or refresh the data.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("PDF generation timeout")), 600000); // 60 seconds timeout
+      });
+
+      const generatePromise = async () => {
+        const html = PDFGenerator.generateHTML(
+          filteredFlights,
+          searchText,
+          selectedDate,
+          selectedCategory
+        );
+        const { uri } = await Print.printToFileAsync({ html });
+        console.log("File has been saved to:", uri);
+        await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
+        return uri;
+      };
+
+      await Promise.race([generatePromise(), timeoutPromise]);
+
+      Alert.alert(
+        "Success",
+        `PDF generated successfully with ${filteredFlights.length} flight${
+          filteredFlights.length !== 1 ? "s" : ""
+        }!`
+      );
+    } catch (error) {
+      let errorMessage = "Failed to generate PDF. Please try again.";
+
+      if (error.message === "PDF generation timeout") {
+        errorMessage = "PDF generation is taking too long. Please try again.";
+      } else if (error.message?.includes("sharing")) {
+        errorMessage =
+          "PDF was generated but couldn't be shared. Please check your device settings.";
+      }
+
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
   const renderFlightItem = ({ item }) => {
     switch (selectedCategory) {
       case "ministry":
@@ -240,6 +308,14 @@ const Flights = () => {
           onClear={handleSearchClear}
           style={styles.searchBarInRow}
         />
+        <TouchableOpacity
+          style={[styles.printButton, isPrinting && styles.printButtonDisabled]}
+          onPress={printToFile}
+          activeOpacity={0.7}
+          disabled={isPrinting}
+        >
+          <Text style={styles.printButtonText}>{isPrinting ? "⏳" : "📄"}</Text>
+        </TouchableOpacity>
         <DateSearchButton
           onPress={() => setShowDateModal(true)}
           selectedDate={selectedDate}
