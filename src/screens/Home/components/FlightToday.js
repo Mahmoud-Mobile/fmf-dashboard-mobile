@@ -8,8 +8,9 @@ import {
 } from "react-native";
 import { Colors } from "../../../Global/colors";
 import { Fonts } from "../../../Global/fonts";
-
+import { useNavigation } from "@react-navigation/native";
 const FlightToday = () => {
+  const navigation = useNavigation();
   const flightData = [
     {
       id: 1,
@@ -130,7 +131,10 @@ const FlightToday = () => {
           <Text style={styles.sectionTitle}>Live Flights</Text>
           <Text style={styles.subtitle}>Real-time flight tracking</Text>
         </View>
-        <TouchableOpacity style={styles.seeAllButton}>
+        <TouchableOpacity
+          style={styles.seeAllButton}
+          onPress={() => navigation.navigate("Flights")}
+        >
           <Text style={styles.seeAllText}>View All</Text>
         </TouchableOpacity>
       </View>

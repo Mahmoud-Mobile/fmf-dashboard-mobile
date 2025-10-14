@@ -1,12 +1,16 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../../Global/colors";
 import { Fonts } from "../../../Global/fonts";
+import { getGridColumns } from "../../../constant";
 
 const EventCard = ({ event, onCheckIn, onPreview }) => {
+  const numColumns = getGridColumns();
+  const screenWidth = Dimensions.get("window").width;
+  const cardWidth = (screenWidth - 32 - numColumns * 8) / numColumns; // 32 for padding, 8 for margins
   return (
-    <View style={styles.eventCard}>
+    <View style={[styles.eventCard, { width: cardWidth }]}>
       <Text style={styles.eventTitle}>{event.title}</Text>
       <Text style={styles.eventSubtitle}>{event.subtitle}</Text>
 
@@ -22,7 +26,7 @@ const EventCard = ({ event, onCheckIn, onPreview }) => {
           </View>
           <View style={styles.infoItem}>
             <MaterialIcons name="event" size={16} color={Colors.Primary} />
-            <Text style={styles.infoText}>Event Date: {event.date}</Text>
+            <Text style={styles.infoText}>{event.date}</Text>
           </View>
         </View>
       </View>
@@ -62,7 +66,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     margin: 4,
-    flex: 1,
     borderWidth: 1,
     borderColor: Colors.borderColor,
     shadowColor: Colors.Secondary,

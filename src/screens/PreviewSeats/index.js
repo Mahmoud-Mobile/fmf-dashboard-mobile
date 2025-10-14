@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, ScrollView, Animated } from "react-native";
+import { View, Text, ScrollView, Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../Global/colors";
 import CustomHeader from "../../components/CustomHeader";
 import FloatingChatIcon from "../../components/FloatingChatIcon";

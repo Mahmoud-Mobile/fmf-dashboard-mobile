@@ -1,19 +1,12 @@
 import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  RefreshControl,
-  Alert,
-  Animated,
-} from "react-native";
+import { View, Text, FlatList, RefreshControl, Alert } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../Global/colors";
 import { getGridColumns } from "../../constant";
 import navigationService from "../../Global/navRef";
 import CustomHeader from "../../components/CustomHeader";
 import FloatingChatIcon from "../../components/FloatingChatIcon";
-import InputWithIcon from "./components/InputWithIcon";
+import SearchBar from "../../components/SearchBar";
 import EventCard from "./components/EventCard";
 import { styles } from "./Styles";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -121,7 +114,6 @@ const CheckInScreen = () => {
     const event = events.find((e) => e.id === id);
     if (event) {
       console.log("Navigating to PreviewSeats with event:", event);
-      // Navigate to PreviewSeats screen with event data
       if (navigationService.navigation) {
         navigationService.navigation.navigate("PreviewSeats", {
           eventTitle: event.title,
@@ -149,10 +141,10 @@ const CheckInScreen = () => {
       <CustomHeader title="Check In" center={true} top={0} />
 
       <View style={styles.searchContainer}>
-        <InputWithIcon
+        <SearchBar
           onChangeText={setSearchTerm}
-          icon="search"
-          placeholder="Search events by title, subtitle, or location"
+          placeholder="Search....."
+          value={searchTerm}
         />
       </View>
 

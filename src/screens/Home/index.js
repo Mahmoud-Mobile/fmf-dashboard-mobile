@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { ScrollView, View, RefreshControl, Animated, Text } from "react-native";
 import styles from "./Styles";
 import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import LoadingModal from "../../components/LoadingModal";
 import FloatingChatIcon from "../../components/FloatingChatIcon";
