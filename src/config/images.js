@@ -8,6 +8,7 @@ import Flights_Icon from "../SVG/Flights_Icon";
 import CheckIn_Icon from "../SVG/CheckIn_Icon";
 import Calendar_Icon from "../SVG/Calendar_Icon";
 import Location_Icon from "../SVG/Location_Icon";
+import User_Icon from "../SVG/User_Icon";
 
 const images = {
   Home_Tab: <Home_Tab />,
@@ -19,6 +20,7 @@ const images = {
   CheckIn_Icon: <CheckIn_Icon />,
   Calendar_Icon: <Calendar_Icon />,
   Location_Icon: <Location_Icon />,
+  User_Icon: <User_Icon />,
 };
 export const ImagesWithProps = ({
   props,
@@ -46,6 +48,8 @@ export const ImagesWithProps = ({
     <Calendar_Icon color={color} size={size} />
   ) : source == "Location_Icon" ? (
     <Location_Icon color={color} size={size} />
+  ) : source == "User_Icon" ? (
+    <User_Icon color={color} size={size} />
   ) : null;
 
 export default images;

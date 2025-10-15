@@ -13,6 +13,10 @@ import Chat from "../screens/Chat";
 import DesignatedCars from "../screens/DesignatedCars";
 import Hotels from "../screens/Hotels";
 import NotificationScreen from "../screens/NotificationScreen";
+import Profile from "../screens/Profile";
+import Survey from "../screens/Survey";
+import PrivacyPolicy from "../screens/PrivacyPolicy";
+import About from "../screens/About";
 import { Colors } from "../Global/colors";
 import { Fonts } from "../Global/fonts";
 import NetInfo from "@react-native-community/netinfo";
@@ -149,6 +153,34 @@ const NavStack = () => {
       <Stack.Screen
         name="NotificationScreen"
         component={NotificationScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Survey"
+        component={Survey}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicy}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="About"
+        component={About}
         options={{
           headerShown: false,
         }}

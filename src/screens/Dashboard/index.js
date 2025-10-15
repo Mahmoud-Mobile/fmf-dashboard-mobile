@@ -29,7 +29,6 @@ import {
   getGridColumns,
   getDeviceDimensions,
 } from "../../constant/deviceUtils";
-import { Fonts } from "../../Global/fonts";
 import styles from "./Styles";
 
 const Dashboard = () => {
@@ -95,7 +94,10 @@ const Dashboard = () => {
   }, [events, searchText, selectedDate]);
 
   useEffect(() => {
-    dispatch(fetchEvents());
+    let params = {
+      eventLevel: "MAIN",
+    };
+    dispatch(fetchEvents(params));
   }, [dispatch]);
 
   const onRefresh = async () => {

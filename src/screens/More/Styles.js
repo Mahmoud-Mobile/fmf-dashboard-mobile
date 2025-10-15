@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     width: "100%",
-    backgroundColor: Colors.Primary,
     height: 200,
     borderBottomRightRadius: 25,
     borderBottomLeftRadius: 25,
@@ -39,6 +38,14 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_MEDIUM,
     opacity: 0.7,
     paddingTop: 10,
+  },
+  positionText: {
+    color: Colors.White,
+    fontSize: 14,
+    textAlign: "left",
+    fontFamily: Fonts.FONT_MEDIUM,
+    opacity: 0.9,
+    paddingTop: 5,
   },
   borderList: {
     marginHorizontal: horizontalMargin,

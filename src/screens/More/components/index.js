@@ -33,19 +33,29 @@ const CustomList = ({ item, Logout, totalItems, index }) => {
         <Text
           style={[
             styles.title,
-            { color: item.navigation !== null ? Colors.Secondary : "#FF5757" },
+            {
+              color:
+                item.navigation !== null
+                  ? item.iconColor || Colors.Secondary
+                  : "#FF5757",
+            },
           ]}
         >
           {item.title}
         </Text>
         <View style={styles.borderIconView}>
-          <ImagesWithProps source={item.icon} color="#282828" />
+          <ImagesWithProps
+            source={item.icon}
+            color={item.iconColor || "#282828"}
+          />
         </View>
       </View>
       <AntDesign
         name="right"
         size={17}
-        color={item.navigation !== null ? "#020201" : "#FF5757"}
+        color={
+          item.navigation !== null ? item.iconColor || "#020201" : "#FF5757"
+        }
       />
     </TouchableOpacity>
   );
