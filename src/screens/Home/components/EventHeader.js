@@ -23,7 +23,7 @@ const EventHeader = () => {
           setUserInfo(JSON.parse(storedUserInfo));
         }
       } catch (error) {
-        console.error("Error loading user info:", error);
+        console.log("Error loading user info:", error);
       }
     };
     loadUserInfo();
