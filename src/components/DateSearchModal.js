@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.White,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: "80%",
-    minHeight: "50%",
+    maxHeight: "90%",
+    minHeight: "60%",
   },
   modalContent: {
     flex: 1,

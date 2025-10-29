@@ -152,6 +152,9 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
+  eventCardListView: {
+    marginRight: 0,
+  },
 });
 
 export default styles;

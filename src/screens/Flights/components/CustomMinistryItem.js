@@ -11,7 +11,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
-import { MaterialIcons } from "@expo/vector-icons";
+import { ActionButtonGroup } from "../../../components/ActionButton";
 
 const CustomMinistryItem = ({ flight, onPress, isTablet = false }) => {
   const formatDate = (dateString) => {
@@ -143,85 +143,49 @@ const CustomMinistryItem = ({ flight, onPress, isTablet = false }) => {
           </View>
         </View>
 
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            style={styles.modernButton}
-            onPress={() => {
-              Alert.alert(
-                "Plane Landed",
-                `Flight ${
-                  flight.arrivalFlightNumber || flight.returnFlightNumber
-                } has landed successfully!`,
-                [{ text: "OK", style: "default" }]
-              );
-            }}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={["#10B981", "#059669"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.buttonGradient}
-            >
-              <View style={styles.buttonContent}>
-                <MaterialIcons name="flight-land" size={20} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Plane Landed</Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.modernButton}
-            onPress={() => {
-              Alert.alert(
-                "Logged Arrived",
-                `Passenger arrival has been logged for flight ${
-                  flight.arrivalFlightNumber || flight.returnFlightNumber
-                }!`,
-                [{ text: "OK", style: "default" }]
-              );
-            }}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={["#F59E0B", "#D97706"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.buttonGradient}
-            >
-              <View style={styles.buttonContent}>
-                <MaterialIcons name="check-circle" size={20} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Logged Arrived</Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.modernButton}
-            onPress={() => {
-              Alert.alert(
-                "Guest Granted",
-                `Guest access has been granted for flight ${
-                  flight.arrivalFlightNumber || flight.returnFlightNumber
-                }!`,
-                [{ text: "OK", style: "default" }]
-              );
-            }}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={["#880CB9", "#368BBA"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.buttonGradient}
-            >
-              <View style={styles.buttonContent}>
-                <MaterialIcons name="verified-user" size={20} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Guest Granted</Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+        <ActionButtonGroup
+          buttons={[
+            {
+              icon: "flight-land",
+              text: "Plane Landed",
+              onPress: () => {
+                Alert.alert(
+                  "Plane Landed",
+                  `Flight ${
+                    flight.arrivalFlightNumber || flight.returnFlightNumber
+                  } has landed successfully!`,
+                  [{ text: "OK", style: "default" }]
+                );
+              },
+            },
+            {
+              icon: "check-circle",
+              text: "Logged Arrived",
+              onPress: () => {
+                Alert.alert(
+                  "Logged Arrived",
+                  `Passenger arrival has been logged for flight ${
+                    flight.arrivalFlightNumber || flight.returnFlightNumber
+                  }!`,
+                  [{ text: "OK", style: "default" }]
+                );
+              },
+            },
+            {
+              icon: "verified-user",
+              text: "Guest Granted",
+              onPress: () => {
+                Alert.alert(
+                  "Guest Granted",
+                  `Guest access has been granted for flight ${
+                    flight.arrivalFlightNumber || flight.returnFlightNumber
+                  }!`,
+                  [{ text: "OK", style: "default" }]
+                );
+              },
+            },
+          ]}
+        />
       </View>
     </TouchableOpacity>
   );
@@ -230,42 +194,42 @@ const CustomMinistryItem = ({ flight, onPress, isTablet = false }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
+    borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 12,
-    marginVertical: 12,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginVertical: 4,
     marginHorizontal: 6,
   },
   headerGradient: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 18,
+    padding: 6,
   },
   flightInfo: {
     flex: 1,
   },
   airlineName: {
-    fontSize: 18,
+    fontSize: 10,
     fontFamily: Fonts.FONT_SEMI_BOLD,
     color: "#FFFFFF",
-    marginBottom: 4,
+    marginBottom: 1,
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
   flightNumber: {
-    fontSize: 14,
+    fontSize: 8,
     fontFamily: Fonts.FONT_REGULAR,
     color: "rgba(255, 255, 255, 0.9)",
   },
@@ -273,51 +237,51 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   statusBadge: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.3)",
   },
   statusText: {
-    fontSize: 11,
+    fontSize: 7,
     fontFamily: Fonts.FONT_MEDIUM,
     color: "#FFFFFF",
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   content: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     backgroundColor: "#FAFBFC",
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
   },
   routeInfo: {
-    marginBottom: 16,
+    marginBottom: 6,
   },
   airportInfo: {
     alignItems: "center",
   },
   airportCode: {
-    fontSize: 32,
+    fontSize: 16,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.Primary,
-    marginBottom: 8,
+    marginBottom: 2,
     textShadowColor: "rgba(136, 12, 185, 0.3)",
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   airportName: {
-    fontSize: 15,
+    fontSize: 9,
     fontFamily: Fonts.FONT_MEDIUM,
     color: "#2D3748",
     textAlign: "center",
-    marginBottom: 3,
+    marginBottom: 1,
   },
   cityCountry: {
-    fontSize: 13,
+    fontSize: 7,
     fontFamily: Fonts.FONT_REGULAR,
     color: "#718096",
     textAlign: "center",
@@ -325,18 +289,18 @@ const styles = StyleSheet.create({
   timeInfo: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 20,
+    marginBottom: 6,
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 6,
+    padding: 6,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 1,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
     borderWidth: 1,
     borderColor: "rgba(136, 12, 185, 0.08)",
   },
@@ -345,21 +309,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timeLabel: {
-    fontSize: 12,
+    fontSize: 7,
     fontFamily: Fonts.FONT_MEDIUM,
     color: "#667eea",
-    marginBottom: 6,
+    marginBottom: 2,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   timeValue: {
-    fontSize: 20,
+    fontSize: 11,
     fontFamily: Fonts.FONT_BOLD,
     color: "#2D3748",
-    marginBottom: 3,
+    marginBottom: 1,
   },
   dateValue: {
-    fontSize: 12,
+    fontSize: 7,
     fontFamily: Fonts.FONT_REGULAR,
     color: "#718096",
   },
@@ -367,8 +331,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 6,
+    padding: 6,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -376,20 +340,20 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 1,
   },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
   },
   infoLabel: {
-    fontSize: 13,
+    fontSize: 8,
     fontFamily: Fonts.FONT_MEDIUM,
     color: "#667eea",
-    marginRight: 6,
+    marginRight: 3,
   },
   infoValue: {
-    fontSize: 13,
+    fontSize: 8,
     fontFamily: Fonts.FONT_REGULAR,
     color: "#2D3748",
   },
@@ -413,54 +377,55 @@ const styles = StyleSheet.create({
     color: "#2D3748",
   },
   userInfoSection: {
-    marginTop: 16,
+    marginTop: 6,
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 6,
+    padding: 6,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 1,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
   },
   userInfoTitle: {
-    fontSize: 14,
+    fontSize: 8,
     fontFamily: Fonts.FONT_SEMI_BOLD,
     color: "#667eea",
-    marginBottom: 12,
+    marginBottom: 4,
     textAlign: "center",
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   userInfoContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   userPhotoContainer: {
-    marginRight: 12,
+    marginRight: 6,
   },
   userPhoto: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 2,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1,
     borderColor: "#667eea",
   },
   userDetails: {
-    flex: 1,
+    alignItems: "flex-start",
+    paddingLeft: 6,
   },
   userName: {
-    fontSize: 16,
+    fontSize: 9,
     fontFamily: Fonts.FONT_SEMI_BOLD,
     color: "#2D3748",
-    marginBottom: 4,
+    marginBottom: 1,
     textAlign: "right",
   },
   userMobile: {
-    fontSize: 14,
+    fontSize: 7,
     fontFamily: Fonts.FONT_REGULAR,
     color: "#718096",
     textAlign: "right",

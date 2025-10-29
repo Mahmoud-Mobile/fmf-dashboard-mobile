@@ -13,6 +13,7 @@ export const setLogoutHandler = (handler) => {
 
 async function createHeaders(jsonPayload) {
   const accessToken = await SecureStore.getItemAsync("accessToken");
+  // console.log("accessToken", accessToken);
   return {
     "Content-Type": jsonPayload ? "application/json" : "multipart/form-data",
     Authorization: `Bearer ${accessToken}`,

@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lead.fmfmanagement",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to location to show your current position and provide directions to event locations.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location to show your current position and provide directions to event locations.",

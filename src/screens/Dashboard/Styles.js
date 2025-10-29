@@ -174,10 +174,10 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   printButton: {
-    backgroundColor: Colors.Primary,
+    backgroundColor: "#2F87C8",
     borderRadius: 12,
     padding: 12,
-    marginRight: 10,
+    marginHorizontal: 10,
     justifyContent: "center",
     alignItems: "center",
     minWidth: 44,

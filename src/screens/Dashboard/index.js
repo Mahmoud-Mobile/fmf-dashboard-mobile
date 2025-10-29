@@ -16,6 +16,7 @@ import LoadingModal from "../../components/LoadingModal";
 import SearchBar from "../../components/SearchBar";
 import DateSearchButton from "../../components/DateSearchButton";
 import DateSearchModal from "../../components/DateSearchModal";
+import ViewToggle from "../../components/ViewToggle";
 import {
   fetchEvents,
   setSelectedEvent,
@@ -40,10 +41,12 @@ const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
 
   const { width: screenWidth } = getDeviceDimensions();
   const numColumns = getGridColumns();
   const cardWidth = (screenWidth - 40 - (numColumns - 1) * 10) / numColumns;
+  const listCardWidth = screenWidth - 40;
 
   const filteredEvents = useMemo(() => {
     let filtered = events;
@@ -101,8 +104,11 @@ const Dashboard = () => {
   }, [dispatch]);
 
   const onRefresh = async () => {
+    let params = {
+      eventLevel: "MAIN",
+    };
     setRefreshing(true);
-    await dispatch(fetchEvents());
+    await dispatch(fetchEvents(params));
     setRefreshing(false);
   };
 
@@ -193,8 +199,9 @@ const Dashboard = () => {
           value={searchText}
           onChangeText={setSearchText}
           onClear={handleSearchClear}
-          style={styles.searchBarInRow}
+          style={[styles.searchBarInRow, { flex: 1.5 }]}
         />
+        <ViewToggle viewMode={viewMode} onToggle={setViewMode} />
         <TouchableOpacity
           style={[styles.printButton, isPrinting && styles.printButtonDisabled]}
           onPress={printToFile}
@@ -215,16 +222,18 @@ const Dashboard = () => {
         <LoadingModal visible={loading} />
       ) : (
         <FlatList
+          key={viewMode}
           data={filteredEvents}
           renderItem={({ item }) => (
             <EventCard
               item={item}
               onPress={handleEventPress}
-              cardWidth={cardWidth}
+              cardWidth={viewMode === "grid" ? cardWidth : listCardWidth}
+              isListView={viewMode === "list"}
             />
           )}
           keyExtractor={(item) => item.id.toString()}
-          numColumns={numColumns}
+          numColumns={viewMode === "grid" ? numColumns : 1}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
           refreshControl={
