@@ -107,9 +107,6 @@ const FlightCard = ({
           <View style={styles.airportInfo}>
             <Text style={styles.airportCode}>{airportCode || "N/A"}</Text>
             <Text style={styles.airportName}>{airportName || "N/A"}</Text>
-            <Text style={styles.cityCountry}>
-              {city || "N/A"}, {country || "N/A"}
-            </Text>
           </View>
         </View>
 

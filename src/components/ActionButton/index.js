@@ -12,7 +12,7 @@ const ActionButton = ({
   style,
   iconSize = 14,
   textStyle,
-
+  iconOnly = false,
   flex,
 }) => {
   return (
@@ -20,31 +20,36 @@ const ActionButton = ({
       style={[
         styles.button,
         style?.width ? null : { flex: flex !== undefined ? flex : 1 },
+        iconOnly && styles.iconOnlyButton,
         style,
       ]}
       onPress={onPress}
       activeOpacity={0.8}
     >
       <LinearGradient
-        colors={colors ? colors : ["#374151", "#374151"]}
+        colors={colors ? colors : ["#f4f6fc", "#f4f6fc"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.gradient}
+        style={[styles.gradient, iconOnly && styles.iconOnlyGradient]}
       >
-        <View style={styles.content}>
-          <MaterialIcons name={icon} size={iconSize} color="#FFFFFF" />
-          <Text style={[styles.text, textStyle]}>{text}</Text>
+        <View style={[styles.content, iconOnly && styles.iconOnlyContent]}>
+          <MaterialIcons
+            name={icon}
+            size={iconOnly ? iconSize || 18 : iconSize}
+            color="#374151"
+          />
+          {!iconOnly && <Text style={[styles.text, textStyle]}>{text}</Text>}
         </View>
       </LinearGradient>
     </TouchableOpacity>
   );
 };
 
-const ActionButtonGroup = ({ buttons, containerStyle }) => {
+const ActionButtonGroup = ({ buttons, containerStyle, iconOnly = false }) => {
   return (
     <View style={[styles.buttonGroup, containerStyle]}>
       {buttons.map((button, index) => (
-        <ActionButton key={index} {...button} />
+        <ActionButton key={index} {...button} iconOnly={iconOnly} />
       ))}
     </View>
   );

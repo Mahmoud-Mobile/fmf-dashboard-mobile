@@ -24,8 +24,10 @@ import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
 import styles from "./Styles";
 
-import FlightCard from "./components/FlightCardGrid";
+import FlightCardGrid from "./components/FlightCardGrid";
+import FlightCardList from "./components/FlightCardList";
 import PDFGenerator from "./components/PDFGenerator";
+import ViewToggle from "../../components/ViewToggle";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalMargin } from "../../config/metrics";
 
@@ -43,6 +45,7 @@ const Flights = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [viewMode, setViewMode] = useState("grid");
 
   const categories = [
     { id: "ministry", label: "Ministry", key: "ministry" },
@@ -464,8 +467,13 @@ const Flights = () => {
 
   const renderFlightItem = ({ item }) => {
     const cardData = prepareFlightCardData(item);
+    if (viewMode === "list") {
+      return (
+        <FlightCardList {...cardData} onPress={() => handleFlightPress(item)} />
+      );
+    }
     return (
-      <FlightCard
+      <FlightCardGrid
         {...cardData}
         onPress={() => handleFlightPress(item)}
         isTablet={isTablet}
@@ -504,6 +512,7 @@ const Flights = () => {
           onClear={handleSearchClear}
           style={styles.searchBarInRow}
         />
+        <ViewToggle viewMode={viewMode} onToggle={setViewMode} />
         <TouchableOpacity
           style={[styles.printButton, isPrinting && styles.printButtonDisabled]}
           onPress={printToFile}
@@ -522,6 +531,7 @@ const Flights = () => {
       </View>
 
       <FlatList
+        key={viewMode}
         data={filteredFlights}
         renderItem={renderFlightItem}
         keyExtractor={(item) => item.id}
@@ -531,8 +541,8 @@ const Flights = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={false}
-        numColumns={isTablet ? 2 : 1}
-        columnWrapperStyle={isTablet ? styles.row : null}
+        numColumns={viewMode === "grid" && isTablet ? 2 : 1}
+        columnWrapperStyle={viewMode === "grid" && isTablet ? styles.row : null}
         contentContainerStyle={{ marginHorizontal: horizontalMargin }}
       />
       <LoadingModal visible={loading} />

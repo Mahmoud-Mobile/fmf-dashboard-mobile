@@ -21,13 +21,25 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 10,
     fontFamily: Fonts.FONT_MEDIUM,
-    color: "#FFFFFF",
+    color: "#374151",
   },
   buttonGroup: {
     marginTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 8,
+  },
+  iconOnlyButton: {
+    flex: 0,
+    minWidth: 40,
+  },
+  iconOnlyGradient: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  iconOnlyContent: {
+    gap: 0,
   },
 });
 
