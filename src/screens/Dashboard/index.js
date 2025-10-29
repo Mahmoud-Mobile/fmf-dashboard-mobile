@@ -26,10 +26,7 @@ import HomeHeader from "./components/HomeHeader";
 import EventCard from "./components";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import PDFGenerator from "./components/PDFGenerator";
-import {
-  getGridColumns,
-  getDeviceDimensions,
-} from "../../constant/deviceUtils";
+import { getDeviceDimensions } from "../../constant/deviceUtils";
 import styles from "./Styles";
 
 const Dashboard = () => {
@@ -41,17 +38,20 @@ const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
-  const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState("grid");
 
   const { width: screenWidth } = getDeviceDimensions();
-  const numColumns = getGridColumns();
-  const cardWidth = (screenWidth - 40 - (numColumns - 1) * 10) / numColumns;
-  const listCardWidth = screenWidth - 40;
+  // For mobile: 2 columns, tablet: 3 columns
+  const numColumns = screenWidth >= 768 ? 3 : 2;
+  const horizontalPadding = 24 * 2; // 24px margin on each side
+  const gapBetweenCards = (numColumns - 1) * 8;
+  const cardWidth =
+    (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
+  const listCardWidth = screenWidth - horizontalPadding;
 
   const filteredEvents = useMemo(() => {
     let filtered = events;
 
-    // Filter by search text
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter((event) => {
@@ -73,19 +73,16 @@ const Dashboard = () => {
       });
     }
 
-    // Filter by date - show all events from selected date onwards
     if (selectedDate) {
       const selectedDateStr = selectedDate.toISOString().split("T")[0];
 
       filtered = filtered.filter((event) => {
-        // Parse event dates correctly - check if they are in JavaScript Date string format
         const startDate = event.startDate
           ? event.startDate.includes("T")
             ? event.startDate.split("T")[0]
             : new Date(event.startDate).toISOString().split("T")[0]
           : null;
 
-        // Show events that start on or after the selected date
         if (startDate) {
           return startDate >= selectedDateStr;
         }
@@ -234,6 +231,7 @@ const Dashboard = () => {
           )}
           keyExtractor={(item) => item.id.toString()}
           numColumns={viewMode === "grid" ? numColumns : 1}
+          columnWrapperStyle={viewMode === "grid" ? styles.columnWrapper : null}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
           refreshControl={

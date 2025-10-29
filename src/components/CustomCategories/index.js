@@ -14,9 +14,9 @@ import { Fonts } from "../../Global/fonts";
 
 const screenWidth = Dimensions.get("window").width;
 
-const CategoryItem = ({ title, isSelected, onPress, width, isLast }) => {
+const CategoryItem = ({ title, isSelected, onPress, isLast }) => {
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{}}>
       {isSelected ? (
         <LinearGradient
           colors={Colors.PrimaryGradient}
@@ -24,7 +24,7 @@ const CategoryItem = ({ title, isSelected, onPress, width, isLast }) => {
           end={{ x: 1, y: 1 }}
           style={[
             styles.gradientCategory,
-            { width, marginRight: isLast ? 0 : 10 },
+            { width: screenWidth * 0.29, marginRight: isLast ? 0 : 10 },
           ]}
         >
           <Text style={styles.selectedText}>{title}</Text>
@@ -33,7 +33,7 @@ const CategoryItem = ({ title, isSelected, onPress, width, isLast }) => {
         <View
           style={[
             styles.unselectedCategory,
-            { width, marginRight: isLast ? 0 : 10 },
+            { width: screenWidth * 0.29, marginRight: isLast ? 0 : 10 },
           ]}
         >
           <Text style={styles.text}>{title}</Text>
@@ -74,13 +74,13 @@ const CustomCategories = ({
 
 const styles = StyleSheet.create({
   container: {
-    // marginTop: 16,
+    marginTop: 5,
   },
   scrollContainer: {
     paddingHorizontal: horizontalMargin,
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5,
+    // marginBottom: 5,
   },
   gradientCategory: {
     height: 35,

@@ -5,7 +5,6 @@ import {
   FlatList,
   Dimensions,
   RefreshControl,
-  TouchableOpacity,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,7 +12,7 @@ import * as Print from "expo-print";
 import { shareAsync } from "expo-sharing";
 
 import { useDispatch, useSelector } from "react-redux";
-import CustomHeader from "../../components/CustomHeader";
+import CustomHeaderWithLayout from "../../components/CustomHeaderWithLayout";
 import CustomCategories from "../../components/CustomCategories";
 import SearchBar from "../../components/SearchBar";
 import DateSearchButton from "../../components/DateSearchButton";
@@ -27,7 +26,6 @@ import styles from "./Styles";
 import FlightCardGrid from "./components/FlightCardGrid";
 import FlightCardList from "./components/FlightCardList";
 import PDFGenerator from "./components/PDFGenerator";
-import ViewToggle from "../../components/ViewToggle";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalMargin } from "../../config/metrics";
 
@@ -365,12 +363,10 @@ const Flights = () => {
 
       actionButtons = [
         {
-          colors: ["#EF4444", "#DC2626"],
+          // colors: ["#EF4444", "#DC2626"],
           icon: "flight-takeoff",
           text: "Plane Taken Off",
-          rightIcon: "arrow-upward",
-          iconSize: 28,
-          rightIconSize: 20,
+          iconSize: 24,
           onPress: () => {
             Alert.alert(
               "Plane Taken Off",
@@ -494,7 +490,13 @@ const Flights = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <CustomHeader title={selectedEvent?.name || "Event flights"} center />
+      <CustomHeaderWithLayout
+        title={selectedEvent?.name || "Event flights"}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        onPrintPress={printToFile}
+        isPrinting={isPrinting}
+      />
 
       <CustomCategories
         categories={categories}
@@ -512,15 +514,6 @@ const Flights = () => {
           onClear={handleSearchClear}
           style={styles.searchBarInRow}
         />
-        <ViewToggle viewMode={viewMode} onToggle={setViewMode} />
-        <TouchableOpacity
-          style={[styles.printButton, isPrinting && styles.printButtonDisabled]}
-          onPress={printToFile}
-          activeOpacity={0.7}
-          disabled={isPrinting}
-        >
-          <Text style={styles.printButtonText}>{isPrinting ? "⏳" : "📄"}</Text>
-        </TouchableOpacity>
         <DateSearchButton
           onPress={() => setShowDateModal(true)}
           selectedDate={selectedDate}

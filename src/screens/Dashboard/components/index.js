@@ -50,12 +50,15 @@ const EventCard = ({ item, onPress, cardWidth, isListView = false }) => {
             <ImagesWithProps
               source="Calendar_Icon"
               color={Colors.Primary}
-              size={24}
+              size={16}
             />
           </View>
           <View style={styles.eventInfo}>
             <View style={styles.titleRow}>
-              <Text style={styles.eventTitle} numberOfLines={2}>
+              <Text
+                style={styles.eventTitle}
+                numberOfLines={isListView ? 2 : 1}
+              >
                 {item.title || item.name}
               </Text>
               <View
@@ -64,28 +67,34 @@ const EventCard = ({ item, onPress, cardWidth, isListView = false }) => {
                   { backgroundColor: getStatusColor(item.status) },
                 ]}
               >
-                <Text style={styles.statusText}>
+                <Text style={styles.statusText} numberOfLines={1}>
                   {item.status || "Unknown"}
                 </Text>
               </View>
             </View>
-            <Text style={styles.eventDescription} numberOfLines={2}>
-              {item.description}
-            </Text>
+            {isListView && (
+              <Text style={styles.eventDescription} numberOfLines={1}>
+                {item.description}
+              </Text>
+            )}
           </View>
         </View>
 
         <View style={styles.eventDetails}>
           {item.location && (
             <View style={styles.detailRow}>
-              <Ionicons name="location-outline" size={16} color={Colors.Gray} />
-              <Text style={styles.detailText}>{item.location}</Text>
+              <Ionicons name="location-outline" size={12} color={Colors.Gray} />
+              <Text style={styles.detailText} numberOfLines={1}>
+                {item.location}
+              </Text>
             </View>
           )}
 
           <View style={styles.detailRow}>
-            <Ionicons name="calendar-outline" size={16} color={Colors.Gray} />
-            <Text style={styles.detailText}>{formatDateRange()}</Text>
+            <Ionicons name="calendar-outline" size={12} color={Colors.Gray} />
+            <Text style={styles.detailText} numberOfLines={1}>
+              {formatDateRange()}
+            </Text>
           </View>
         </View>
 
