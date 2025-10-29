@@ -1,19 +1,36 @@
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Alert,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
+import { ActionButtonGroup } from "../../../components/ActionButton";
 import { ActionButton } from "../../../components/ActionButton";
 
-const CustomReturnItem = ({ flight, onPress, isTablet = false }) => {
+const FlightCard = ({
+  airlineName,
+  flightNumber,
+  status,
+  headerGradientColors,
+
+  airportCode,
+  airportName,
+  city,
+  country,
+
+  timeInfo = [],
+
+  additionalInfo = [],
+
+  userName = "Mahmoud",
+  userMobile = "+9665900000",
+  userPhoto = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+
+  actionButtons,
+
+  onPress,
+  isTablet = false,
+}) => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -23,7 +40,6 @@ const CustomReturnItem = ({ flight, onPress, isTablet = false }) => {
       }
       return "N/A";
     } catch (error) {
-      console.warn("Date formatting error:", error, "for date:", dateString);
       return "N/A";
     }
   };
@@ -37,48 +53,50 @@ const CustomReturnItem = ({ flight, onPress, isTablet = false }) => {
       }
       return "N/A";
     } catch (error) {
-      console.warn("Time formatting error:", error, "for date:", dateString);
       return "N/A";
     }
   };
 
-  const getStatusGradient = (status) => {
-    switch (status) {
-      case "SCHEDULED":
-        return ["#667eea", "#764ba2"];
-      case "DELAYED":
-        return ["#FF9500", "#FF7A00"];
-      case "CANCELLED":
-        return ["#FF3B30", "#FF1B10"];
-      case "DEPARTED":
-        return ["#34C759", "#30B04F"];
-      default:
-        return ["#667eea", "#764ba2"];
+  const renderActions = () => {
+    if (!actionButtons || actionButtons.length === 0) return null;
+
+    // If single button, use ActionButton
+    if (actionButtons.length === 1) {
+      const button = actionButtons[0];
+      return (
+        <View style={{ marginTop: 16, alignItems: "center" }}>
+          <ActionButton
+            {...button}
+            style={{ width: "100%", ...button.style }}
+          />
+        </View>
+      );
     }
+
+    // Multiple buttons, use ActionButtonGroup
+    return <ActionButtonGroup buttons={actionButtons} />;
   };
 
   return (
     <TouchableOpacity
-      style={[styles.container, { width: isTablet ? "48%" : "100%" }]}
-      onPress={() => onPress && onPress(flight)}
+      style={[styles.container, { width: isTablet ? "49%" : "100%" }]}
+      onPress={onPress}
       activeOpacity={0.8}
     >
       <LinearGradient
-        colors={getStatusGradient(flight.returnFlightStatus)}
+        colors={headerGradientColors || ["#667eea", "#764ba2"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.headerGradient}
       >
         <View style={styles.header}>
           <View style={styles.flightInfo}>
-            <Text style={styles.airlineName}>
-              {flight.returnAirlineName || "N/A"}
-            </Text>
-            <Text style={styles.flightNumber}>{flight.returnFlightNumber}</Text>
+            <Text style={styles.airlineName}>{airlineName || "N/A"}</Text>
+            <Text style={styles.flightNumber}>{flightNumber || "N/A"}</Text>
           </View>
           <View style={styles.statusContainer}>
             <View style={styles.statusBadge}>
-              <Text style={styles.statusText}>{flight.returnFlightStatus}</Text>
+              <Text style={styles.statusText}>{status || "N/A"}</Text>
             </View>
           </View>
         </View>
@@ -87,93 +105,58 @@ const CustomReturnItem = ({ flight, onPress, isTablet = false }) => {
       <View style={styles.content}>
         <View style={styles.routeInfo}>
           <View style={styles.airportInfo}>
-            <Text style={styles.airportCode}>{flight.returnAirportCode}</Text>
-            <Text style={styles.airportName}>{flight.returnAirport}</Text>
+            <Text style={styles.airportCode}>{airportCode || "N/A"}</Text>
+            <Text style={styles.airportName}>{airportName || "N/A"}</Text>
             <Text style={styles.cityCountry}>
-              {flight.returnCity}, {flight.returnCountry}
+              {city || "N/A"}, {country || "N/A"}
             </Text>
           </View>
         </View>
 
-        <View style={styles.timeInfo}>
-          <View style={styles.timeContainer}>
-            <Text style={styles.timeLabel}>🚀 Departure Time</Text>
-            <Text style={styles.timeValue}>
-              {formatTime(flight.returnDate)}
-            </Text>
-            <Text style={styles.dateValue}>
-              {formatDate(flight.returnDate)}
-            </Text>
+        {timeInfo.length > 0 && (
+          <View style={styles.timeInfo}>
+            {timeInfo.map((timeItem, index) => (
+              <View key={index} style={styles.timeContainer}>
+                <Text style={styles.timeLabel}>{timeItem.label || ""}</Text>
+                <Text style={styles.timeValue}>
+                  {timeItem.time ? formatTime(timeItem.time) : "N/A"}
+                </Text>
+                <Text style={styles.dateValue}>
+                  {timeItem.date ? formatDate(timeItem.date) : "N/A"}
+                </Text>
+              </View>
+            ))}
           </View>
+        )}
 
-          {flight.estimatedDepartureTime && (
-            <View style={styles.timeContainer}>
-              <Text style={styles.timeLabel}>⏰ Estimated</Text>
-              <Text style={styles.timeValue}>
-                {formatTime(flight.estimatedDepartureTime)}
-              </Text>
-              <Text style={styles.dateValue}>
-                {formatDate(flight.estimatedDepartureTime)}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.additionalInfo}>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>💺 Seat:</Text>
-            <Text style={styles.infoValue}>{flight.seatNumber || "N/A"}</Text>
+        {additionalInfo.length > 0 && (
+          <View style={styles.additionalInfo}>
+            {additionalInfo.map((infoItem, index) => (
+              <View key={index} style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{infoItem.title || ""}:</Text>
+                <Text style={styles.infoValue}>{infoItem.value || "N/A"}</Text>
+              </View>
+            ))}
           </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>📋 Booking:</Text>
-            <Text style={styles.infoValue}>
-              {flight.bookingReference || "N/A"}
-            </Text>
-          </View>
-        </View>
+        )}
 
         {/* User Information Section */}
         <View style={styles.userInfoSection}>
           <Text style={styles.userInfoTitle}>Passenger Info</Text>
           <View style={styles.userInfoContainer}>
-            <View style={styles.userPhotoContainer}>
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-                }}
-                style={styles.userPhoto}
-                resizeMode="cover"
-              />
-            </View>
+            <Image
+              source={{ uri: userPhoto }}
+              style={styles.userPhoto}
+              resizeMode="cover"
+            />
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>Mahmoud</Text>
-              <Text style={styles.userMobile}>+96659116100</Text>
+              <Text style={styles.userName}>{userName}</Text>
+              <Text style={styles.userMobile}>{userMobile}</Text>
             </View>
           </View>
         </View>
 
-        <View style={{ marginTop: 16, alignItems: "center" }}>
-          <ActionButton
-            colors={["#EF4444", "#DC2626"]}
-            icon="flight-takeoff"
-            text="Plane Taken Off"
-            rightIcon="arrow-upward"
-            iconSize={28}
-            rightIconSize={20}
-            onPress={() => {
-              Alert.alert(
-                "Plane Taken Off",
-                `Flight ${flight.returnFlightNumber} has taken off successfully!`,
-                [{ text: "OK", style: "default" }]
-              );
-              console.log(
-                "Return flight action completed for flight:",
-                flight.id
-              );
-            }}
-            style={{ width: "100%" }}
-          />
-        </View>
+        {renderActions()}
       </View>
     </TouchableOpacity>
   );
@@ -191,8 +174,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    marginVertical: 4,
-    marginHorizontal: 6,
+    marginVertical: 10,
   },
   headerGradient: {
     borderTopLeftRadius: 8,
@@ -371,9 +353,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  userPhotoContainer: {
-    marginRight: 6,
-  },
   userPhoto: {
     width: 24,
     height: 24,
@@ -382,6 +361,8 @@ const styles = StyleSheet.create({
     borderColor: "#667eea",
   },
   userDetails: {
+    alignItems: "flex-start",
+    paddingLeft: 6,
     flex: 1,
   },
   userName: {
@@ -397,41 +378,6 @@ const styles = StyleSheet.create({
     color: "#718096",
     textAlign: "right",
   },
-  modernButtonContainer: {
-    marginTop: 16,
-    alignItems: "center",
-  },
-  modernButton: {
-    width: "100%",
-    borderRadius: 25,
-    elevation: 8,
-    shadowColor: "#EF4444",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  buttonGradient: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_SEMI_BOLD,
-    color: "#FFFFFF",
-    marginHorizontal: 12,
-    textAlign: "center",
-  },
 });
 
-export default CustomReturnItem;
+export default FlightCard;

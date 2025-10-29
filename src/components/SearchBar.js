@@ -1,5 +1,8 @@
 import React from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, TextInput, TouchableOpacity } from "react-native";
+import { Colors } from "../Global/colors";
+import { Ionicons } from "@expo/vector-icons";
+import { Fonts } from "../Global/fonts";
 
 const SearchBar = ({
   placeholder = "Search...",
@@ -18,7 +21,7 @@ const SearchBar = ({
   return (
     <View style={[styles.searchContainer, style]}>
       <View style={styles.searchBar}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Ionicons name="search" size={22} color={Colors.Gray} />
         <TextInput
           style={styles.searchInput}
           placeholder={placeholder}
@@ -28,7 +31,7 @@ const SearchBar = ({
         />
         {value.length > 0 && (
           <TouchableOpacity onPress={handleClear}>
-            <Text style={styles.clearIcon}>✕</Text>
+            <Ionicons name="close" size={24} color={Colors.Gray} />
           </TouchableOpacity>
         )}
       </View>
@@ -37,35 +40,23 @@ const SearchBar = ({
 };
 
 const styles = {
-  searchContainer: {
-    paddingHorizontal: 22,
-    paddingVertical: 16,
-  },
+  searchContainer: {},
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffff",
+    backgroundColor: Colors.White,
     borderRadius: 16,
     paddingHorizontal: 16,
-    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: Colors.LightGray,
     height: 50,
-  },
-  searchIcon: {
-    fontSize: 16,
-    marginRight: 12,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#1E293B",
-  },
-  clearIcon: {
-    fontSize: 16,
-    color: "#94A3B8",
-    padding: 4,
+    fontSize: 12,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.TextPrimary,
+    marginLeft: 5,
   },
 };
 

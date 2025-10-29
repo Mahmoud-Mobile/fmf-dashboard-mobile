@@ -8,7 +8,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.Background,
   },
 
-  listContainer: {},
   row: {
     justifyContent: "space-between",
     paddingHorizontal: 0,
@@ -16,7 +15,7 @@ const styles = StyleSheet.create({
   listFooter: {
     padding: 20,
     alignItems: "center",
-    marginBottom: 300,
+    marginBottom: 100,
   },
   footerText: {
     fontSize: 14,

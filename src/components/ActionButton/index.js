@@ -10,10 +10,9 @@ const ActionButton = ({
   text,
   onPress,
   style,
-  iconSize = 20,
+  iconSize = 14,
   textStyle,
-  rightIcon,
-  rightIconSize = 20,
+
   flex,
 }) => {
   return (
@@ -35,13 +34,6 @@ const ActionButton = ({
         <View style={styles.content}>
           <MaterialIcons name={icon} size={iconSize} color="#FFFFFF" />
           <Text style={[styles.text, textStyle]}>{text}</Text>
-          {rightIcon && (
-            <MaterialIcons
-              name={rightIcon}
-              size={rightIconSize}
-              color="#FFFFFF"
-            />
-          )}
         </View>
       </LinearGradient>
     </TouchableOpacity>

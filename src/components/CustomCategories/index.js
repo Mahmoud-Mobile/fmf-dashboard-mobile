@@ -74,7 +74,7 @@ const CustomCategories = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 16,
+    // marginTop: 16,
   },
   scrollContainer: {
     paddingHorizontal: horizontalMargin,
@@ -83,14 +83,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   gradientCategory: {
-    height: 45,
-    borderRadius: 25,
+    height: 35,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
   },
   unselectedCategory: {
-    height: 45,
-    borderRadius: 25,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: "#F8F9FA",
     borderWidth: 1,
     borderColor: "#374151",

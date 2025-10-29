@@ -2,26 +2,15 @@ import { StyleSheet } from "react-native";
 import { Fonts } from "../../Global/fonts";
 
 const styles = StyleSheet.create({
-  button: {
-    borderRadius: 20,
-    elevation: 6,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    flex: 1,
-  },
+  button: {},
   buttonSingle: {
     width: "100%",
   },
   gradient: {
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 20,
-    height: 50,
+    borderRadius: 12,
+    height: 40,
   },
   content: {
     flexDirection: "row",
@@ -30,19 +19,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   text: {
-    fontSize: 12,
-    fontFamily: Fonts.FONT_Semi,
+    fontSize: 10,
+    fontFamily: Fonts.FONT_MEDIUM,
     color: "#FFFFFF",
   },
   buttonGroup: {
-    marginTop: 16,
+    marginTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 8,
-  },
-  buttonSingleContainer: {
-    marginTop: 16,
-    alignItems: "center",
   },
 });
 

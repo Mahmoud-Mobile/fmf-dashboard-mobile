@@ -24,12 +24,11 @@ import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
 import styles from "./Styles";
 
-// Custom Category Components
-import CustomMinistryItem from "./components/CustomMinistryItem";
-import CustomArrivalItem from "./components/CustomArrivalItem";
-import CustomReturnItem from "./components/CustomReturnItem";
+import FlightCard from "./components/FlightCardGrid";
 import PDFGenerator from "./components/PDFGenerator";
 import { useNavigation } from "@react-navigation/native";
+import { horizontalMargin } from "../../config/metrics";
+
 const { width } = Dimensions.get("window");
 const isTablet = width > 768;
 
@@ -51,7 +50,6 @@ const Flights = () => {
     { id: "return", label: "Return", key: "return" },
   ];
 
-  // Filter flights based on search text and date
   const filteredFlights = useMemo(() => {
     let filtered = flights?.flights || [];
 
@@ -240,41 +238,239 @@ const Flights = () => {
     }
   };
 
-  const renderFlightItem = ({ item }) => {
-    switch (selectedCategory) {
-      case "ministry":
-        return (
-          <CustomMinistryItem
-            flight={item}
-            onPress={handleFlightPress}
-            isTablet={isTablet}
-          />
-        );
-      case "arrival":
-        return (
-          <CustomArrivalItem
-            flight={item}
-            onPress={handleFlightPress}
-            isTablet={isTablet}
-          />
-        );
-      case "return":
-        return (
-          <CustomReturnItem
-            flight={item}
-            onPress={handleFlightPress}
-            isTablet={isTablet}
-          />
-        );
+  const getStatusGradient = (status) => {
+    switch (status) {
+      case "SCHEDULED":
+        return ["#667eea", "#764ba2"];
+      case "DELAYED":
+        return ["#FF9500", "#FF7A00"];
+      case "CANCELLED":
+        return ["#FF3B30", "#FF1B10"];
+      case "ARRIVED":
+        return ["#34C759", "#30B04F"];
+      case "DEPARTED":
+        return ["#34C759", "#30B04F"];
       default:
-        return (
-          <CustomMinistryItem
-            flight={item}
-            onPress={handleFlightPress}
-            isTablet={isTablet}
-          />
-        );
+        return ["#667eea", "#764ba2"];
     }
+  };
+
+  const prepareFlightCardData = (flight) => {
+    let flightData = {};
+    let timeInfo = [];
+    let additionalInfo = [];
+    let actionButtons = [];
+
+    if (selectedCategory === "arrival") {
+      flightData = {
+        airlineName: flight.arrivalAirlinesName || "N/A",
+        flightNumber: flight.arrivalFlightNumber,
+        status: flight.arrivalFlightStatus,
+        headerGradientColors: getStatusGradient(flight.arrivalFlightStatus),
+        airportCode: flight.arrivalAirportCode,
+        airportName: flight.arrivalAirport,
+        city: flight.arrivalCity,
+        country: flight.arrivalCountry,
+      };
+
+      timeInfo = [
+        {
+          label: "✈️ Arrival Time",
+          time: flight.arrivalDate,
+          date: flight.arrivalDate,
+        },
+      ];
+      if (flight.estimatedArrivalTime) {
+        timeInfo.push({
+          label: "⏰ Estimated",
+          time: flight.estimatedArrivalTime,
+          date: flight.estimatedArrivalTime,
+        });
+      }
+
+      additionalInfo = [
+        { title: "💺 Seat", value: flight.seatNumber || "N/A" },
+        { title: "📋 Booking", value: flight.bookingReference || "N/A" },
+      ];
+
+      actionButtons = [
+        {
+          icon: "flight-land",
+          text: "Plane Landed",
+          onPress: () => {
+            Alert.alert(
+              "Plane Landed",
+              `Flight ${flight.arrivalFlightNumber} has landed successfully!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+        {
+          icon: "check-circle",
+          text: "Logged Arrived",
+          onPress: () => {
+            Alert.alert(
+              "Logged Arrived",
+              `Passenger arrival has been logged for flight ${flight.arrivalFlightNumber}!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+        {
+          icon: "verified-user",
+          text: "Guest Granted",
+          onPress: () => {
+            Alert.alert(
+              "Guest Granted",
+              `Guest access has been granted for flight ${flight.arrivalFlightNumber}!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+      ];
+    } else if (selectedCategory === "return") {
+      flightData = {
+        airlineName: flight.returnAirlineName || "N/A",
+        flightNumber: flight.returnFlightNumber,
+        status: flight.returnFlightStatus,
+        headerGradientColors: getStatusGradient(flight.returnFlightStatus),
+        airportCode: flight.returnAirportCode,
+        airportName: flight.returnAirport,
+        city: flight.returnCity,
+        country: flight.returnCountry,
+      };
+
+      timeInfo = [
+        {
+          label: "🚀 Departure Time",
+          time: flight.returnDate,
+          date: flight.returnDate,
+        },
+      ];
+      if (flight.estimatedDepartureTime) {
+        timeInfo.push({
+          label: "⏰ Estimated",
+          time: flight.estimatedDepartureTime,
+          date: flight.estimatedDepartureTime,
+        });
+      }
+
+      additionalInfo = [
+        { title: "💺 Seat", value: flight.seatNumber || "N/A" },
+        { title: "📋 Booking", value: flight.bookingReference || "N/A" },
+      ];
+
+      actionButtons = [
+        {
+          colors: ["#EF4444", "#DC2626"],
+          icon: "flight-takeoff",
+          text: "Plane Taken Off",
+          rightIcon: "arrow-upward",
+          iconSize: 28,
+          rightIconSize: 20,
+          onPress: () => {
+            Alert.alert(
+              "Plane Taken Off",
+              `Flight ${flight.returnFlightNumber} has taken off successfully!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+      ];
+    } else {
+      // Ministry
+      flightData = {
+        airlineName:
+          flight.arrivalAirlinesName || flight.returnAirlineName || "N/A",
+        flightNumber: flight.arrivalFlightNumber || flight.returnFlightNumber,
+        status: "MINISTRY",
+        headerGradientColors: ["#667eea", "#764ba2"],
+        airportCode: flight.arrivalAirportCode || flight.returnAirportCode,
+        airportName: flight.arrivalAirport || flight.returnAirport,
+        city: flight.arrivalCity || flight.returnCity,
+        country: flight.arrivalCountry || flight.returnCountry,
+      };
+
+      if (flight.arrivalDate) {
+        timeInfo.push({
+          label: "Arrival",
+          time: flight.arrivalDate,
+          date: flight.arrivalDate,
+        });
+      }
+      if (flight.estimatedArrivalTime) {
+        timeInfo.push({
+          label: "⏰ Estimated",
+          time: flight.estimatedArrivalTime,
+          date: flight.estimatedArrivalTime,
+        });
+      }
+
+      additionalInfo = [
+        { title: "Flight Type", value: flight.flightType || "N/A" },
+        { title: "Class", value: flight.flightClass || "N/A" },
+      ];
+
+      actionButtons = [
+        {
+          icon: "flight-land",
+          text: "Plane Landed",
+          onPress: () => {
+            Alert.alert(
+              "Plane Landed",
+              `Flight ${
+                flight.arrivalFlightNumber || flight.returnFlightNumber
+              } has landed successfully!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+        {
+          icon: "check-circle",
+          text: "Logged Arrived",
+          onPress: () => {
+            Alert.alert(
+              "Logged Arrived",
+              `Passenger arrival has been logged for flight ${
+                flight.arrivalFlightNumber || flight.returnFlightNumber
+              }!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+        {
+          icon: "verified-user",
+          text: "Guest Granted",
+          onPress: () => {
+            Alert.alert(
+              "Guest Granted",
+              `Guest access has been granted for flight ${
+                flight.arrivalFlightNumber || flight.returnFlightNumber
+              }!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+      ];
+    }
+
+    return {
+      ...flightData,
+      timeInfo,
+      additionalInfo,
+      actionButtons,
+    };
+  };
+
+  const renderFlightItem = ({ item }) => {
+    const cardData = prepareFlightCardData(item);
+    return (
+      <FlightCard
+        {...cardData}
+        onPress={() => handleFlightPress(item)}
+        isTablet={isTablet}
+      />
+    );
   };
 
   const renderEmptyComponent = () => <EmptyListComponent />;
@@ -289,7 +485,7 @@ const Flights = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <CustomHeader title={selectedEvent?.name || "Event flights"} center />
 
       <CustomCategories
@@ -302,7 +498,7 @@ const Flights = () => {
 
       <View style={styles.searchRow}>
         <SearchBar
-          placeholder="Search flights..."
+          placeholder="Search by airline, flight number, airport, city, seat, booking..."
           value={searchText}
           onChangeText={setSearchText}
           onClear={handleSearchClear}
@@ -325,21 +521,20 @@ const Flights = () => {
         />
       </View>
 
-      <View style={{ marginHorizontal: 12 }}>
-        <FlatList
-          data={filteredFlights}
-          renderItem={renderFlightItem}
-          keyExtractor={(item) => item.id}
-          ListFooterComponent={renderListFooter}
-          ListEmptyComponent={renderEmptyComponent}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          showsVerticalScrollIndicator={false}
-          numColumns={isTablet ? 2 : 1}
-          columnWrapperStyle={isTablet ? styles.row : null}
-        />
-      </View>
+      <FlatList
+        data={filteredFlights}
+        renderItem={renderFlightItem}
+        keyExtractor={(item) => item.id}
+        ListFooterComponent={renderListFooter}
+        ListEmptyComponent={renderEmptyComponent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+        numColumns={isTablet ? 2 : 1}
+        columnWrapperStyle={isTablet ? styles.row : null}
+        contentContainerStyle={{ marginHorizontal: horizontalMargin }}
+      />
       <LoadingModal visible={loading} />
       <FloatingChatIcon />
 
