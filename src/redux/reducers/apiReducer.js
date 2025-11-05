@@ -9,6 +9,7 @@ const apiSlice = createSlice({
     events: [],
     selectedEvent: {},
     flights: [],
+    trips: [],
     loading: false,
     error: null,
   },
@@ -43,6 +44,11 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setTrips: (state, action) => {
+      state.trips = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
     setLoading: (state) => {
       state.loading = true;
     },
@@ -61,6 +67,7 @@ export const {
   setEvents,
   setSelectedEvent,
   setFlights,
+  setTrips,
   setLoading,
   setError,
 } = apiSlice.actions;

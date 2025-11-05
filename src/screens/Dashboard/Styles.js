@@ -12,7 +12,6 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   columnWrapper: {
-    justifyContent: "space-between",
     marginBottom: 8,
   },
   searchRow: {

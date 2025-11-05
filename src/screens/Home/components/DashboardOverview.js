@@ -1,173 +1,153 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "../../../Global/colors";
 import { Fonts } from "../../../Global/fonts";
+import { horizontalMargin } from "../../../config/metrics";
 
 const DashboardOverview = () => {
   const dashboardData = [
     {
       id: 1,
-      title: "Arrivals Today",
-      count: 24,
-      icon: "✈️",
-      color: "#3B82F6",
+      title: "Total Flights",
+      count: 12,
+      icon: "airplane",
+      subMetrics: [
+        { label: "Delayed", value: 4, color: Colors.Error },
+        { label: "Arrived", value: 6, color: Colors.Success },
+      ],
     },
     {
       id: 2,
-      title: "Flights Today",
-      count: 18,
-      icon: "🛫",
-      color: "#10B981",
+      title: "Active Staff",
+      count: 20,
+      icon: "account-group",
+      subMetrics: [
+        { label: "Completed Tasks", value: 13, color: Colors.Success },
+        { label: "Pending Tasks", value: 7, color: Colors.Error },
+      ],
     },
     {
       id: 3,
-      title: "Departures",
-      count: 12,
-      icon: "🛬",
-      color: "#F59E0B",
+      title: "Active Trips",
+      count: 7,
+      icon: "car",
+      subMetrics: [
+        { label: "completed", value: 3, color: Colors.Success },
+        { label: "Ongoing", value: 4, color: Colors.Error },
+      ],
     },
     {
       id: 4,
-      title: "Active Trips",
-      count: 8,
-      icon: "🚗",
-      color: "#EF4444",
+      title: "Hotel Occupancy",
+      count: 620,
+      icon: "office-building",
+      subMetrics: [
+        { label: "Check-in", value: 360, color: Colors.Success },
+        { label: "Pending", value: 260, color: Colors.Error },
+      ],
     },
   ];
 
-  const MetricCard = ({ item }) => (
-    <TouchableOpacity style={styles.cardWrapper}>
+  const MetricCard = ({ item }) => {
+    return (
       <View style={styles.card}>
-        <View style={styles.cardContent}>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardTitle}>{item.title}</Text>
           <View style={styles.iconContainer}>
-            <View
-              style={[
-                styles.iconBackground,
-                { backgroundColor: `${item.color}15` },
-              ]}
-            >
-              <Text style={styles.icon}>{item.icon}</Text>
+            <MaterialCommunityIcons
+              name={item.icon}
+              size={16}
+              color={Colors.Primary}
+            />
+          </View>
+        </View>
+
+        <Text style={styles.count}>{item.count}</Text>
+        <View style={{ marginTop: 5 }}>
+          {item.subMetrics.map((metric, index) => (
+            <View key={index} style={styles.subMetric}>
+              <View style={[styles.dot, { backgroundColor: metric.color }]} />
+              <Text style={styles.subMetricText}>
+                {metric.label}: {metric.value}
+              </Text>
             </View>
-          </View>
-
-          <View style={styles.countContainer}>
-            <Text style={styles.count}>{item.count}</Text>
-          </View>
-
-          <Text style={styles.title}>{item.title}</Text>
+          ))}
         </View>
       </View>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.sectionTitle}>Dashboard Overview</Text>
-        <Text style={styles.subtitle}>Real-time operational metrics</Text>
-      </View>
-      <ScrollView
+      <FlatList
+        data={dashboardData}
+        renderItem={({ item }) => <MetricCard item={item} />}
+        keyExtractor={(item) => item.id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContainer}
-      >
-        {dashboardData.map((item) => (
-          <MetricCard key={item.id} item={item} />
-        ))}
-      </ScrollView>
+        contentContainerStyle={styles.listContent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingVertical: 20,
+    marginTop: 32,
   },
-  headerContainer: {
-    marginBottom: 20,
+  listContent: {
+    paddingHorizontal: horizontalMargin,
   },
-  sectionTitle: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: Colors.Black,
-    fontFamily: Fonts.FONT_BOLD,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: Colors.gray,
-    fontFamily: Fonts.FONT_REGULAR,
-    opacity: 0.8,
-  },
-  scrollContainer: {
-    paddingRight: 16,
-  },
-  cardWrapper: {
-    marginRight: 16,
+  separator: {
+    width: 12,
   },
   card: {
     backgroundColor: Colors.White,
-    borderRadius: 20,
-    padding: 22,
-    width: 160,
-    minHeight: 120,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 1,
-    elevation: 4,
-    marginVertical: 2,
+    borderRadius: 12,
+    padding: 16,
+    width: 230,
   },
-  cardContent: {
-    flex: 1,
+  cardHeader: {
+    flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   iconContainer: {
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  iconBackground: {
-    borderRadius: 12,
-    padding: 12,
-    width: 48,
-    height: 48,
+    backgroundColor: "#EFF6FF",
+    borderRadius: 6,
+    width: 30,
+    height: 30,
     justifyContent: "center",
     alignItems: "center",
   },
-  icon: {
-    fontSize: 24,
-  },
-  countContainer: {
-    alignItems: "center",
-    marginBottom: 8,
+  cardTitle: {
+    fontSize: 12,
+    color: Colors.SecondaryText,
+    fontFamily: Fonts.FONT_REGULAR,
   },
   count: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: Colors.Black,
+    fontSize: 36,
+    color: Colors.PrimaryText,
     fontFamily: Fonts.FONT_BOLD,
-    textAlign: "center",
+    marginVertical: 16,
   },
-  title: {
-    fontSize: 13,
-    color: Colors.gray,
-    fontFamily: Fonts.FONT_MEDIUM,
-    fontWeight: "500",
-    lineHeight: 16,
-    textAlign: "center",
+  subMetric: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 8,
+  },
+  subMetricText: {
+    fontSize: 12,
+    color: Colors.Black,
+    fontFamily: Fonts.FONT_REGULAR,
   },
 });
 

@@ -1,68 +1,64 @@
-import React, { useState } from "react";
-import {
-  ScrollView,
-  View,
-  RefreshControl,
-  Animated,
-  Text,
-  Dimensions,
-} from "react-native";
+import React from "react";
+import { View, Dimensions, ScrollView, Text } from "react-native";
 import styles from "./Styles";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import LoadingModal from "../../components/LoadingModal";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
-import { Colors } from "../../Global/colors";
-import { LinearGradient } from "expo-linear-gradient";
 import EventHeader from "./components/EventHeader";
+import DataTableCard from "../../components/DataTableCard";
+import ChartCard from "../../components/ChartCard";
+import { Colors } from "../../Global/colors";
+import dummyData from "../../data/dummyData.json";
 import DashboardOverview from "./components/DashboardOverview";
-import FlightToday from "./components/FlightToday";
-import SwipeCategories from "./components/SwipeCategories";
-
-import ArrivalGuests from "./components/ArrivalGuests";
-import ReturnGuests from "./components/ReturnGuests";
-import Flight from "./components/Flight";
-import ArrivalGuestChart from "./components/ArrivalGuestChart";
-import ReturnGuestChart from "./components/ReturnGuestChart";
-import HotelOccupancy from "./components/HotelOccupancy";
-import HotelDetails from "./components/HotelDetails";
-import TripList from "./components/TripList";
-import TripsSummary from "./components/TripsSummary";
-import AgeChart from "./components/AgeChart";
-import GenderChart from "./components/GenderChart";
-import ContinentChart from "./components/ContinentChart";
 
 const Home = () => {
   const navigation = useNavigation();
   const { selectedEvent } = useSelector((state) => state.api) || {};
 
-  const [onRefresh, setOnRefresh] = useState(false);
-  const [showIndicator, setShowIndicator] = useState(false);
-
-  const Call_RefreshControl = () => {
-    setOnRefresh(false);
-  };
-
   const { width } = Dimensions.get("window");
   const isTablet = width >= 768;
 
-  const renderRow = (children) => {
+  const handleItemPress = (item, screenName) => {
+    if (screenName && navigation) {
+      navigation.navigate(screenName, { item });
+    }
+  };
+
+  const {
+    returnGuestsData,
+    arrivalGuestsData,
+    flightsData,
+    hotelOccupancyData,
+    hotelDetailsData,
+    tripListData,
+    tripsSummaryData,
+    arrivalGuestsChartData,
+    returnGuestsChartData,
+    ageDistributionChartData,
+    continentChartData,
+    genderDistributionChartData,
+  } = dummyData;
+
+  const renderResponsiveCards = (cards, tabletColumns = 2) => {
     if (isTablet) {
+      const widthPercentage = tabletColumns === 2 ? "48%" : "32%";
       return (
-        <View style={styles.rowContainer}>
-          {React.Children.map(children, (child, index) => (
-            <View key={index} style={styles.tabletCardWrapper}>
-              {child}
+        <View style={styles.responsiveGridContainer}>
+          {cards.map((card, index) => (
+            <View
+              key={index}
+              style={{ width: widthPercentage, marginBottom: 10 }}
+            >
+              {card}
             </View>
           ))}
         </View>
       );
     } else {
       return (
-        <View style={styles.mobileContainer}>
-          {React.Children.map(children, (child, index) => (
-            <View key={index} style={styles.mobileCardWrapper}>
-              {child}
+        <View style={{}}>
+          {cards.map((card, index) => (
+            <View key={index} style={{ width: "100%" }}>
+              {card}
             </View>
           ))}
         </View>
@@ -70,71 +66,208 @@ const Home = () => {
     }
   };
 
-  const renderGrid = (children) => {
-    return (
-      <View style={styles.gridContainer}>
-        {React.Children.map(children, (child, index) => (
-          <View
-            key={index}
-            style={isTablet ? styles.gridItemTablet : styles.gridItem}
-          >
-            {child}
-          </View>
-        ))}
-      </View>
-    );
-  };
   return (
-    <LinearGradient
-      colors={["#E5E5E5", Colors.White, Colors.White]}
-      style={{ flex: 1 }}
-    >
-      <View style={styles.container}>
-        <EventHeader />
-        {/* <DashboardOverview />
-        <FlightToday /> */}
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={onRefresh}
-              onRefresh={Call_RefreshControl}
+    <View style={styles.container}>
+      <EventHeader />
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <DashboardOverview />
+
+        <View style={styles.content}>
+          <Text style={styles.sectionTitle}>Event Analytics</Text>
+          <View style={styles.chartCardsContainer}>
+            <ChartCard
+              key="arrival-guests-chart"
+              title="Arrival Guests"
+              data={arrivalGuestsChartData}
             />
-          }
-        >
-          <View style={styles.content}>
-            <SwipeCategories />
-
-            {renderRow([<ArrivalGuests />, <ReturnGuests />, <Flight />])}
-
-            <View style={styles.sectionTitle}>
-              <Text style={styles.sectionTitleText}>Event Analytics</Text>
-            </View>
-            {renderGrid([
-              <ArrivalGuestChart />,
-              <ReturnGuestChart />,
-              <AgeChart />,
-              <GenderChart />,
-              <ContinentChart />,
-            ])}
-
-            <View style={styles.sectionTitle}>
-              <Text style={styles.sectionTitleText}>Hotel Information</Text>
-            </View>
-            {renderRow([<HotelOccupancy />, <HotelDetails />])}
-
-            <View style={styles.sectionTitle}>
-              <Text style={styles.sectionTitleText}>Trips Information</Text>
-            </View>
-            {renderRow([<TripList />, <TripsSummary />])}
+            <ChartCard
+              key="return-guests-chart"
+              title="Return Guests"
+              data={returnGuestsChartData}
+            />
+            <ChartCard
+              key="age-distribution-chart"
+              title="Age Distribution"
+              data={ageDistributionChartData}
+            />
+            <ChartCard
+              key="continent-chart"
+              title="Continent"
+              data={continentChartData}
+            />
+            <ChartCard
+              key="gender-distribution-chart"
+              title="Gender Distribution"
+              data={genderDistributionChartData}
+            />
           </View>
-        </ScrollView>
-
-        <FloatingChatIcon />
-        {showIndicator ? <LoadingModal visible={showIndicator} /> : <></>}
-      </View>
-    </LinearGradient>
+          {renderResponsiveCards(
+            [
+              <DataTableCard
+                key="arrival-guests"
+                title="Arrival Guests"
+                columns={[
+                  {
+                    title: "Flight No",
+                    key: "flightNo",
+                  },
+                  { title: "Name", key: "name" },
+                  {
+                    title: "Date & Time",
+                    key: "dateTime",
+                    render: ({ item }) => (
+                      <View style={{}}>
+                        <Text style={styles.dateText}>{item.date}</Text>
+                        <Text style={styles.timeText}>{item.time}</Text>
+                      </View>
+                    ),
+                  },
+                ]}
+                data={arrivalGuestsData}
+              />,
+              <DataTableCard
+                key="return-guests"
+                title="Return Guests"
+                columns={[
+                  {
+                    title: "Flight No",
+                    key: "flightNo",
+                  },
+                  { title: "Name", key: "name" },
+                  {
+                    title: "Date & Time",
+                    key: "dateTime",
+                    render: ({ item }) => (
+                      <View style={{}}>
+                        <Text style={styles.dateText}>{item.date}</Text>
+                        <Text style={styles.timeText}>{item.time}</Text>
+                      </View>
+                    ),
+                  },
+                ]}
+                data={returnGuestsData}
+              />,
+            ],
+            2
+          )}
+          {renderResponsiveCards(
+            [
+              <DataTableCard
+                key="flights"
+                title="Flights"
+                columns={[
+                  {
+                    title: "Flight No",
+                    key: "flightNo",
+                  },
+                  { title: "Airline", key: "airline" },
+                  { title: "Destination", key: "destination" },
+                  {
+                    title: "Date & Time",
+                    key: "dateTime",
+                    render: ({ item }) => (
+                      <View style={{}}>
+                        <Text style={styles.dateText}>{item.date}</Text>
+                        <Text style={styles.timeText}>{item.time}</Text>
+                      </View>
+                    ),
+                  },
+                ]}
+                data={flightsData}
+                onItemPress={handleItemPress}
+                navigationName="FlightDetails"
+              />,
+              <DataTableCard
+                key="hotel-occupancy"
+                title="Hotel Occupancy"
+                columns={[
+                  { title: "Hotel Name", key: "hotelName" },
+                  {
+                    title: "Count",
+                    key: "count",
+                    render: ({ item }) => (
+                      <View style={{}}>
+                        <Text style={styles.countBadgeText}>{item.count}</Text>
+                      </View>
+                    ),
+                  },
+                ]}
+                data={hotelOccupancyData}
+              />,
+            ],
+            2
+          )}
+          {renderResponsiveCards(
+            [
+              <DataTableCard
+                key="hotel-details"
+                title="Hotel Details"
+                columns={[
+                  { title: "Hotel", key: "hotel" },
+                  { title: "Guest", key: "guest" },
+                  {
+                    title: "Status",
+                    key: "status",
+                    render: ({ item }) => {
+                      const getStatusColor = (status) => {
+                        switch (status) {
+                          case "Checked In":
+                            return Colors.Success;
+                          case "Checked Out":
+                            return Colors.DarkGray;
+                          case "Pending":
+                            return Colors.Warning;
+                          default:
+                            return Colors.DarkGray;
+                        }
+                      };
+                      return (
+                        <Text
+                          style={[
+                            styles.statusText,
+                            { color: getStatusColor(item.status) },
+                          ]}
+                        >
+                          {item.status}
+                        </Text>
+                      );
+                    },
+                  },
+                ]}
+                data={hotelDetailsData}
+              />,
+              <DataTableCard
+                key="trip-list"
+                title="Trip List"
+                columns={[
+                  { title: "Car Name", key: "carName" },
+                  { title: "Driver", key: "driver" },
+                ]}
+                data={tripListData}
+              />,
+            ],
+            2
+          )}
+          {renderResponsiveCards(
+            [
+              <DataTableCard
+                key="trips-summary"
+                title="Trips Summary"
+                columns={[
+                  { title: "Guest Name", key: "guestName" },
+                  { title: "Driver", key: "driver" },
+                ]}
+                data={tripsSummaryData}
+              />,
+            ],
+            2
+          )}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 

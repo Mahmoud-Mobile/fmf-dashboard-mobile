@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   text: {
-    fontSize: 10,
+    fontSize: 8,
     fontFamily: Fonts.FONT_MEDIUM,
     color: "#374151",
   },

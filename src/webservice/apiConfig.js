@@ -84,6 +84,11 @@ const flights = async (eventId, data) => {
   return await Get(`participants/events/${eventId}/flights`, data);
 };
 
+// trips apis
+const trips = async (eventId, data) => {
+  return await Get(`events/${eventId}/transportation/trips`, data);
+};
+
 export {
   login,
   register,
@@ -103,4 +108,5 @@ export {
   events,
   getEventById,
   flights,
+  trips,
 };

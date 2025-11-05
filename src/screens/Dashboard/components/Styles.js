@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(0, 0, 0, 0.05)",
     overflow: "hidden",
+    marginRight: 10,
   },
   eventCardContent: {
     padding: 10,
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.Gray,
-    marginRight: 3,
+    marginRight: 2,
   },
   typeValue: {
     fontSize: 9,
@@ -147,15 +148,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
-    minWidth: 50,
     alignItems: "center",
   },
   activeText: {
     fontSize: 8,
-    fontFamily: Fonts.FONT_Semi,
+    fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.White,
     textTransform: "uppercase",
-    letterSpacing: 0.3,
   },
   eventCardListView: {
     marginRight: 0,

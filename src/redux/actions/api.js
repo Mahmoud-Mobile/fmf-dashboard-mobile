@@ -3,6 +3,7 @@ import {
   events,
   getEventById,
   flights,
+  trips,
 } from "../../webservice/apiConfig";
 
 import {
@@ -12,6 +13,7 @@ import {
   setEvents,
   setSelectedEvent,
   setFlights,
+  setTrips,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -64,6 +66,18 @@ export const fetchFlights = (eventId, params) => async (dispatch) => {
   } catch (error) {
     console.log("Error in fetchFlights:", error);
     dispatch(setError("Error fetching flights"));
+  }
+};
+
+// Fetch trips for an event
+export const fetchTrips = (eventId, params) => async (dispatch) => {
+  dispatch(setLoading());
+  try {
+    const response = await trips(eventId, params);
+    dispatch(setTrips(response));
+  } catch (error) {
+    console.log("Error in fetchTrips:", error);
+    dispatch(setError("Error fetching trips"));
   }
 };
 

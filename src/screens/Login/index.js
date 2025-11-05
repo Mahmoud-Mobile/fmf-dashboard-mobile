@@ -14,7 +14,6 @@ import CustomInput from "../../components/CustomInput";
 import CustomPressable from "../../components/CustomPressable";
 import { setEmail, setPassword } from "../../redux/actions/authActions";
 import { useDispatch, useSelector } from "react-redux";
-import * as SecureStore from "expo-secure-store";
 import { login } from "../../redux/actions/authActions";
 
 const Login = () => {

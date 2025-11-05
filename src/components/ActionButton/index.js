@@ -10,7 +10,7 @@ const ActionButton = ({
   text,
   onPress,
   style,
-  iconSize = 14,
+  iconSize = 12,
   textStyle,
   iconOnly = false,
   flex,
