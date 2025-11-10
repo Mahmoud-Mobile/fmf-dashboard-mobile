@@ -46,12 +46,15 @@ const ChartCard = ({
         <View style={{ alignSelf: "center" }}>
           <PieChart
             data={pieData}
-            radius={60}
+            radius={50}
             innerRadius={20}
             showText={false}
             textColor="#ffff"
             textSize={20}
             fontWeight="bold"
+            centerLabelComponent={() => {
+              return <View />;
+            }}
           />
         </View>
 

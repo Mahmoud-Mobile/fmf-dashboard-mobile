@@ -4,7 +4,8 @@ import NavStack from "./src/Navigation/NavStack";
 import * as Font from "expo-font";
 import ToastWrapper from "./src/components/ToastWrapper";
 import { Provider } from "react-redux";
-import store from "./src/redux/store";
+import { PersistGate } from "redux-persist/integration/react";
+import store, { persistor } from "./src/redux/store";
 import navigationService from "./src/Global/navRef";
 import * as Notifications from "expo-notifications";
 import { CommonActions } from "@react-navigation/native";
@@ -93,16 +94,18 @@ const App = () => {
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Provider store={store}>
-          <ToastWrapper>
-            <NavigationContainer
-              ref={navigationRef}
-              onReady={() => {
-                navigationService.navigation = navigationRef.current;
-              }}
-            >
-              <NavStack />
-            </NavigationContainer>
-          </ToastWrapper>
+          <PersistGate loading={null} persistor={persistor}>
+            <ToastWrapper>
+              <NavigationContainer
+                ref={navigationRef}
+                onReady={() => {
+                  navigationService.navigation = navigationRef.current;
+                }}
+              >
+                <NavStack />
+              </NavigationContainer>
+            </ToastWrapper>
+          </PersistGate>
         </Provider>
       </GestureHandlerRootView>
     </SafeAreaProvider>

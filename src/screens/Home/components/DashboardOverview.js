@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.White,
     borderRadius: 12,
     padding: 16,
-    width: 230,
+    width: 210,
   },
   cardHeader: {
     flexDirection: "row",
