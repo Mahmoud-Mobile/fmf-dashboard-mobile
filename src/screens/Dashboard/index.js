@@ -1,32 +1,24 @@
-import React, { useEffect, useState, useMemo } from "react";
-import {
-  View,
-  FlatList,
-  Alert,
-  RefreshControl,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { View, Alert, FlatList, RefreshControl } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import * as Print from "expo-print";
 import { shareAsync } from "expo-sharing";
-import { Colors } from "../../Global/colors";
 import LoadingModal from "../../components/LoadingModal";
-import SearchBar from "../../components/SearchBar";
-import DateSearchButton from "../../components/DateSearchButton";
 import DateSearchModal from "../../components/DateSearchModal";
-import ViewToggle from "../../components/ViewToggle";
+import SearchActionRow from "../../components/SearchActionRow";
 import {
   fetchEvents,
   setSelectedEvent,
   fetchEventById,
 } from "../../redux/actions/api";
 import HomeHeader from "./components/HomeHeader";
-import EventCard from "./components";
+import EventCardGrid from "./components/EventCardGrid";
+import EventCardList from "./components/EventCardList";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import PDFGenerator from "./components/PDFGenerator";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
+import { Colors } from "../../Global/colors";
 import styles from "./Styles";
 
 const Dashboard = () => {
@@ -41,9 +33,9 @@ const Dashboard = () => {
   const [viewMode, setViewMode] = useState("grid");
 
   const { width: screenWidth } = getDeviceDimensions();
-  // For mobile: 2 columns, tablet: 3 columns
+
   const numColumns = screenWidth >= 768 ? 3 : 2;
-  const horizontalPadding = 24 * 2; // 24px margin on each side
+  const horizontalPadding = 24 * 2;
   const gapBetweenCards = (numColumns - 1) * 8;
   const cardWidth =
     (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
@@ -187,51 +179,68 @@ const Dashboard = () => {
     }
   };
 
+  const cardSettings = useMemo(() => {
+    const isGrid = viewMode === "grid";
+
+    return {
+      isGrid,
+      component: isGrid ? EventCardGrid : EventCardList,
+      width: isGrid ? cardWidth : listCardWidth,
+      numColumns: isGrid ? numColumns : 1,
+      columnWrapper: isGrid ? styles.columnWrapper : undefined,
+    };
+  }, [cardWidth, listCardWidth, numColumns, viewMode]);
+
+  const renderEventCard = useCallback(
+    ({ item }) => {
+      const CardComponent = cardSettings.component;
+      return (
+        <CardComponent
+          item={item}
+          onPress={handleEventPress}
+          width={cardSettings.width}
+        />
+      );
+    },
+    [cardSettings, handleEventPress]
+  );
+
+  const listKeyExtractor = useCallback((item, index) => {
+    if (item?.id || item?.eventId) {
+      return String(item.id || item.eventId);
+    }
+    if (item?._id) {
+      return String(item._id);
+    }
+    return `event-${index}`;
+  }, []);
+
   return (
     <View style={styles.container}>
       <HomeHeader />
-      <View style={styles.searchRow}>
-        <SearchBar
-          placeholder="Search events..."
-          value={searchText}
-          onChangeText={setSearchText}
-          onClear={handleSearchClear}
-          style={[styles.searchBarInRow, { flex: 1.5 }]}
-        />
-        <ViewToggle viewMode={viewMode} onToggle={setViewMode} />
-        <TouchableOpacity
-          style={[styles.printButton, isPrinting && styles.printButtonDisabled]}
-          onPress={printToFile}
-          activeOpacity={0.7}
-          disabled={isPrinting}
-        >
-          <Text style={styles.printButtonText}>{isPrinting ? "⏳" : "📄"}</Text>
-        </TouchableOpacity>
-        <DateSearchButton
-          onPress={() => setShowDateModal(true)}
-          selectedDate={selectedDate}
-          onClear={() => setSelectedDate(null)}
-          title="Show Events From Date"
-          style={styles.dateButtonInRow}
-        />
-      </View>
+      <SearchActionRow
+        searchPlaceholder="Search events..."
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        onSearchClear={handleSearchClear}
+        viewMode={viewMode}
+        onToggleViewMode={setViewMode}
+        onPressPrint={printToFile}
+        isPrinting={isPrinting}
+        onPressDate={() => setShowDateModal(true)}
+        selectedDate={selectedDate}
+        onClearDate={() => setSelectedDate(null)}
+      />
       {loading ? (
         <LoadingModal visible={loading} />
       ) : (
         <FlatList
           key={viewMode}
           data={filteredEvents}
-          renderItem={({ item }) => (
-            <EventCard
-              item={item}
-              onPress={handleEventPress}
-              cardWidth={viewMode === "grid" ? cardWidth : listCardWidth}
-              isListView={viewMode === "list"}
-            />
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={viewMode === "grid" ? numColumns : 1}
-          columnWrapperStyle={viewMode === "grid" ? styles.columnWrapper : null}
+          renderItem={renderEventCard}
+          keyExtractor={listKeyExtractor}
+          numColumns={cardSettings.numColumns}
+          columnWrapperStyle={cardSettings.columnWrapper}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -251,10 +260,9 @@ const Dashboard = () => {
                   ? `No events match "${searchText}". Try a different search term.`
                   : "There are no events to display at the moment."
               }
-              buttonText={searchText ? "Clear Search" : "Refresh"}
-              onRefresh={searchText ? handleSearchClear : onRefresh}
             />
           )}
+          contentInsetAdjustmentBehavior="always"
         />
       )}
 

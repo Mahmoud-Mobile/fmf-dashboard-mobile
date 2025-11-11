@@ -1,8 +1,8 @@
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors } from "../../Global/colors";
 import styles from "./Styles";
+import { Colors } from "../../Global/colors";
 
 const ViewToggle = ({ viewMode, onToggle, containerStyle }) => {
   return (
@@ -15,11 +15,7 @@ const ViewToggle = ({ viewMode, onToggle, containerStyle }) => {
         onPress={() => onToggle("grid")}
         activeOpacity={0.7}
       >
-        <Ionicons
-          name={viewMode === "grid" ? "grid" : "grid-outline"}
-          size={18}
-          color={viewMode === "grid" ? Colors.White : Colors.Primary}
-        />
+        <Ionicons name="grid-outline" size={20} color={Colors.SecondaryText} />
       </TouchableOpacity>
       <TouchableOpacity
         style={[
@@ -29,15 +25,10 @@ const ViewToggle = ({ viewMode, onToggle, containerStyle }) => {
         onPress={() => onToggle("list")}
         activeOpacity={0.7}
       >
-        <Ionicons
-          name={viewMode === "list" ? "list" : "list-outline"}
-          size={18}
-          color={viewMode === "list" ? Colors.White : Colors.Primary}
-        />
+        <Ionicons name="list" size={20} color={Colors.SecondaryText} />
       </TouchableOpacity>
     </View>
   );
 };
 
 export default ViewToggle;
-

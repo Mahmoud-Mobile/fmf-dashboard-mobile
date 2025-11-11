@@ -21,7 +21,7 @@ const SearchBar = ({
   return (
     <View style={[styles.searchContainer, style]}>
       <View style={styles.searchBar}>
-        <Ionicons name="search" size={22} color={Colors.Gray} />
+        <Ionicons name="search" size={20} color={Colors.SecondaryText} />
         <TextInput
           style={styles.searchInput}
           placeholder={placeholder}
@@ -31,7 +31,7 @@ const SearchBar = ({
         />
         {value.length > 0 && (
           <TouchableOpacity onPress={handleClear}>
-            <Ionicons name="close" size={24} color={Colors.Gray} />
+            <Ionicons name="close" size={20} color={Colors.SecondaryText} />
           </TouchableOpacity>
         )}
       </View>
@@ -45,11 +45,9 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Colors.White,
-    borderRadius: 16,
+    borderRadius: 8,
     paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: Colors.LightGray,
-    height: 50,
+    height: 45,
   },
   searchInput: {
     flex: 1,

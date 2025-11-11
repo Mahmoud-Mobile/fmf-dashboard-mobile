@@ -1,5 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, TouchableOpacity, Switch } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Switch,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../Global/colors";
 import styles from "./styles";
@@ -27,6 +33,10 @@ const SectionVisibilityToggle = ({
     setIsOpen((prev) => !prev);
   };
 
+  const handleClosePanel = () => {
+    setIsOpen(false);
+  };
+
   const handleSectionToggle = (sectionId) => {
     if (onToggleSection) {
       onToggleSection(sectionId);
@@ -39,6 +49,11 @@ const SectionVisibilityToggle = ({
 
   return (
     <>
+      {isOpen && (
+        <TouchableWithoutFeedback onPress={handleClosePanel}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
+      )}
       {isOpen && (
         <View style={[styles.panelContainer, panelStyle]}>
           {!!label && <Text style={styles.panelLabel}>{label}</Text>}

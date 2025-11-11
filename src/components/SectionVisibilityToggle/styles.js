@@ -56,6 +56,11 @@ const styles = StyleSheet.create({
     color: Colors.PrimaryText,
     marginRight: 12,
   },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "transparent",
+    zIndex: 8,
+  },
 });
 
 export default styles;

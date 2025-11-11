@@ -17,7 +17,7 @@ import { logout } from "./actions/authActions";
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
-  whitelist: ["ui"],
+  blacklist: ["api"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
