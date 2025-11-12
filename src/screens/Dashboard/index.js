@@ -13,8 +13,7 @@ import {
   fetchEventById,
 } from "../../redux/actions/api";
 import HomeHeader from "./components/HomeHeader";
-import EventCardGrid from "./components/EventCardGrid";
-import EventCardList from "./components/EventCardList";
+import CustomEventCard from "./components";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import PDFGenerator from "./components/PDFGenerator";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
@@ -30,16 +29,25 @@ const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState("list");
 
   const { width: screenWidth } = getDeviceDimensions();
 
-  const numColumns = screenWidth >= 768 ? 3 : 2;
   const horizontalPadding = 24 * 2;
-  const gapBetweenCards = (numColumns - 1) * 8;
-  const cardWidth =
-    (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
-  const listCardWidth = screenWidth - horizontalPadding;
+
+  const numColumns = useMemo(() => {
+    if (viewMode === "list") {
+      return 1;
+    }
+    return 2;
+  }, [viewMode]);
+
+  const { cardWidth } = useMemo(() => {
+    const gapBetweenCards = (numColumns - 1) * 8;
+    const width =
+      (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
+    return { cardWidth: width };
+  }, [numColumns, screenWidth]);
 
   const filteredEvents = useMemo(() => {
     let filtered = events;
@@ -127,7 +135,6 @@ const Dashboard = () => {
     try {
       setIsPrinting(true);
 
-      // Check if there are events to print
       if (filteredEvents.length === 0) {
         Alert.alert(
           "No Events to Print",
@@ -137,7 +144,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Add timeout to prevent infinite loading
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("PDF generation timeout")), 30000); // 30 seconds timeout
       });
@@ -149,7 +155,6 @@ const Dashboard = () => {
           selectedDate
         );
         const { uri } = await Print.printToFileAsync({ html });
-        console.log("File has been saved to:", uri);
         await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
         return uri;
       };
@@ -163,7 +168,6 @@ const Dashboard = () => {
         }!`
       );
     } catch (error) {
-      console.error("Error generating PDF:", error);
       let errorMessage = "Failed to generate PDF. Please try again.";
 
       if (error.message === "PDF generation timeout") {
@@ -180,16 +184,16 @@ const Dashboard = () => {
   };
 
   const cardSettings = useMemo(() => {
-    const isGrid = viewMode === "grid";
+    const isGrid = viewMode === "grid" && numColumns > 1;
 
     return {
       isGrid,
-      component: isGrid ? EventCardGrid : EventCardList,
-      width: isGrid ? cardWidth : listCardWidth,
-      numColumns: isGrid ? numColumns : 1,
+      component: CustomEventCard,
+      width: cardWidth,
+      numColumns: numColumns,
       columnWrapper: isGrid ? styles.columnWrapper : undefined,
     };
-  }, [cardWidth, listCardWidth, numColumns, viewMode]);
+  }, [cardWidth, numColumns, viewMode]);
 
   const renderEventCard = useCallback(
     ({ item }) => {

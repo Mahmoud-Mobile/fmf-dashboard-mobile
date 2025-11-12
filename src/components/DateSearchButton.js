@@ -16,7 +16,7 @@ const DateSearchButton = ({ onPress, selectedDate, onClear, style }) => {
           onPress={onClear}
           activeOpacity={0.7}
         >
-          <MaterialIcons name="close" size={12} color={Colors.White} />
+          <MaterialIcons name="close" size={14} color={Colors.White} />
         </TouchableOpacity>
       )}
       <TouchableOpacity

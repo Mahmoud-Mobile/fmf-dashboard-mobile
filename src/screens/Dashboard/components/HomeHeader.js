@@ -94,12 +94,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   greeting: {
-    fontSize: 18,
+    fontSize: 16,
     color: Colors.White,
     fontFamily: Fonts.FONT_REGULAR,
   },
   username: {
-    fontSize: 18,
+    fontSize: 16,
     color: Colors.White,
     fontFamily: Fonts.FONT_REGULAR,
   },

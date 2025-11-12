@@ -6,6 +6,7 @@ import SearchBar from "../SearchBar";
 import DateSearchButton from "../DateSearchButton";
 import ViewToggle from "../ViewToggle";
 import { Colors } from "../../Global/colors";
+import { isMobile } from "../../constant/deviceUtils";
 import styles from "./Styles";
 
 const SearchActionRow = ({
@@ -41,7 +42,7 @@ const SearchActionRow = ({
     typeof searchValue !== "undefined" &&
     typeof onSearchChange === "function";
   const shouldRenderViewToggle =
-    showViewToggle && typeof onToggleViewMode === "function";
+    showViewToggle && typeof onToggleViewMode === "function" && !isMobile();
   const shouldRenderPrint =
     showPrintButton && typeof onPressPrint === "function";
   const shouldRenderDate = showDateButton && typeof onPressDate === "function";
