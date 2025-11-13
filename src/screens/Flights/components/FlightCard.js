@@ -161,9 +161,7 @@ const FlightCard = ({
 
           <View style={styles.detailRow}>
             <MaterialIcons name="event" size={14} color="#6B7280" />
-            <Text style={styles.detailText}>
-              Arrival Date & Time: {getArrivalDateTime()}
-            </Text>
+            <Text style={styles.detailText}>{getArrivalDateTime()}</Text>
           </View>
         </View>
       </View>
@@ -262,7 +260,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
-    // flex: 1,
+    flex: 1,
     width: "50%",
   },
   detailsColumn: {
@@ -277,21 +275,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    // flex: 1,
+    // maxWidth: "60%",
   },
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 8,
-    borderRadius: 8,
     height: 22,
     position: "absolute",
-    top: 10,
-    right: 5,
+    top: 0,
+    right: 0,
+    borderBottomLeftRadius: 8,
+    gap: 4,
   },
   statusText: {
-    fontSize: 10,
-    fontFamily: Fonts.FONT_REGULAR,
+    fontSize: 8,
+    fontFamily: Fonts.FONT_MEDIUM,
     textTransform: "uppercase",
   },
 });
