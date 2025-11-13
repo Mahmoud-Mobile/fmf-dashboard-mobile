@@ -3,7 +3,6 @@ import { View, Dimensions, ScrollView, Text } from "react-native";
 import styles from "./Styles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import EventHeader from "./components/EventHeader";
 import DataTableCard from "../../components/DataTableCard";
 import ChartCard from "../../components/ChartCard";
 import SectionVisibilityToggle from "../../components/SectionVisibilityToggle";
@@ -11,6 +10,7 @@ import { Colors } from "../../Global/colors";
 import dummyData from "../../data/dummyData.json";
 import DashboardOverview from "./components/DashboardOverview";
 import { toggleSectionVisibility } from "../../redux/reducers/uiReducer";
+import CustomEventHeader from "../../components/CustomEventHeader";
 
 const SECTION_CONFIG = [
   { id: "dashboardOverview", label: "Dashboard Overview" },
@@ -28,6 +28,7 @@ const Home = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { selectedEvent } = useSelector((state) => state.api) || {};
+
   const storedSectionVisibility =
     useSelector((state) => state.ui?.sectionVisibility) || {};
 
@@ -263,7 +264,11 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      <EventHeader />
+      <CustomEventHeader
+        event={selectedEvent}
+        onLeftButtonPress={() => navigation.goBack()}
+        onRightButtonPress={() => navigation.navigate("NotificationScreen")}
+      />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}

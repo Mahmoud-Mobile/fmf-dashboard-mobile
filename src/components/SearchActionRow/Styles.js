@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-
 import { Colors } from "../../Global/colors";
 import { horizontalMargin } from "../../config/metrics";
 
@@ -9,8 +8,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: horizontalMargin,
     backgroundColor: Colors.Background,
-    marginTop: 10,
-    marginBottom: 15,
+    marginTop: 20,
+    marginBottom: 20,
     gap: 8,
   },
   searchBar: {

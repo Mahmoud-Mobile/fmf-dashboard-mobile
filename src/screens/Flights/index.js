@@ -10,9 +10,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Print from "expo-print";
 import { shareAsync } from "expo-sharing";
-
+import CustomEventHeader from "../../components/CustomEventHeader";
 import { useDispatch, useSelector } from "react-redux";
-import CustomHeaderWithLayout from "../../components/CustomHeaderWithLayout";
 import CustomCategories from "../../components/CustomCategories";
 import SearchBar from "../../components/SearchBar";
 import DateSearchButton from "../../components/DateSearchButton";
@@ -28,6 +27,7 @@ import FlightCardList from "./components/FlightCardList";
 import PDFGenerator from "./components/PDFGenerator";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalMargin } from "../../config/metrics";
+import SearchActionRow from "../../components/SearchActionRow";
 
 const { width } = Dimensions.get("window");
 const isTablet = width > 768;
@@ -489,13 +489,26 @@ const Flights = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <CustomHeaderWithLayout
-        title={selectedEvent?.name || "Event flights"}
+    <View style={styles.container}>
+      <CustomEventHeader
+        event={selectedEvent}
+        onLeftButtonPress={() => navigation.goBack()}
+        onRightButtonPress={() => navigation.navigate("NotificationScreen")}
+      />
+
+      <SearchActionRow
+        searchPlaceholder="Search by airline, flight number, airport, city, seat, booking..."
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        onSearchClear={handleSearchClear}
         viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onPrintPress={printToFile}
+        onToggleViewMode={setViewMode}
+        onPressPrint={printToFile}
         isPrinting={isPrinting}
+        onPressDate={() => setShowDateModal(true)}
+        selectedDate={selectedDate}
+        onClearDate={() => setSelectedDate(null)}
+        // containerStyle={{ marginBottom: 20 }}
       />
 
       <CustomCategories
@@ -505,23 +518,6 @@ const Flights = () => {
         horizontal={true}
         scrollable={true}
       />
-
-      <View style={styles.searchRow}>
-        <SearchBar
-          placeholder="Search by airline, flight number, airport, city, seat, booking..."
-          value={searchText}
-          onChangeText={setSearchText}
-          onClear={handleSearchClear}
-          style={styles.searchBarInRow}
-        />
-        <DateSearchButton
-          onPress={() => setShowDateModal(true)}
-          selectedDate={selectedDate}
-          onClear={() => setSelectedDate(null)}
-          title="Show Flights From Date"
-          style={styles.dateButtonInRow}
-        />
-      </View>
 
       <FlatList
         key={viewMode}
@@ -549,7 +545,7 @@ const Flights = () => {
         title="Filter Flights by Date"
         placeholder="Select a date to show flights from that date onwards"
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
