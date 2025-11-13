@@ -1,20 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Dimensions,
-  RefreshControl,
-  Alert,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { View, Text, FlatList, RefreshControl, Alert } from "react-native";
 import * as Print from "expo-print";
 import { shareAsync } from "expo-sharing";
+import moment from "moment";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import { useDispatch, useSelector } from "react-redux";
 import CustomCategories from "../../components/CustomCategories";
-import SearchBar from "../../components/SearchBar";
-import DateSearchButton from "../../components/DateSearchButton";
 import DateSearchModal from "../../components/DateSearchModal";
 import FloatingChatIcon from "../../components/FloatingChatIcon";
 import LoadingModal from "../../components/LoadingModal";
@@ -22,15 +13,12 @@ import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
 import styles from "./Styles";
 
-import FlightCardGrid from "./components/FlightCardGrid";
-import FlightCardList from "./components/FlightCardList";
+import FlightCard from "./components/FlightCard";
 import PDFGenerator from "./components/PDFGenerator";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalMargin } from "../../config/metrics";
 import SearchActionRow from "../../components/SearchActionRow";
-
-const { width } = Dimensions.get("window");
-const isTablet = width > 768;
+import { getDeviceDimensions } from "../../constant/deviceUtils";
 
 const Flights = () => {
   const dispatch = useDispatch();
@@ -43,7 +31,25 @@ const Flights = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState("list");
+
+  const { width: screenWidth } = getDeviceDimensions();
+  // console.log(flights?.flights?.[0]);
+  const horizontalPadding = horizontalMargin * 2;
+
+  const numColumns = useMemo(() => {
+    if (viewMode === "list") {
+      return 1;
+    }
+    return 2;
+  }, [viewMode]);
+
+  const { cardWidth } = useMemo(() => {
+    const gapBetweenCards = (numColumns - 1) * 8;
+    const width =
+      (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
+    return { cardWidth: width };
+  }, [numColumns, screenWidth, horizontalPadding]);
 
   const categories = [
     { id: "ministry", label: "Ministry", key: "ministry" },
@@ -58,12 +64,6 @@ const Flights = () => {
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter((flight) => {
-        // Search across all relevant flight fields
-        const airlineName = (
-          flight.arrivalAirlinesName ||
-          flight.returnAirlineName ||
-          ""
-        ).toLowerCase();
         const flightNumber = (
           flight.arrivalFlightNumber ||
           flight.returnFlightNumber ||
@@ -79,20 +79,7 @@ const Flights = () => {
           flight.returnAirport ||
           ""
         ).toLowerCase();
-        const city = (
-          flight.arrivalCity ||
-          flight.returnCity ||
-          ""
-        ).toLowerCase();
-        const country = (
-          flight.arrivalCountry ||
-          flight.returnCountry ||
-          ""
-        ).toLowerCase();
         const flightType = (flight.flightType || "").toLowerCase();
-        const flightClass = (flight.flightClass || "").toLowerCase();
-        const seatNumber = (flight.seatNumber || "").toLowerCase();
-        const bookingReference = (flight.bookingReference || "").toLowerCase();
         const status = (
           flight.arrivalFlightStatus ||
           flight.returnFlightStatus ||
@@ -100,36 +87,26 @@ const Flights = () => {
         ).toLowerCase();
 
         return (
-          airlineName.includes(searchLower) ||
           flightNumber.includes(searchLower) ||
           airportCode.includes(searchLower) ||
           airportName.includes(searchLower) ||
-          city.includes(searchLower) ||
-          country.includes(searchLower) ||
           flightType.includes(searchLower) ||
-          flightClass.includes(searchLower) ||
-          seatNumber.includes(searchLower) ||
-          bookingReference.includes(searchLower) ||
           status.includes(searchLower)
         );
       });
     }
 
-    // Filter by date - show all flights from selected date onwards
     if (selectedDate) {
-      const selectedDateStr = selectedDate.toISOString().split("T")[0];
+      const selectedDateStr = moment(selectedDate).format("YYYY-MM-DD");
 
       filtered = filtered.filter((flight) => {
-        // Parse flight dates correctly - they are in JavaScript Date string format
         const arrivalDate = flight.arrivalDate
-          ? new Date(flight.arrivalDate).toISOString().split("T")[0]
+          ? moment(flight.arrivalDate).format("YYYY-MM-DD")
           : null;
         const returnDate = flight.returnDate
-          ? new Date(flight.returnDate).toISOString().split("T")[0]
+          ? moment(flight.returnDate).format("YYYY-MM-DD")
           : null;
 
-        // Show flights that arrive on or after the selected date
-        // OR flights that return on or after the selected date
         return (
           (arrivalDate && arrivalDate >= selectedDateStr) ||
           (returnDate && returnDate >= selectedDateStr)
@@ -239,243 +216,171 @@ const Flights = () => {
     }
   };
 
-  const getStatusGradient = (status) => {
-    switch (status) {
-      case "SCHEDULED":
-        return ["#667eea", "#764ba2"];
-      case "DELAYED":
-        return ["#FF9500", "#FF7A00"];
-      case "CANCELLED":
-        return ["#FF3B30", "#FF1B10"];
-      case "ARRIVED":
-        return ["#34C759", "#30B04F"];
-      case "DEPARTED":
-        return ["#34C759", "#30B04F"];
-      default:
-        return ["#667eea", "#764ba2"];
-    }
-  };
-
   const prepareFlightCardData = (flight) => {
     let flightData = {};
     let timeInfo = [];
-    let additionalInfo = [];
-    let actionButtons = [];
+
+    // Static passenger data
+    const passengerData = {
+      userName: "Ahmed Mohamed",
+      userMobile: "+966 65 090 7242",
+      userPhoto:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    };
 
     if (selectedCategory === "arrival") {
       flightData = {
-        airlineName: flight.arrivalAirlinesName || "N/A",
+        airlineName: flight.arrivalAirlinesName,
         flightNumber: flight.arrivalFlightNumber,
         status: flight.arrivalFlightStatus,
-        headerGradientColors: getStatusGradient(flight.arrivalFlightStatus),
         airportCode: flight.arrivalAirportCode,
         airportName: flight.arrivalAirport,
-        city: flight.arrivalCity,
-        country: flight.arrivalCountry,
+        ...passengerData,
       };
 
-      timeInfo = [
-        {
-          label: "✈️ Arrival Time",
-          time: flight.arrivalDate,
-          date: flight.arrivalDate,
-        },
-      ];
-      if (flight.estimatedArrivalTime) {
-        timeInfo.push({
-          label: "⏰ Estimated",
-          time: flight.estimatedArrivalTime,
-          date: flight.estimatedArrivalTime,
-        });
-      }
-
-      additionalInfo = [
-        { title: "💺 Seat", value: flight.seatNumber || "N/A" },
-        { title: "📋 Booking", value: flight.bookingReference || "N/A" },
-      ];
-
-      actionButtons = [
-        {
-          icon: "flight-land",
-          text: "Plane Landed",
-          onPress: () => {
-            Alert.alert(
-              "Plane Landed",
-              `Flight ${flight.arrivalFlightNumber} has landed successfully!`,
-              [{ text: "OK", style: "default" }]
-            );
-          },
-        },
-        {
-          icon: "check-circle",
-          text: "Logged Arrived",
-          onPress: () => {
-            Alert.alert(
-              "Logged Arrived",
-              `Passenger arrival has been logged for flight ${flight.arrivalFlightNumber}!`,
-              [{ text: "OK", style: "default" }]
-            );
-          },
-        },
-        {
-          icon: "verified-user",
-          text: "Guest Granted",
-          onPress: () => {
-            Alert.alert(
-              "Guest Granted",
-              `Guest access has been granted for flight ${flight.arrivalFlightNumber}!`,
-              [{ text: "OK", style: "default" }]
-            );
-          },
-        },
-      ];
+      timeInfo.push({
+        label: "Arrival",
+        date: flight.arrivalDate,
+      });
     } else if (selectedCategory === "return") {
       flightData = {
-        airlineName: flight.returnAirlineName || "N/A",
+        airlineName:
+          flight.returnAirlinesName || "this parameter is not available",
         flightNumber: flight.returnFlightNumber,
         status: flight.returnFlightStatus,
-        headerGradientColors: getStatusGradient(flight.returnFlightStatus),
-        airportCode: flight.returnAirportCode,
+        airportCode:
+          flight.returnAirportCode || "this parameter is not available",
         airportName: flight.returnAirport,
-        city: flight.returnCity,
-        country: flight.returnCountry,
+        ...passengerData,
       };
 
-      timeInfo = [
-        {
-          label: "🚀 Departure Time",
-          time: flight.returnDate,
-          date: flight.returnDate,
-        },
-      ];
-      if (flight.estimatedDepartureTime) {
-        timeInfo.push({
-          label: "⏰ Estimated",
-          time: flight.estimatedDepartureTime,
-          date: flight.estimatedDepartureTime,
-        });
-      }
-
-      additionalInfo = [
-        { title: "💺 Seat", value: flight.seatNumber || "N/A" },
-        { title: "📋 Booking", value: flight.bookingReference || "N/A" },
-      ];
-
-      actionButtons = [
-        {
-          // colors: ["#EF4444", "#DC2626"],
-          icon: "flight-takeoff",
-          text: "Plane Taken Off",
-          iconSize: 24,
-          onPress: () => {
-            Alert.alert(
-              "Plane Taken Off",
-              `Flight ${flight.returnFlightNumber} has taken off successfully!`,
-              [{ text: "OK", style: "default" }]
-            );
-          },
-        },
-      ];
+      timeInfo.push({
+        label: "Return",
+        date: flight.returnDate,
+      });
     } else {
-      // Ministry
       flightData = {
-        airlineName:
-          flight.arrivalAirlinesName || flight.returnAirlineName || "N/A",
-        flightNumber: flight.arrivalFlightNumber || flight.returnFlightNumber,
-        status: "MINISTRY",
-        headerGradientColors: ["#667eea", "#764ba2"],
-        airportCode: flight.arrivalAirportCode || flight.returnAirportCode,
-        airportName: flight.arrivalAirport || flight.returnAirport,
-        city: flight.arrivalCity || flight.returnCity,
-        country: flight.arrivalCountry || flight.returnCountry,
+        airlineName: flight.arrivalAirlinesName,
+        flightNumber: flight.arrivalFlightNumber,
+        status: flight.returnFlightStatus,
+        airportCode: flight.arrivalAirportCode,
+        airportName: flight.arrivalAirport,
+        ...passengerData,
       };
 
-      if (flight.arrivalDate) {
-        timeInfo.push({
-          label: "Arrival",
-          time: flight.arrivalDate,
-          date: flight.arrivalDate,
-        });
-      }
-      if (flight.estimatedArrivalTime) {
-        timeInfo.push({
-          label: "⏰ Estimated",
-          time: flight.estimatedArrivalTime,
-          date: flight.estimatedArrivalTime,
-        });
-      }
-
-      additionalInfo = [
-        { title: "Flight Type", value: flight.flightType || "N/A" },
-        { title: "Class", value: flight.flightClass || "N/A" },
-      ];
-
-      actionButtons = [
-        {
-          icon: "flight-land",
-          text: "Plane Landed",
-          onPress: () => {
-            Alert.alert(
-              "Plane Landed",
-              `Flight ${
-                flight.arrivalFlightNumber || flight.returnFlightNumber
-              } has landed successfully!`,
-              [{ text: "OK", style: "default" }]
-            );
-          },
-        },
-        {
-          icon: "check-circle",
-          text: "Logged Arrived",
-          onPress: () => {
-            Alert.alert(
-              "Logged Arrived",
-              `Passenger arrival has been logged for flight ${
-                flight.arrivalFlightNumber || flight.returnFlightNumber
-              }!`,
-              [{ text: "OK", style: "default" }]
-            );
-          },
-        },
-        {
-          icon: "verified-user",
-          text: "Guest Granted",
-          onPress: () => {
-            Alert.alert(
-              "Guest Granted",
-              `Guest access has been granted for flight ${
-                flight.arrivalFlightNumber || flight.returnFlightNumber
-              }!`,
-              [{ text: "OK", style: "default" }]
-            );
-          },
-        },
-      ];
+      timeInfo.push({
+        label: "Arrival",
+        date: flight.arrivalDate,
+      });
     }
 
     return {
       ...flightData,
       timeInfo,
-      additionalInfo,
-      actionButtons,
     };
   };
 
-  const renderFlightItem = ({ item }) => {
-    const cardData = prepareFlightCardData(item);
-    if (viewMode === "list") {
+  const cardSettings = useMemo(() => {
+    const isGrid = viewMode === "grid" && numColumns > 1;
+
+    return {
+      isGrid,
+      component: FlightCard,
+      width: cardWidth,
+      numColumns: numColumns,
+      columnWrapper: isGrid ? styles.columnWrapper : undefined,
+    };
+  }, [cardWidth, numColumns, viewMode]);
+
+  const getActionButtons = useCallback(
+    (flight) => {
+      const isDisabled =
+        flight.isLuggageReceived === true ||
+        flight.isParticipantArrived === true ||
+        flight.isParticipantDeparted === true;
+
+      const isSelected = !isDisabled;
+
+      if (selectedCategory === "return") {
+        return [
+          {
+            icon: "flight-takeoff",
+            text: "Plane Taken Off",
+            iconSize: 24,
+            isSelected: isSelected,
+            disabled: isDisabled,
+            onPress: () => {
+              Alert.alert(
+                "Plane Taken Off",
+                `Flight ${flight.returnFlightNumber} has taken off successfully!`,
+                [{ text: "OK", style: "default" }]
+              );
+            },
+          },
+        ];
+      } else {
+        return [
+          {
+            icon: "flight-land",
+            text: "Plane Landed",
+            isSelected: isSelected,
+            disabled: isDisabled,
+            onPress: () => {
+              Alert.alert(
+                "Plane Landed",
+                `Flight ${flight.arrivalFlightNumber} has landed successfully!`,
+                [{ text: "OK", style: "default" }]
+              );
+            },
+          },
+          {
+            icon: "check-circle",
+            text: "Logged Arrived",
+            isSelected: isSelected,
+            disabled: isDisabled,
+            onPress: () => {
+              Alert.alert(
+                "Logged Arrived",
+                `Passenger arrival has been logged for flight ${flight.arrivalFlightNumber}!`,
+                [{ text: "OK", style: "default" }]
+              );
+            },
+          },
+          {
+            icon: "verified-user",
+            text: "Guest Granted",
+            isSelected: isSelected,
+            disabled: isDisabled,
+            onPress: () => {
+              Alert.alert(
+                "Guest Granted",
+                `Guest access has been granted for flight ${flight.arrivalFlightNumber}!`,
+                [{ text: "OK", style: "default" }]
+              );
+            },
+          },
+        ];
+      }
+    },
+    [selectedCategory]
+  );
+
+  const renderFlightItem = useCallback(
+    ({ item }) => {
+      const cardData = prepareFlightCardData(item);
+      const CardComponent = cardSettings.component;
+      const actionButtons = getActionButtons(item);
       return (
-        <FlightCardList {...cardData} onPress={() => handleFlightPress(item)} />
+        <CardComponent
+          {...cardData}
+          actionButtons={actionButtons}
+          onPress={() => handleFlightPress(item)}
+          width={cardSettings.width}
+        />
       );
-    }
-    return (
-      <FlightCardGrid
-        {...cardData}
-        onPress={() => handleFlightPress(item)}
-        isTablet={isTablet}
-      />
-    );
-  };
+    },
+    [cardSettings, handleFlightPress, getActionButtons]
+  );
 
   const renderEmptyComponent = () => <EmptyListComponent />;
 
@@ -518,23 +423,27 @@ const Flights = () => {
         horizontal={true}
         scrollable={true}
       />
-
-      <FlatList
-        key={viewMode}
-        data={filteredFlights}
-        renderItem={renderFlightItem}
-        keyExtractor={(item) => item.id}
-        ListFooterComponent={renderListFooter}
-        ListEmptyComponent={renderEmptyComponent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-        numColumns={viewMode === "grid" && isTablet ? 2 : 1}
-        columnWrapperStyle={viewMode === "grid" && isTablet ? styles.row : null}
-        contentContainerStyle={{ marginHorizontal: horizontalMargin }}
-      />
       <LoadingModal visible={loading} />
+      {!loading && (
+        <FlatList
+          key={viewMode}
+          data={filteredFlights}
+          renderItem={renderFlightItem}
+          keyExtractor={(item, index) =>
+            item.id ? `${item.id}-${index}` : `flight-${index}`
+          }
+          ListFooterComponent={renderListFooter}
+          ListEmptyComponent={renderEmptyComponent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+          numColumns={cardSettings.numColumns}
+          columnWrapperStyle={cardSettings.columnWrapper}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
+
       <FloatingChatIcon />
 
       <DateSearchModal

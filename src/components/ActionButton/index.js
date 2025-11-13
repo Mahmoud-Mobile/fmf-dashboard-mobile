@@ -1,55 +1,57 @@
 import React from "react";
 import { TouchableOpacity, View, Text } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "./Styles";
+import { Colors } from "../../Global/colors";
 
 const ActionButton = ({
-  colors,
   icon,
   text,
   onPress,
   style,
-  iconSize = 12,
   textStyle,
-  iconOnly = false,
   flex,
+  isSelected = false,
+  disabled = false,
 }) => {
+  const isButtonActive = isSelected && !disabled;
+
   return (
     <TouchableOpacity
       style={[
         styles.button,
+        isButtonActive ? styles.buttonActive : styles.buttonInactive,
         style?.width ? null : { flex: flex !== undefined ? flex : 1 },
-        iconOnly && styles.iconOnlyButton,
         style,
+        disabled && { opacity: 0.5 },
       ]}
-      onPress={onPress}
-      activeOpacity={0.8}
+      onPress={disabled ? undefined : onPress}
+      activeOpacity={disabled ? 1 : 0.8}
+      disabled={disabled}
     >
-      <LinearGradient
-        colors={colors ? colors : ["#f4f6fc", "#f4f6fc"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.gradient, iconOnly && styles.iconOnlyGradient]}
+      <MaterialIcons
+        name={icon}
+        size={12}
+        color={isButtonActive ? Colors.White : Colors.Black}
+      />
+      <Text
+        style={[
+          styles.text,
+          isButtonActive ? styles.textActive : styles.textInactive,
+          textStyle,
+        ]}
       >
-        <View style={[styles.content, iconOnly && styles.iconOnlyContent]}>
-          <MaterialIcons
-            name={icon}
-            size={iconOnly ? iconSize || 18 : iconSize}
-            color="#374151"
-          />
-          {!iconOnly && <Text style={[styles.text, textStyle]}>{text}</Text>}
-        </View>
-      </LinearGradient>
+        {text}
+      </Text>
     </TouchableOpacity>
   );
 };
 
-const ActionButtonGroup = ({ buttons, containerStyle, iconOnly = false }) => {
+const ActionButtonGroup = ({ buttons, containerStyle }) => {
   return (
     <View style={[styles.buttonGroup, containerStyle]}>
       {buttons.map((button, index) => (
-        <ActionButton key={index} {...button} iconOnly={iconOnly} />
+        <ActionButton key={index} {...button} />
       ))}
     </View>
   );

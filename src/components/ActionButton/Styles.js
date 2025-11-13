@@ -1,45 +1,43 @@
 import { StyleSheet } from "react-native";
 import { Fonts } from "../../Global/fonts";
+import { Colors } from "../../Global/colors";
 
 const styles = StyleSheet.create({
-  button: {},
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    height: 30,
+  },
+  buttonActive: {
+    backgroundColor: Colors.Primary,
+  },
+  buttonInactive: {
+    backgroundColor: "#EEF0F4",
+    borderWidth: 1,
+    borderColor: "#EEF0F4",
+  },
   buttonSingle: {
     width: "100%",
   },
-  gradient: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 12,
-    height: 40,
-  },
-  content: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
+
   text: {
-    fontSize: 8,
-    fontFamily: Fonts.FONT_MEDIUM,
-    color: "#374151",
+    fontSize: 10,
+    fontFamily: Fonts.FONT_REGULAR,
+    marginLeft: 4,
+  },
+  textActive: {
+    color: Colors.White,
+  },
+  textInactive: {
+    color: Colors.Black,
   },
   buttonGroup: {
-    marginTop: 10,
     flexDirection: "row",
-    justifyContent: "space-between",
     gap: 8,
-  },
-  iconOnlyButton: {
-    flex: 0,
-    minWidth: 40,
-  },
-  iconOnlyGradient: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  iconOnlyContent: {
-    gap: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

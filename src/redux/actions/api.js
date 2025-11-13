@@ -64,8 +64,9 @@ export const fetchFlights = (eventId, params) => async (dispatch) => {
     const response = await flights(eventId, params);
     dispatch(setFlights(response));
   } catch (error) {
-    console.log("Error in fetchFlights:", error);
     dispatch(setError("Error fetching flights"));
+  } finally {
+    dispatch(setLoading(false));
   }
 };
 

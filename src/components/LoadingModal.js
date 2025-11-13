@@ -1,34 +1,18 @@
 import React from "react";
-import { View, Modal, ActivityIndicator, StyleSheet } from "react-native";
+import Spinner from "react-native-loading-spinner-overlay";
 import { Colors } from "../Global/colors";
 
 const LoadingModal = ({ visible }) => {
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.modalBackground}>
-        <View style={styles.activityIndicatorWrapper}>
-          <ActivityIndicator color={Colors.Primary} size="small" />
-        </View>
-      </View>
-    </Modal>
+    <Spinner
+      visible={visible}
+      textContent={""}
+      textStyle={{ color: Colors.White }}
+      overlayColor="rgba(0, 0, 0, 0.05)"
+      color={Colors.Primary}
+      size="small"
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  modalBackground: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-  },
-  activityIndicatorWrapper: {
-    backgroundColor: Colors.White,
-    borderRadius: 10,
-    padding: 20,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-});
 
 export default LoadingModal;

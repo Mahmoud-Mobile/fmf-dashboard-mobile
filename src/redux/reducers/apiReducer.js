@@ -49,8 +49,8 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-    setLoading: (state) => {
-      state.loading = true;
+    setLoading: (state, action) => {
+      state.loading = action.payload !== undefined ? action.payload : true;
     },
 
     setError: (state, action) => {
