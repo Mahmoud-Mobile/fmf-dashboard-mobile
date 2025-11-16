@@ -92,6 +92,50 @@ const styles = StyleSheet.create({
   tripStatusPending: {
     color: Colors.Warning,
   },
+  visibleBtn: {
+    backgroundColor: Colors.Primary,
+    paddingVertical: 10,
+    borderRadius: 8,
+    width: 200,
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 30,
+  },
+  visibleContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  visibleText: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.White,
+  },
+  // bottom sheet
+  bottomSheetContent: {
+    gap: 10,
+  },
+  bottomSheetTitle: {
+    color: Colors.PrimaryText,
+    fontFamily: Fonts.FONT_BOLD,
+    marginBottom: 8,
+  },
+  visibilityRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  sectionRow: {
+    paddingVertical: 5,
+  },
+  tabRow: {
+    paddingVertical: 5,
+  },
+  visibilityLabel: {
+    color: Colors.PrimaryText,
+    fontFamily: Fonts.FONT_REGULAR,
+  },
 });
 
 export default styles;

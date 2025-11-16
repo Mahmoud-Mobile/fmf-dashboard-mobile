@@ -1,16 +1,28 @@
-import React, { useMemo } from "react";
-import { View, Dimensions, ScrollView, Text } from "react-native";
+import React, { useMemo, useRef, useEffect } from "react";
+import {
+  View,
+  Dimensions,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  Switch,
+} from "react-native";
+import { Alert } from "react-native";
 import styles from "./Styles";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import DataTableCard from "../../components/DataTableCard";
 import ChartCard from "../../components/ChartCard";
-import SectionVisibilityToggle from "../../components/SectionVisibilityToggle";
 import { Colors } from "../../Global/colors";
 import dummyData from "../../data/dummyData.json";
 import DashboardOverview from "./components/DashboardOverview";
-import { toggleSectionVisibility } from "../../redux/reducers/uiReducer";
+import {
+  toggleSectionVisibility,
+  toggleTabVisibility,
+} from "../../redux/reducers/uiReducer";
 import CustomEventHeader from "../../components/CustomEventHeader";
+import BottomSheet from "../../components/BottomSheet";
 
 const SECTION_CONFIG = [
   { id: "dashboardOverview", label: "Dashboard Overview" },
@@ -28,9 +40,12 @@ const Home = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { selectedEvent } = useSelector((state) => state.api) || {};
+  const bottomSheetRef = useRef(null);
 
   const storedSectionVisibility =
     useSelector((state) => state.ui?.sectionVisibility) || {};
+  const storedTabVisibility =
+    useSelector((state) => state.ui?.tabVisibility) || {};
 
   const { width } = Dimensions.get("window");
   const isTablet = width >= 768;
@@ -51,6 +66,59 @@ const Home = () => {
 
   const handleToggleSectionVisibility = (sectionId) => {
     dispatch(toggleSectionVisibility(sectionId));
+  };
+
+  const TABS_CONFIG = [
+    { id: "Home", label: "Home", locked: true },
+    { id: "Flights", label: "Flights" },
+    { id: "CheckIn", label: "Check In" },
+    { id: "Trips", label: "Trips" },
+    { id: "DesignatedCars", label: "Designated Cars" },
+    { id: "Hotels", label: "Hotels" },
+    { id: "More", label: "More", locked: true },
+  ];
+
+  // Default visible tabs on first app open (no persisted state yet)
+  const DEFAULT_TAB_VISIBILITY = {
+    Home: true,
+    More: true,
+    Flights: true,
+    CheckIn: true,
+    Trips: true,
+    DesignatedCars: false,
+    Hotels: false,
+  };
+
+  const resolvedTabVisibility = useMemo(() => {
+    return TABS_CONFIG.reduce((acc, tab) => {
+      const storedValue = storedTabVisibility?.[tab.id];
+      acc[tab.id] =
+        storedValue === undefined
+          ? DEFAULT_TAB_VISIBILITY[tab.id] ?? true
+          : storedValue;
+      return acc;
+    }, {});
+  }, [storedTabVisibility]);
+
+  // Keep latest visibility snapshot to avoid stale closures during rapid toggles
+  const latestTabVisibilityRef = useRef(resolvedTabVisibility);
+  useEffect(() => {
+    latestTabVisibilityRef.current = resolvedTabVisibility;
+  }, [resolvedTabVisibility]);
+
+  const handleToggleTabVisibility = (tabId) => {
+    const MAX_VISIBLE_TABS = 5;
+    const snapshot = latestTabVisibilityRef.current || {};
+    const currentIsVisible = !!snapshot[tabId];
+    const currentVisibleCount = Object.values(snapshot).filter(Boolean).length;
+
+    // If attempting to enable another tab beyond the max, show alert and do nothing
+    if (!currentIsVisible && currentVisibleCount >= MAX_VISIBLE_TABS) {
+      Alert.alert("Limit reached", `You can select up to ${MAX_VISIBLE_TABS} tabs.`);
+      return;
+    }
+
+    dispatch(toggleTabVisibility(tabId));
   };
 
   const {
@@ -311,13 +379,63 @@ const Home = () => {
           )}
           {renderResponsiveCards()}
         </View>
+        <TouchableOpacity
+          onPress={() => bottomSheetRef.current?.open()}
+          style={styles.visibleBtn}
+        >
+          <View style={styles.visibleContent}>
+            <MaterialIcons name="tune" size={18} color={Colors.White} />
+            <Text style={styles.visibleText}>Customize View</Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
-      <SectionVisibilityToggle
-        sections={SECTION_CONFIG}
-        visibleSections={visibleSections}
-        onToggleSection={handleToggleSectionVisibility}
-        label="Show / Hide Sections"
-      />
+
+      <BottomSheet ref={bottomSheetRef} title="Visibility Settings">
+        <View style={styles.bottomSheetContent}>
+          <View>
+            <Text style={styles.bottomSheetTitle}>Sections</Text>
+            {SECTION_CONFIG.map((section) => (
+              <View
+                key={section.id}
+                style={[styles.visibilityRow, styles.sectionRow]}
+              >
+                <Text style={styles.visibilityLabel}>{section.label}</Text>
+                <Switch
+                  value={visibleSections[section.id]}
+                  onValueChange={() =>
+                    handleToggleSectionVisibility(section.id)
+                  }
+                  trackColor={{
+                    false: Colors.LightGray,
+                    true: Colors.Primary,
+                  }}
+                  thumbColor={Colors.White}
+                />
+              </View>
+            ))}
+          </View>
+          <View>
+            <Text style={styles.bottomSheetTitle}>Tabs</Text>
+            {TABS_CONFIG.map((tab) => (
+              <View key={tab.id} style={[styles.visibilityRow, styles.tabRow]}>
+                <Text style={styles.visibilityLabel}>{tab.label}</Text>
+                <Switch
+                  value={tab.locked ? true : resolvedTabVisibility[tab.id]}
+                  onValueChange={() =>
+                    !tab.locked && handleToggleTabVisibility(tab.id)
+                  }
+                  disabled={!!tab.locked}
+                  trackColor={{
+                    false: Colors.LightGray,
+                    true: Colors.Primary,
+                  }}
+                  thumbColor={Colors.White}
+                />
+              </View>
+            ))}
+          </View>
+        </View>
+      </BottomSheet>
     </View>
   );
 };

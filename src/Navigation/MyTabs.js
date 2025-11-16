@@ -7,13 +7,15 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useIsFocused, useRoute } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSelectedEvent } from "../redux/actions/api";
 import Home from "../screens/Home";
 import Flights from "../screens/Flights";
 import CheckIn from "../screens/CheckIn";
 import Trips from "../screens/Trips";
 import More from "../screens/More";
+import Hotels from "../screens/Hotels";
+import DesignatedCars from "../screens/DesignatedCars";
 import { ImagesWithProps } from "../config/images";
 import { Fonts } from "../Global/fonts";
 import { Colors } from "../Global/colors";
@@ -48,6 +50,20 @@ const TabArr = [
     icon: "Chat_Icon",
     headerShown: false,
     titleText: "Trips",
+  },
+  {
+    route: "DesignatedCars",
+    component: DesignatedCars,
+    icon: "Location_Icon",
+    headerShown: false,
+    titleText: "Designated Cars",
+  },
+  {
+    route: "Hotels",
+    component: Hotels,
+    icon: "OverView_Icon",
+    headerShown: false,
+    titleText: "Hotels",
   },
   {
     route: "More",
@@ -110,6 +126,7 @@ const TabButton = ({ item, onPress, routeName }) => {
 const MyTabs = () => {
   const route = useRoute();
   const dispatch = useDispatch();
+  const tabVisibility = useSelector((state) => state.ui?.tabVisibility) || {};
 
   // Get the selected event from route params and store it in Redux
   React.useEffect(() => {
@@ -117,6 +134,52 @@ const MyTabs = () => {
       dispatch(setSelectedEvent(route.params.selectedEvent));
     }
   }, [route.params?.selectedEvent, dispatch]);
+
+  const resolvedTabVisibility = React.useMemo(() => {
+    // Default visible tabs on first app open (no persisted state yet)
+    const DEFAULT_TAB_VISIBILITY = {
+      Home: true,
+      More: true,
+      Flights: true,
+      CheckIn: true,
+      Trips: true,
+      DesignatedCars: false,
+      Hotels: false,
+    };
+    return TabArr.reduce((acc, tab) => {
+      const stored = tabVisibility?.[tab.route];
+      acc[tab.route] =
+        stored === undefined
+          ? DEFAULT_TAB_VISIBILITY[tab.route] ?? true
+          : stored;
+      return acc;
+    }, {});
+  }, [tabVisibility]);
+
+  // Always force Home and More to be visible
+  const visibleRoutes = React.useMemo(() => {
+    const forcedVisible = { ...resolvedTabVisibility, Home: true, More: true };
+
+    // Priority order to include when limiting to 5
+    const priorityOrder = [
+      "Home",
+      "More",
+      "Flights",
+      "CheckIn",
+      "Trips",
+      "DesignatedCars",
+      "Hotels",
+    ];
+
+    const selected = [];
+    for (const routeName of priorityOrder) {
+      if (forcedVisible[routeName]) {
+        selected.push(routeName);
+      }
+      if (selected.length >= 5) break;
+    }
+    return new Set(selected);
+  }, [resolvedTabVisibility]);
 
   return (
     <Tab.Navigator
@@ -126,7 +189,7 @@ const MyTabs = () => {
         headerBackLeft: true,
       }}
     >
-      {TabArr.map((item) => (
+      {TabArr.filter((t) => visibleRoutes.has(t.route)).map((item) => (
         <Tab.Screen
           key={item.route}
           name={item.route}

@@ -11,7 +11,7 @@ import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
 import styles from "./Styles";
 
-import FlightCard from "./components/FlightCard";
+import FlightCard from "./components";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalMargin } from "../../config/metrics";
 import SearchActionRow from "../../components/SearchActionRow";
@@ -147,7 +147,8 @@ const Flights = () => {
   };
 
   const handleFlightPress = (flight) => {
-    navigation.navigate("FlightDetails", { flight });
+    const actionButtons = getActionButtons(flight);
+    navigation.navigate("FlightDetails", { flight, actionButtons });
   };
 
   const handleSearchClear = () => {

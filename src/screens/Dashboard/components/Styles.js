@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     elevation: 16,
     padding: 16,
     marginBottom: 16,
-    marginRight: 4,
+    marginRight: 10,
   },
   flexWrap: {
     flexDirection: "row",

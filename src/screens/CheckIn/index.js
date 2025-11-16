@@ -137,8 +137,8 @@ const CheckInScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <CustomHeader title="Check In" center={true} top={0} />
+    <View style={styles.container}>
+      <CustomHeader title="Check In" />
 
       <View style={styles.searchContainer}>
         <SearchBar
@@ -176,7 +176,7 @@ const CheckInScreen = () => {
         </View>
       )}
       <FloatingChatIcon />
-    </SafeAreaView>
+    </View>
   );
 };
 
