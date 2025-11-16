@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { View, Text, FlatList, RefreshControl, Alert } from "react-native";
-import * as Print from "expo-print";
-import { shareAsync } from "expo-sharing";
 import moment from "moment";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,11 +12,15 @@ import { fetchFlights } from "../../redux/actions/api";
 import styles from "./Styles";
 
 import FlightCard from "./components/FlightCard";
-import PDFGenerator from "./components/PDFGenerator";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalMargin } from "../../config/metrics";
 import SearchActionRow from "../../components/SearchActionRow";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
+import {
+  exportToExcel,
+  formatDateTime,
+  formatStamp,
+} from "../../config/exportToExcel";
 
 const Flights = () => {
   const dispatch = useDispatch();
@@ -164,50 +166,85 @@ const Flights = () => {
     try {
       setIsPrinting(true);
 
-      // Check if there are flights to print
+      // Check if there are flights to export
       if (filteredFlights.length === 0) {
         Alert.alert(
-          "No Flights to Print",
-          "There are no flights to generate a PDF report. Please adjust your search filters or refresh the data.",
+          "No Flights to Export",
+          "There are no flights to generate an Excel report. Please adjust your search filters or refresh the data.",
           [{ text: "OK" }]
         );
         return;
       }
 
-      // Add timeout to prevent infinite loading
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("PDF generation timeout")), 600000); // 60 seconds timeout
+      // date helpers are imported from config/exportToExcel
+
+      // Prepare data for Excel
+      const excelData = filteredFlights.map((flight) => {
+        let passengerName = "N/A";
+        let airlineName = "N/A";
+        let flightNumber = "N/A";
+        let status = "N/A";
+        let airportCode = "N/A";
+        let airportName = "N/A";
+        let date = "N/A";
+
+        // Extract passenger name
+        passengerName = "Mahmoud Tawba";
+
+        // Category-based data extraction
+        if (selectedCategory === "arrival") {
+          airlineName = flight.arrivalAirlinesName || "N/A";
+          flightNumber = flight.arrivalFlightNumber || "N/A";
+          status = flight.arrivalFlightStatus || "N/A";
+          airportCode = flight.arrivalAirportCode || "N/A";
+          airportName = flight.arrivalAirport || "N/A";
+          date = formatDateTime(flight.arrivalDate);
+        } else if (selectedCategory === "return") {
+          airlineName = flight.returnAirlinesName || "N/A";
+          flightNumber = flight.returnFlightNumber || "N/A";
+          status = flight.returnFlightStatus || "N/A";
+          airportCode = flight.returnAirportCode || "N/A";
+          airportName = flight.returnAirport || "N/A";
+          date = formatDateTime(flight.returnDate);
+        } else {
+          airlineName = flight.arrivalAirlinesName || "N/A";
+          flightNumber = flight.arrivalFlightNumber || "N/A";
+          status = flight.arrivalFlightStatus || "N/A";
+          airportCode = flight.arrivalAirportCode || "N/A";
+          airportName = flight.arrivalAirport || "N/A";
+          date = formatDateTime(flight.arrivalDate);
+        }
+
+        return {
+          "Passenger Name": passengerName,
+          "Airline Name": airlineName,
+          "Flight Number": flightNumber,
+          Status: status,
+          "Airport Code": airportCode,
+          "Airport Name": airportName,
+          Date: date,
+        };
       });
 
-      const generatePromise = async () => {
-        const html = PDFGenerator.generateHTML(
-          filteredFlights,
-          searchText,
-          selectedDate,
-          selectedCategory
-        );
-        const { uri } = await Print.printToFileAsync({ html });
-        console.log("File has been saved to:", uri);
-        await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
-        return uri;
-      };
-
-      await Promise.race([generatePromise(), timeoutPromise]);
+      const fileName = `flights_${formatStamp(new Date())}.xlsx`;
+      await exportToExcel({
+        rows: excelData,
+        fileName,
+        sheetName: "Flights",
+      });
 
       Alert.alert(
         "Success",
-        `PDF generated successfully with ${filteredFlights.length} flight${
-          filteredFlights.length !== 1 ? "s" : ""
-        }!`
+        `Excel file generated successfully with ${
+          filteredFlights.length
+        } flight${filteredFlights.length !== 1 ? "s" : ""}!`
       );
     } catch (error) {
-      let errorMessage = "Failed to generate PDF. Please try again.";
+      let errorMessage = "Failed to generate Excel file. Please try again.";
 
-      if (error.message === "PDF generation timeout") {
-        errorMessage = "PDF generation is taking too long. Please try again.";
-      } else if (error.message?.includes("sharing")) {
+      if (error.message?.includes("sharing")) {
         errorMessage =
-          "PDF was generated but couldn't be shared. Please check your device settings.";
+          "Excel file was generated but couldn't be shared. Please check your device settings.";
       }
 
       Alert.alert("Error", errorMessage);
