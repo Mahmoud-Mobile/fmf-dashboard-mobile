@@ -44,7 +44,7 @@ const CustomEventCard = ({ item, onPress, width }) => {
       style={[styles.cardContainer, width ? { width } : null]}
     >
       <View style={styles.flexWrap}>
-        <View style={{ gap: 8 }}>
+        <View style={styles.leftColumn}>
           <View style={styles.flexRow}>
             <View style={styles.iconContainer}>
               <ImagesWithProps
@@ -61,7 +61,7 @@ const CustomEventCard = ({ item, onPress, width }) => {
               name="location-outline"
               size={16}
               color={Colors.Gray}
-              style={{ marginRight: 4 }}
+              style={{ marginRight: 4, marginTop: 2 }}
             />
             <Text style={styles.detailText}>{item?.location}</Text>
           </View>
@@ -70,14 +70,14 @@ const CustomEventCard = ({ item, onPress, width }) => {
               name="calendar-outline"
               size={16}
               color={Colors.Gray}
-              style={{ marginRight: 4 }}
+              style={{ marginRight: 4, marginTop: 2 }}
             />
             <Text style={styles.detailText}>
               {formatDateRange(item?.startDate, item?.endDate)}
             </Text>
           </View>
         </View>
-        <View style={{ gap: 8 }}>
+        <View style={styles.rightColumn}>
           <Text style={styles.metaLabel}>
             <Text style={styles.metaLabelBold}>Type: </Text>
             <Text style={styles.metaValue}>{item?.eventType}</Text>

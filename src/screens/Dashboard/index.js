@@ -19,6 +19,7 @@ import PDFGenerator from "./components/PDFGenerator";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
 import { Colors } from "../../Global/colors";
 import styles from "./Styles";
+import { horizontalMargin } from "../../config/metrics";
 
 const Dashboard = () => {
   const navigation = useNavigation();
@@ -33,7 +34,7 @@ const Dashboard = () => {
 
   const { width: screenWidth } = getDeviceDimensions();
 
-  const horizontalPadding = 24 * 2;
+  const horizontalPadding = horizontalMargin * 2;
 
   const numColumns = useMemo(() => {
     if (viewMode === "list") {

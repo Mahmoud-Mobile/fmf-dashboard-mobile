@@ -4,16 +4,14 @@ import { Fonts } from "../../../Global/fonts";
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: Colors.White,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "rgba(17, 24, 39, 0.06)",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 5,
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    shadowColor: "rgba(222, 222, 222, 1)",
+    shadowOffset: { width: 0, height: 30 },
+    shadowOpacity: 0.1,
+    shadowRadius: 30,
+    elevation: 16,
     padding: 16,
-    overflow: "hidden",
     marginBottom: 16,
     marginRight: 4,
   },
@@ -21,8 +19,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 4,
+  },
+  leftColumn: {
+    minWidth: "48%",
+    gap: 8,
+  },
+  rightColumn: {
+    minWidth: "48%",
+    gap: 8,
   },
   flexRow: {
     flexDirection: "row",
@@ -54,6 +58,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     alignSelf: "flex-start",
     backgroundColor: "#BEDBFF",
+    position: "absolute",
+    top: 0,
+    right: 0,
   },
   statusText: {
     fontSize: 10,
@@ -62,7 +69,7 @@ const styles = StyleSheet.create({
   },
   detailItem: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   detailText: {
     fontSize: 12,
