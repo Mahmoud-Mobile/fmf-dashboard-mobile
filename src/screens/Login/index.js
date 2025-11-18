@@ -1,82 +1,68 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-  StatusBar,
-} from "react-native";
+import { View, StatusBar } from "react-native";
 import styles from "./Styles";
-import { useNavigation } from "@react-navigation/native";
-import CustomInput from "../../components/CustomInput";
-import CustomPressable from "../../components/CustomPressable";
-import { setEmail, setPassword } from "../../redux/actions/authActions";
-import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../redux/actions/authActions";
 
 const Login = () => {
-  const navigation = useNavigation();
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
-  const dispatch = useDispatch();
-  const { email, password } = useSelector((state) => state.auth);
+  // const navigation = useNavigation();
+  // const emailRef = useRef(null);
+  // const passwordRef = useRef(null);
+  // const dispatch = useDispatch();
+  // const { email, password } = useSelector((state) => state.auth);
 
-  const [emailError, setEmailError] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [emailError, setEmailError] = useState(false);
+  // const [passwordError, setPasswordError] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
-  const validateInputs = () => {
-    let isValid = true;
-    if (email.trim().length < 1) {
-      setEmailError(true);
-      isValid = false;
-    } else {
-      setEmailError(false);
-    }
-    if (password.trim().length < 1) {
-      setPasswordError(true);
-      isValid = false;
-    } else {
-      setPasswordError(false);
-    }
-    return isValid;
-  };
+  // const validateInputs = () => {
+  //   let isValid = true;
+  //   if (email.trim().length < 1) {
+  //     setEmailError(true);
+  //     isValid = false;
+  //   } else {
+  //     setEmailError(false);
+  //   }
+  //   if (password.trim().length < 1) {
+  //     setPasswordError(true);
+  //     isValid = false;
+  //   } else {
+  //     setPasswordError(false);
+  //   }
+  //   return isValid;
+  // };
 
-  const handleLogin = async () => {
-    if (!validateInputs()) {
-      return;
-    }
-    const body = {
-      email: email,
-      password: password,
-    };
-    setLoading(true);
-    try {
-      const response = await dispatch(login(body));
+  // const handleLogin = async () => {
+  //   if (!validateInputs()) {
+  //     return;
+  //   }
+  //   const body = {
+  //     email: email,
+  //     password: password,
+  //   };
+  //   setLoading(true);
+  //   try {
+  //     const response = await dispatch(login(body));
 
-      if (response.type === "LOGIN_SUCCESS") {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Dashboard" }],
-        });
-      }
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-    }
-  };
+  //     if (response.type === "LOGIN_SUCCESS") {
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{ name: "Dashboard" }],
+  //       });
+  //     }
+  //     setLoading(false);
+  //   } catch (error) {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    dispatch(setEmail("khaled@lead-360.co"));
-    dispatch(setPassword("password123"));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(setEmail("khaled@lead-360.co"));
+  //   dispatch(setPassword("password123"));
+  // }, []);
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <KeyboardAvoidingView
+      {/* <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
@@ -140,7 +126,7 @@ const Login = () => {
             <Text style={styles.footerText}>FMF Dashboard</Text>
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingView> */}
     </View>
   );
 };

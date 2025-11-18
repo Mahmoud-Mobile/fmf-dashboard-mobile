@@ -1,284 +1,455 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { View, Alert, FlatList, RefreshControl } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
-import * as Print from "expo-print";
-import { shareAsync } from "expo-sharing";
-import LoadingModal from "../../components/LoadingModal";
-import DateSearchModal from "../../components/DateSearchModal";
-import SearchActionRow from "../../components/SearchActionRow";
+import React, { useMemo, useRef, useEffect } from "react";
 import {
-  fetchEvents,
-  setSelectedEvent,
-  fetchEventById,
-} from "../../redux/actions/api";
-import HomeHeader from "./components/HomeHeader";
-import CustomEventCard from "./components";
-import EmptyListComponent from "../../components/EmptyListComponent";
-import PDFGenerator from "./components/PDFGenerator";
-import { getDeviceDimensions } from "../../constant/deviceUtils";
-import { Colors } from "../../Global/colors";
+  View,
+  Dimensions,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  Switch,
+} from "react-native";
+import { Alert } from "react-native";
 import styles from "./Styles";
-import { horizontalMargin } from "../../config/metrics";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import DataTableCard from "../../components/DataTableCard";
+import ChartCard from "../../components/ChartCard";
+import { Colors } from "../../Global/colors";
+import dummyData from "../../data/dummyData.json";
+import DashboardOverview from "./components/DashboardOverview";
+import {
+  toggleSectionVisibility,
+  toggleTabVisibility,
+} from "../../redux/reducers/uiReducer";
+import CustomEventHeader from "../../components/CustomEventHeader";
+import BottomSheet from "../../components/BottomSheet";
+
+const SECTION_CONFIG = [
+  { id: "dashboardOverview", label: "Dashboard Overview" },
+  { id: "eventAnalytics", label: "Event Analytics" },
+  { id: "arrivalGuests", label: "Arrival Guests" },
+  { id: "returnGuests", label: "Return Guests" },
+  { id: "flights", label: "Flights" },
+  { id: "hotelOccupancy", label: "Hotel Occupancy" },
+  { id: "hotelDetails", label: "Hotel Details" },
+  { id: "tripList", label: "Trip List" },
+  { id: "tripsSummary", label: "Trips Summary" },
+];
 
 const Dashboard = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { events, loading, error } = useSelector((state) => state.api);
-  const [refreshing, setRefreshing] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [showDateModal, setShowDateModal] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
-  const [viewMode, setViewMode] = useState("list");
+  const { selectedEvent } = useSelector((state) => state.api) || {};
+  const bottomSheetRef = useRef(null);
 
-  const { width: screenWidth } = getDeviceDimensions();
+  const storedSectionVisibility =
+    useSelector((state) => state.ui?.sectionVisibility) || {};
+  const storedTabVisibility =
+    useSelector((state) => state.ui?.tabVisibility) || {};
 
-  const horizontalPadding = horizontalMargin * 2;
+  const { width } = Dimensions.get("window");
+  const isTablet = width >= 768;
 
-  const numColumns = useMemo(() => {
-    if (viewMode === "list") {
-      return 1;
+  const visibleSections = useMemo(() => {
+    return SECTION_CONFIG.reduce((acc, section) => {
+      const storedValue = storedSectionVisibility?.[section.id];
+      // Convert string "true"/"false" to boolean if needed (from persisted state)
+      const boolValue =
+        storedValue === undefined
+          ? true
+          : typeof storedValue === "string"
+          ? storedValue === "true"
+          : Boolean(storedValue);
+      acc[section.id] = boolValue;
+      return acc;
+    }, {});
+  }, [storedSectionVisibility]);
+
+  const handleItemPress = (item, screenName) => {
+    if (screenName && navigation) {
+      navigation.navigate(screenName, { item });
     }
-    return 2;
-  }, [viewMode]);
+  };
 
-  const { cardWidth } = useMemo(() => {
-    const gapBetweenCards = (numColumns - 1) * 8;
-    const width =
-      (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
-    return { cardWidth: width };
-  }, [numColumns, screenWidth]);
+  const handleToggleSectionVisibility = (sectionId) => {
+    dispatch(toggleSectionVisibility(sectionId));
+  };
 
-  const filteredEvents = useMemo(() => {
-    let filtered = events;
+  const TABS_CONFIG = [
+    { id: "Dashboard", label: "Dashboard", locked: true },
+    { id: "Flights", label: "Flights" },
+    { id: "CheckIn", label: "Check In" },
+    { id: "Trips", label: "Trips" },
+    { id: "DesignatedCars", label: "Designated Cars" },
+    { id: "Hotels", label: "Hotels" },
+    { id: "More", label: "More", locked: true },
+  ];
 
-    if (searchText.trim()) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter((event) => {
-        const title = (event.title || event.name || "").toLowerCase();
-        const description = (event.description || "").toLowerCase();
-        const location = (event.location || "").toLowerCase();
-        const eventType = (event.eventType || "").toLowerCase();
-        const eventLevel = (event.eventLevel || "").toLowerCase();
-        const status = (event.status || "").toLowerCase();
+  // Default visible tabs on first app open (no persisted state yet)
+  const DEFAULT_TAB_VISIBILITY = {
+    Dashboard: true,
+    More: true,
+    Flights: true,
+    CheckIn: true,
+    Trips: true,
+    DesignatedCars: false,
+    Hotels: false,
+  };
 
-        return (
-          title.includes(searchLower) ||
-          description.includes(searchLower) ||
-          location.includes(searchLower) ||
-          eventType.includes(searchLower) ||
-          eventLevel.includes(searchLower) ||
-          status.includes(searchLower)
-        );
-      });
-    }
+  const resolvedTabVisibility = useMemo(() => {
+    return TABS_CONFIG.reduce((acc, tab) => {
+      const storedValue = storedTabVisibility?.[tab.id];
+      // Convert string "true"/"false" to boolean if needed (from persisted state)
+      const boolValue =
+        storedValue === undefined
+          ? DEFAULT_TAB_VISIBILITY[tab.id] ?? true
+          : typeof storedValue === "string"
+          ? storedValue === "true"
+          : Boolean(storedValue);
+      acc[tab.id] = boolValue;
+      return acc;
+    }, {});
+  }, [storedTabVisibility]);
 
-    if (selectedDate) {
-      const selectedDateStr = selectedDate.toISOString().split("T")[0];
-
-      filtered = filtered.filter((event) => {
-        const startDate = event.startDate
-          ? event.startDate.includes("T")
-            ? event.startDate.split("T")[0]
-            : new Date(event.startDate).toISOString().split("T")[0]
-          : null;
-
-        if (startDate) {
-          return startDate >= selectedDateStr;
-        }
-        return false;
-      });
-    }
-
-    return filtered;
-  }, [events, searchText, selectedDate]);
-
+  // Keep latest visibility snapshot to avoid stale closures during rapid toggles
+  const latestTabVisibilityRef = useRef(resolvedTabVisibility);
   useEffect(() => {
-    let params = {
-      eventLevel: "MAIN",
-    };
-    dispatch(fetchEvents(params));
-  }, [dispatch]);
+    latestTabVisibilityRef.current = resolvedTabVisibility;
+  }, [resolvedTabVisibility]);
 
-  const onRefresh = async () => {
-    let params = {
-      eventLevel: "MAIN",
-    };
-    setRefreshing(true);
-    await dispatch(fetchEvents(params));
-    setRefreshing(false);
-  };
+  const handleToggleTabVisibility = (tabId) => {
+    const MAX_VISIBLE_TABS = 5;
+    const snapshot = latestTabVisibilityRef.current || {};
+    const currentIsVisible = !!snapshot[tabId];
+    const currentVisibleCount = Object.values(snapshot).filter(Boolean).length;
 
-  const handleEventPress = async (item) => {
-    try {
-      dispatch(setSelectedEvent(item));
-      await dispatch(fetchEventById(item.id));
-      navigation.navigate("MyTabs");
-    } catch (error) {
-      Alert.alert("Error", "Failed to load event details");
-    }
-  };
-
-  const handleSearchClear = () => {
-    setSearchText("");
-  };
-
-  const handleDateSelect = (date) => {
-    setSelectedDate(date);
-  };
-
-  const handleDateModalClose = () => {
-    setShowDateModal(false);
-  };
-
-  const printToFile = async () => {
-    try {
-      setIsPrinting(true);
-
-      if (filteredEvents.length === 0) {
-        Alert.alert(
-          "No Events to Print",
-          "There are no events to generate a PDF report. Please adjust your search filters or refresh the data.",
-          [{ text: "OK" }]
-        );
-        return;
-      }
-
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("PDF generation timeout")), 30000); // 30 seconds timeout
-      });
-
-      const generatePromise = async () => {
-        const html = PDFGenerator.generateHTML(
-          filteredEvents,
-          searchText,
-          selectedDate
-        );
-        const { uri } = await Print.printToFileAsync({ html });
-        await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
-        return uri;
-      };
-
-      await Promise.race([generatePromise(), timeoutPromise]);
-
+    // If attempting to enable another tab beyond the max, show alert and do nothing
+    if (!currentIsVisible && currentVisibleCount >= MAX_VISIBLE_TABS) {
       Alert.alert(
-        "Success",
-        `PDF generated successfully with ${filteredEvents.length} event${
-          filteredEvents.length !== 1 ? "s" : ""
-        }!`
+        "Limit reached",
+        `You can select up to ${MAX_VISIBLE_TABS} tabs.`
       );
-    } catch (error) {
-      let errorMessage = "Failed to generate PDF. Please try again.";
-
-      if (error.message === "PDF generation timeout") {
-        errorMessage = "PDF generation is taking too long. Please try again.";
-      } else if (error.message?.includes("sharing")) {
-        errorMessage =
-          "PDF was generated but couldn't be shared. Please check your device settings.";
-      }
-
-      Alert.alert("Error", errorMessage);
-    } finally {
-      setIsPrinting(false);
+      return;
     }
+
+    dispatch(toggleTabVisibility(tabId));
   };
 
-  const cardSettings = useMemo(() => {
-    const isGrid = viewMode === "grid" && numColumns > 1;
+  const {
+    returnGuestsData,
+    arrivalGuestsData,
+    flightsData,
+    hotelOccupancyData,
+    hotelDetailsData,
+    tripListData,
+    tripsSummaryData,
+    arrivalGuestsChartData,
+    returnGuestsChartData,
+    ageDistributionChartData,
+    continentChartData,
+    genderDistributionChartData,
+  } = dummyData;
 
-    return {
-      isGrid,
-      component: CustomEventCard,
-      width: cardWidth,
-      numColumns: numColumns,
-      columnWrapper: isGrid ? styles.columnWrapper : undefined,
-    };
-  }, [cardWidth, numColumns, viewMode]);
+  const renderResponsiveCards = () => {
+    const cards = [
+      visibleSections.arrivalGuests && {
+        key: "arrival-guests",
+        element: (
+          <DataTableCard
+            title="Arrival Guests"
+            columns={[
+              {
+                title: "Flight No",
+                key: "flightNo",
+              },
+              { title: "Name", key: "name" },
+              {
+                title: "Date & Time",
+                key: "dateTime",
+                render: ({ item }) => (
+                  <View style={{}}>
+                    <Text style={styles.dateText}>{item.date}</Text>
+                    <Text style={styles.timeText}>{item.time}</Text>
+                  </View>
+                ),
+              },
+            ]}
+            data={arrivalGuestsData}
+          />
+        ),
+      },
+      visibleSections.returnGuests && {
+        key: "return-guests",
+        element: (
+          <DataTableCard
+            title="Return Guests"
+            columns={[
+              {
+                title: "Flight No",
+                key: "flightNo",
+              },
+              { title: "Name", key: "name" },
+              {
+                title: "Date & Time",
+                key: "dateTime",
+                render: ({ item }) => (
+                  <View style={{}}>
+                    <Text style={styles.dateText}>{item.date}</Text>
+                    <Text style={styles.timeText}>{item.time}</Text>
+                  </View>
+                ),
+              },
+            ]}
+            data={returnGuestsData}
+          />
+        ),
+      },
+      visibleSections.flights && {
+        key: "flights",
+        element: (
+          <DataTableCard
+            title="Flights"
+            columns={[
+              {
+                title: "Flight No",
+                key: "flightNo",
+              },
+              { title: "Airline", key: "airline" },
+              { title: "Destination", key: "destination" },
+              {
+                title: "Date & Time",
+                key: "dateTime",
+                render: ({ item }) => (
+                  <View style={{}}>
+                    <Text style={styles.dateText}>{item.date}</Text>
+                    <Text style={styles.timeText}>{item.time}</Text>
+                  </View>
+                ),
+              },
+            ]}
+            data={flightsData}
+            onItemPress={handleItemPress}
+            navigationName="FlightDetails"
+          />
+        ),
+      },
+      visibleSections.hotelOccupancy && {
+        key: "hotel-occupancy",
+        element: (
+          <DataTableCard
+            title="Hotel Occupancy"
+            columns={[
+              { title: "Hotel Name", key: "hotelName" },
+              {
+                title: "Count",
+                key: "count",
+                render: ({ item }) => (
+                  <View style={{}}>
+                    <Text style={styles.countBadgeText}>{item.count}</Text>
+                  </View>
+                ),
+              },
+            ]}
+            data={hotelOccupancyData}
+          />
+        ),
+      },
+      visibleSections.hotelDetails && {
+        key: "hotel-details",
+        element: (
+          <DataTableCard
+            title="Hotel Details"
+            columns={[
+              { title: "Hotel", key: "hotel" },
+              { title: "Guest", key: "guest" },
+              {
+                title: "Status",
+                key: "status",
+                render: ({ item }) => {
+                  const getStatusColor = (status) => {
+                    switch (status) {
+                      case "Checked In":
+                        return Colors.Success;
+                      case "Checked Out":
+                        return Colors.DarkGray;
+                      case "Pending":
+                        return Colors.Warning;
+                      default:
+                        return Colors.DarkGray;
+                    }
+                  };
+                  return (
+                    <Text
+                      style={[
+                        styles.statusText,
+                        { color: getStatusColor(item.status) },
+                      ]}
+                    >
+                      {item.status}
+                    </Text>
+                  );
+                },
+              },
+            ]}
+            data={hotelDetailsData}
+          />
+        ),
+      },
+      visibleSections.tripList && {
+        key: "trip-list",
+        element: (
+          <DataTableCard
+            title="Trip List"
+            columns={[
+              { title: "Car Name", key: "carName" },
+              { title: "Driver", key: "driver" },
+            ]}
+            data={tripListData}
+          />
+        ),
+      },
+      visibleSections.tripsSummary && {
+        key: "trips-summary",
+        element: (
+          <DataTableCard
+            title="Trips Summary"
+            columns={[
+              { title: "Guest Name", key: "guestName" },
+              { title: "Driver", key: "driver" },
+            ]}
+            data={tripsSummaryData}
+          />
+        ),
+      },
+    ].filter(Boolean);
 
-  const renderEventCard = useCallback(
-    ({ item }) => {
-      const CardComponent = cardSettings.component;
-      return (
-        <CardComponent
-          item={item}
-          onPress={handleEventPress}
-          width={cardSettings.width}
-        />
-      );
-    },
-    [cardSettings, handleEventPress]
-  );
-
-  const listKeyExtractor = useCallback((item, index) => {
-    if (item?.id || item?.eventId) {
-      return String(item.id || item.eventId);
+    if (!cards.length) {
+      return null;
     }
-    if (item?._id) {
-      return String(item._id);
-    }
-    return `event-${index}`;
-  }, []);
+
+    const cardWidth = isTablet ? "48%" : "100%";
+    const containerStyle = [
+      styles.responsiveGridContainer,
+      !isTablet && { justifyContent: "flex-start" },
+    ];
+
+    return (
+      <View style={containerStyle}>
+        {cards.map(({ key, element }) => (
+          <View key={key} style={{ width: cardWidth, marginBottom: 10 }}>
+            {element}
+          </View>
+        ))}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <HomeHeader />
-      <SearchActionRow
-        searchPlaceholder="Search events..."
-        searchValue={searchText}
-        onSearchChange={setSearchText}
-        onSearchClear={handleSearchClear}
-        viewMode={viewMode}
-        onToggleViewMode={setViewMode}
-        onPressPrint={printToFile}
-        isPrinting={isPrinting}
-        onPressDate={() => setShowDateModal(true)}
-        selectedDate={selectedDate}
-        onClearDate={() => setSelectedDate(null)}
+      <CustomEventHeader
+        event={selectedEvent}
+        onLeftButtonPress={() => navigation.goBack()}
+        onRightButtonPress={() => navigation.navigate("NotificationScreen")}
       />
-      {loading ? (
-        <LoadingModal visible={loading} />
-      ) : (
-        <FlatList
-          key={viewMode}
-          data={filteredEvents}
-          renderItem={renderEventCard}
-          keyExtractor={listKeyExtractor}
-          numColumns={cardSettings.numColumns}
-          columnWrapperStyle={cardSettings.columnWrapper}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[Colors.Primary]}
-              tintColor={Colors.Primary}
-            />
-          }
-          ListEmptyComponent={() => (
-            <EmptyListComponent
-              icon="Calendar_Icon"
-              title={searchText ? "No Events Found" : "No Events Available"}
-              description={
-                searchText
-                  ? `No events match "${searchText}". Try a different search term.`
-                  : "There are no events to display at the moment."
-              }
-            />
-          )}
-          contentInsetAdjustmentBehavior="always"
-        />
-      )}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {visibleSections.dashboardOverview && <DashboardOverview />}
 
-      <DateSearchModal
-        visible={showDateModal}
-        onClose={handleDateModalClose}
-        onDateSelect={handleDateSelect}
-        selectedDate={selectedDate}
-        title="Filter Events by Date"
-        placeholder="Select a date to show events from that date onwards"
-      />
+        <View style={styles.content}>
+          {visibleSections.eventAnalytics && (
+            <>
+              <Text style={styles.sectionTitle}>Event Analytics</Text>
+              <View style={styles.chartCardsContainer}>
+                <ChartCard
+                  key="arrival-guests-chart"
+                  title="Arrival Guests"
+                  data={arrivalGuestsChartData}
+                />
+                <ChartCard
+                  key="return-guests-chart"
+                  title="Return Guests"
+                  data={returnGuestsChartData}
+                />
+                <ChartCard
+                  key="age-distribution-chart"
+                  title="Age Distribution"
+                  data={ageDistributionChartData}
+                />
+                <ChartCard
+                  key="continent-chart"
+                  title="Continent"
+                  data={continentChartData}
+                />
+                <ChartCard
+                  key="gender-distribution-chart"
+                  title="Gender Distribution"
+                  data={genderDistributionChartData}
+                />
+              </View>
+            </>
+          )}
+          {renderResponsiveCards()}
+        </View>
+        <TouchableOpacity
+          onPress={() => bottomSheetRef.current?.open()}
+          style={styles.visibleBtn}
+        >
+          <View style={styles.visibleContent}>
+            <MaterialIcons name="tune" size={18} color={Colors.White} />
+            <Text style={styles.visibleText}>Customize View</Text>
+          </View>
+        </TouchableOpacity>
+      </ScrollView>
+
+      <BottomSheet ref={bottomSheetRef} title="Visibility Settings">
+        <View style={styles.bottomSheetContent}>
+          <View>
+            <Text style={styles.bottomSheetTitle}>Sections</Text>
+            {SECTION_CONFIG.map((section) => (
+              <View
+                key={section.id}
+                style={[styles.visibilityRow, styles.sectionRow]}
+              >
+                <Text style={styles.visibilityLabel}>{section.label}</Text>
+                <Switch
+                  value={visibleSections[section.id]}
+                  onValueChange={() =>
+                    handleToggleSectionVisibility(section.id)
+                  }
+                  trackColor={{
+                    false: Colors.LightGray,
+                    true: Colors.Primary,
+                  }}
+                  thumbColor={Colors.White}
+                />
+              </View>
+            ))}
+          </View>
+          <View>
+            <Text style={styles.bottomSheetTitle}>Tabs</Text>
+            {TABS_CONFIG.map((tab) => (
+              <View key={tab.id} style={[styles.visibilityRow, styles.tabRow]}>
+                <Text style={styles.visibilityLabel}>{tab.label}</Text>
+                <Switch
+                  value={tab.locked ? true : resolvedTabVisibility[tab.id]}
+                  onValueChange={() =>
+                    !tab.locked && handleToggleTabVisibility(tab.id)
+                  }
+                  disabled={!!tab.locked}
+                  trackColor={{
+                    false: Colors.LightGray,
+                    true: Colors.Primary,
+                  }}
+                  thumbColor={Colors.White}
+                />
+              </View>
+            ))}
+          </View>
+        </View>
+      </BottomSheet>
     </View>
   );
 };

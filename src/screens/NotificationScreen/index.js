@@ -12,7 +12,6 @@ const NotificationScreen = () => {
   const [data, setData] = useState([]);
   const navigation = useNavigation();
   useEffect(() => {
-    // Mock data - replace with actual API call
     const mockData = [
       {
         id: "1",
@@ -37,9 +36,9 @@ const NotificationScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <View style={styles.container}>
       <CustomHeader
-        title="Notifications"
+        leftLabel="Notifications"
         onLeftButtonPress={() => navigation.goBack()}
       />
       <FlatList
@@ -59,7 +58,7 @@ const NotificationScreen = () => {
         )}
         ListFooterComponent={() => <View style={{ height: 50 }} />}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

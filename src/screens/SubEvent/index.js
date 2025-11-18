@@ -1,0 +1,282 @@
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { View, Alert, FlatList, RefreshControl } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import LoadingModal from "../../components/LoadingModal";
+import DateSearchModal from "../../components/DateSearchModal";
+import SearchActionRow from "../../components/SearchActionRow";
+import {
+  fetchEvents,
+  setSelectedEvent,
+  fetchEventById,
+} from "../../redux/actions/api";
+import HomeHeader from "./components/HomeHeader";
+import CustomEventCard from "./components";
+import EmptyListComponent from "../../components/EmptyListComponent";
+import { getDeviceDimensions } from "../../constant/deviceUtils";
+import { Colors } from "../../Global/colors";
+import styles from "./Styles";
+import { horizontalMargin } from "../../config/metrics";
+import {
+  exportToExcel,
+  formatDateTime,
+  formatStamp,
+} from "../../config/exportToExcel";
+
+const SubEvent = () => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { events, loading, error } = useSelector((state) => state.api);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [viewMode, setViewMode] = useState("list");
+
+  const { width: screenWidth } = getDeviceDimensions();
+
+  const horizontalPadding = horizontalMargin * 2;
+
+  const numColumns = useMemo(() => {
+    if (viewMode === "list") {
+      return 1;
+    }
+    return 2;
+  }, [viewMode]);
+
+  const { cardWidth } = useMemo(() => {
+    const gapBetweenCards = (numColumns - 1) * 8;
+    const width =
+      (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
+    return { cardWidth: width };
+  }, [numColumns, screenWidth]);
+
+  const filteredEvents = useMemo(() => {
+    let filtered = events;
+
+    if (searchText.trim()) {
+      const searchLower = searchText.toLowerCase();
+      filtered = filtered.filter((event) => {
+        const title = (event.title || event.name || "").toLowerCase();
+        const description = (event.description || "").toLowerCase();
+        const location = (event.location || "").toLowerCase();
+        const eventType = (event.eventType || "").toLowerCase();
+        const eventLevel = (event.eventLevel || "").toLowerCase();
+        const status = (event.status || "").toLowerCase();
+
+        return (
+          title.includes(searchLower) ||
+          description.includes(searchLower) ||
+          location.includes(searchLower) ||
+          eventType.includes(searchLower) ||
+          eventLevel.includes(searchLower) ||
+          status.includes(searchLower)
+        );
+      });
+    }
+
+    if (selectedDate) {
+      const selectedDateStr = selectedDate.toISOString().split("T")[0];
+
+      filtered = filtered.filter((event) => {
+        const startDate = event.startDate
+          ? event.startDate.includes("T")
+            ? event.startDate.split("T")[0]
+            : new Date(event.startDate).toISOString().split("T")[0]
+          : null;
+
+        if (startDate) {
+          return startDate >= selectedDateStr;
+        }
+        return false;
+      });
+    }
+
+    return filtered;
+  }, [events, searchText, selectedDate]);
+
+  useEffect(() => {
+    let params = {
+      eventLevel: "MAIN",
+    };
+    dispatch(fetchEvents(params));
+  }, [dispatch]);
+
+  const onRefresh = async () => {
+    let params = {
+      eventLevel: "MAIN",
+    };
+    setRefreshing(true);
+    await dispatch(fetchEvents(params));
+    setRefreshing(false);
+  };
+
+  const handleEventPress = async (item) => {
+    try {
+      dispatch(setSelectedEvent(item));
+      await dispatch(fetchEventById(item.id));
+      navigation.navigate("MyTabs");
+    } catch (error) {
+      Alert.alert("Error", "Failed to load event details");
+    }
+  };
+
+  const handleSearchClear = () => {
+    setSearchText("");
+  };
+
+  const handleDateSelect = (date) => {
+    setSelectedDate(date);
+  };
+
+  const handleDateModalClose = () => {
+    setShowDateModal(false);
+  };
+
+  const printToFile = async () => {
+    try {
+      setIsPrinting(true);
+
+      if (filteredEvents.length === 0) {
+        Alert.alert(
+          "No Events to Export",
+          "There are no events to generate an Excel report. Please adjust your search filters or refresh the data.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      const excelData = filteredEvents.map((event) => {
+        return {
+          "Event Title": event.title || event.name || "N/A",
+          Location: event.location || "N/A",
+          "Event Type": event.eventType || "N/A",
+          "Event Level": event.eventLevel || "N/A",
+          Status: event.status || "N/A",
+          "Start Date": formatDateTime(event.startDate),
+          "End Date": formatDateTime(event.endDate),
+          Description: event.description || "N/A",
+        };
+      });
+
+      const fileName = `subevent_${formatStamp(new Date())}.xlsx`;
+      await exportToExcel({
+        rows: excelData,
+        fileName,
+        sheetName: "SubEvent",
+      });
+    } catch (error) {
+      let errorMessage = "Failed to generate Excel file. Please try again.";
+
+      if (error.message?.includes("sharing")) {
+        errorMessage =
+          "Excel file was generated but couldn't be shared. Please check your device settings.";
+      }
+
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
+  const cardSettings = useMemo(() => {
+    const isGrid = viewMode === "grid" && numColumns > 1;
+
+    return {
+      isGrid,
+      component: CustomEventCard,
+      width: cardWidth,
+      numColumns: numColumns,
+      columnWrapper: isGrid ? styles.columnWrapper : undefined,
+    };
+  }, [cardWidth, numColumns, viewMode]);
+
+  const renderEventCard = useCallback(
+    ({ item }) => {
+      const CardComponent = cardSettings.component;
+      return (
+        <CardComponent
+          item={item}
+          onPress={handleEventPress}
+          width={cardSettings.width}
+        />
+      );
+    },
+    [cardSettings, handleEventPress]
+  );
+
+  const listKeyExtractor = useCallback((item, index) => {
+    if (item?.id || item?.eventId) {
+      return String(item.id || item.eventId);
+    }
+    if (item?._id) {
+      return String(item._id);
+    }
+    return `event-${index}`;
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <HomeHeader />
+      <SearchActionRow
+        searchPlaceholder="Search events..."
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        onSearchClear={handleSearchClear}
+        viewMode={viewMode}
+        onToggleViewMode={setViewMode}
+        onPressPrint={printToFile}
+        isPrinting={isPrinting}
+        onPressDate={() => setShowDateModal(true)}
+        selectedDate={selectedDate}
+        onClearDate={() => setSelectedDate(null)}
+      />
+      {loading ? (
+        <LoadingModal visible={loading} />
+      ) : (
+        <FlatList
+          key={viewMode}
+          data={filteredEvents}
+          renderItem={renderEventCard}
+          keyExtractor={listKeyExtractor}
+          numColumns={cardSettings.numColumns}
+          columnWrapperStyle={cardSettings.columnWrapper}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[Colors.Primary]}
+              tintColor={Colors.Primary}
+            />
+          }
+          ListEmptyComponent={() => (
+            <EmptyListComponent
+              icon="Calendar_Icon"
+              title={searchText ? "No Events Found" : "No Events Available"}
+              description={
+                searchText
+                  ? `No events match "${searchText}". Try a different search term.`
+                  : "There are no events to display at the moment."
+              }
+            />
+          )}
+          contentInsetAdjustmentBehavior="always"
+        />
+      )}
+
+      <DateSearchModal
+        visible={showDateModal}
+        onClose={handleDateModalClose}
+        onDateSelect={handleDateSelect}
+        selectedDate={selectedDate}
+        title="Filter Events by Date"
+        placeholder="Select a date to show events from that date onwards"
+      />
+    </View>
+  );
+};
+
+export default SubEvent;

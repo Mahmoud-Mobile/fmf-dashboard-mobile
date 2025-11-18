@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, Platform, Text, TextInput, View, Animated } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
 import { MaterialIcons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
 import navigationService from "../../Global/navRef";
 import { styles } from "./Styles";
 import { Colors } from "../../Global/colors";
@@ -115,14 +112,8 @@ const ZebraQR = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <CustomHeader
-        title="Zebra Scanner"
-        center={false}
-        top={0}
-        scrollY={scrollY}
-        onLeftButtonPress={handleBack}
-      />
+    <View style={styles.container}>
+      <CustomHeader leftLabel="Zebra Scanner" onLeftButtonPress={handleBack} />
 
       <View style={styles.body}>
         <View style={styles.scannerInfo}>
@@ -154,7 +145,6 @@ const ZebraQR = () => {
             editable
             autoCorrect={false}
             autoCapitalize="none"
-            // Prevent the software keyboard and hide caret; keeps focus for hardware scans
             {...(Platform.OS === "android"
               ? { showSoftInputOnFocus: false }
               : {})}
@@ -167,8 +157,7 @@ const ZebraQR = () => {
           />
         ) : null}
       </View>
-      <FloatingChatIcon />
-    </SafeAreaView>
+    </View>
   );
 };
 

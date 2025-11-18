@@ -239,13 +239,6 @@ const Flights = () => {
         fileName,
         sheetName: "Flights",
       });
-
-      Alert.alert(
-        "Success",
-        `Excel file generated successfully with ${
-          filteredFlights.length
-        } flight${filteredFlights.length !== 1 ? "s" : ""}!`
-      );
     } catch (error) {
       let errorMessage = "Failed to generate Excel file. Please try again.";
 

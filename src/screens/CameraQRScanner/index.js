@@ -1,12 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, ActivityIndicator, StyleSheet, Text, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useIsFocused } from "@react-navigation/native";
 import { Colors } from "../../Global/colors";
 import CustomHeader from "../../components/CustomHeader";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
 import navigationService from "../../Global/navRef";
 import { styles } from "./Styles";
 

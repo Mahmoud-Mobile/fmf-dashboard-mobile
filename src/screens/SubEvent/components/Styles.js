@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
   flexRow: {
     flexDirection: "row",
     alignItems: "center",
+    maxWidth: "80%",
   },
 
   cardHeader: {
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   eventTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     marginLeft: 8,

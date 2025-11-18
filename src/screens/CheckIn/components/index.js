@@ -2,7 +2,7 @@ import React from "react";
 import { TouchableOpacity, View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
-
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Colors } from "../../../Global/colors";
 import { ImagesWithProps } from "../../../config/images";
 import styles from "./Styles";
@@ -54,7 +54,7 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
       style={[styles.cardContainer, width && { width }]}
     >
       <View style={styles.flexWrap}>
-        <View style={{ width: "40%" }}>
+        <View style={{ width: "80%" }}>
           <View style={styles.flexRow}>
             <ImagesWithProps source="FMF_Icon" />
             <Text style={styles.eventTitle}>{item?.title}</Text>
@@ -64,7 +64,7 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
             <Ionicons
               name="location-outline"
               size={16}
-              color={Colors.Gray}
+              color="#646464"
               style={{ marginRight: 4 }}
             />
             <Text style={styles.detailText}>{item?.location}</Text>
@@ -75,7 +75,7 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
             <Ionicons
               name="calendar-outline"
               size={16}
-              color={Colors.Gray}
+              color="#646464"
               style={{ marginRight: 4, marginTop: 2 }}
             />
             <Text style={styles.detailText}>
@@ -83,10 +83,10 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
             </Text>
           </View>
           <View style={styles.detailItem}>
-            <Ionicons
-              name="people-outline"
+            <MaterialCommunityIcons
+              name="seat-outline"
               size={16}
-              color={Colors.Gray}
+              color="#646464"
               style={{ marginRight: 4, marginTop: 2 }}
             />
             <Text style={styles.detailText}>{item?.capacity}</Text>

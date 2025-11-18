@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../screens/Login";
-import Dashboard from "../screens/Dashboard";
+import SubEvent from "../screens/SubEvent";
 import MyTabs from "../Navigation/MyTabs";
 import NoInternetScreen from "../screens/NoInternetScreen";
 import FlightDetails from "../screens/FlightDetails";
@@ -69,12 +69,12 @@ const NavStack = () => {
 
   return (
     <Stack.Navigator
-      initialRouteName={isLoggedIn ? "Dashboard" : "Login"} // Use the login state to set the initial route
+      initialRouteName={isLoggedIn ? "SubEvent" : "Login"} // Use the login state to set the initial route
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen
-        name="Dashboard"
-        component={Dashboard}
+        name="SubEvent"
+        component={SubEvent}
         options={{ headerShown: false, animationEnabled: false }}
       />
       <Stack.Screen

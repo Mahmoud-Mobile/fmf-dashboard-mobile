@@ -3,7 +3,6 @@ import { View, FlatList, RefreshControl, Alert } from "react-native";
 import { Colors } from "../../Global/colors";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
 import navigationService from "../../Global/navRef";
-import HomeHeader from "../Dashboard/components/HomeHeader";
 import SearchActionRow from "../../components/SearchActionRow";
 import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
@@ -14,12 +13,17 @@ import { horizontalMargin } from "../../config/metrics";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import CustomEventHeader from "../../components/CustomEventHeader";
+import {
+  exportToExcel,
+  formatDateTime,
+  formatStamp,
+} from "../../config/exportToExcel";
 
 const mockEvents = [
   {
     id: "1",
     title: "Riyadh Season Riyadh ",
-    capacity: "Riyadh Season Opening Ceremony",
+    capacity: "500 Seats Capacity",
     location: "Saudi Arabia",
     startDate: "2024-10-24 12:30",
     endDate: "2024-10-25 18:40",
@@ -28,7 +32,7 @@ const mockEvents = [
   {
     id: "2",
     title: "Riyadh Season",
-    capacity: "Riyadh Season Opening Ceremony",
+    capacity: "500 Seats Capacity",
     location: "Saudi Arabia",
     startDate: "2024-10-24 12:30",
     endDate: "2024-10-25 18:40",
@@ -37,7 +41,7 @@ const mockEvents = [
   {
     id: "3",
     title: "Riyadh Season",
-    capacity: "Riyadh Season Opening Ceremony",
+    capacity: "500 Seats Capacity",
     location: "Saudi Arabia Saudi Arabia Saudi Arabia",
     startDate: "2024-10-24 12:30",
     endDate: "2024-10-25 18:40",
@@ -46,7 +50,7 @@ const mockEvents = [
   {
     id: "4",
     title: "Riyadh Season",
-    capacity: "Riyadh Season Opening Ceremony",
+    capacity: "500 Seats Capacity",
     location: "Saudi Arabia",
     startDate: "2024-10-24 12:30",
     endDate: "2024-10-25 18:40",
@@ -76,7 +80,7 @@ const CheckInScreen = () => {
     if (viewMode === "list") {
       return 1;
     }
-    return 2;
+    return 3;
   }, [viewMode]);
 
   const { cardWidth } = useMemo(() => {
@@ -200,7 +204,52 @@ const CheckInScreen = () => {
     setShowDateModal(false);
   };
 
-  const printToFile = async () => {};
+  const printToFile = async () => {
+    try {
+      setIsPrinting(true);
+
+      // Check if there are events to export
+      if (filteredEvents.length === 0) {
+        Alert.alert(
+          "No Events to Export",
+          "There are no events to generate an Excel report. Please adjust your search filters or refresh the data.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      const excelData = filteredEvents.map((event) => {
+        return {
+          "Event Title": event.title || "N/A",
+          Location: event.location || "N/A",
+          Capacity: event.capacity || "N/A",
+          "Start Date": formatDateTime(event.startDate),
+          "End Date": formatDateTime(event.endDate),
+          "Check-In Status": event.isCheckedIn
+            ? "Checked In"
+            : "Not Checked In",
+        };
+      });
+
+      const fileName = `checkin_events_${formatStamp(new Date())}.xlsx`;
+      await exportToExcel({
+        rows: excelData,
+        fileName,
+        sheetName: "Check-In Events",
+      });
+    } catch (error) {
+      let errorMessage = "Failed to generate Excel file. Please try again.";
+
+      if (error.message?.includes("sharing")) {
+        errorMessage =
+          "Excel file was generated but couldn't be shared. Please check your device settings.";
+      }
+
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsPrinting(false);
+    }
+  };
 
   const cardSettings = useMemo(() => {
     const isGrid = viewMode === "grid" && numColumns > 1;

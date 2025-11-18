@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
-    marginLeft: 8,
+    marginLeft: 4,
   },
   detailItem: {
     flexDirection: "row",

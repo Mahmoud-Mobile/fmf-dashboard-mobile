@@ -9,7 +9,7 @@ import Animated, {
 import { useIsFocused, useRoute } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedEvent } from "../redux/actions/api";
-import Home from "../screens/Home";
+import Dashboard from "../screens/Dashboard";
 import Flights from "../screens/Flights";
 import CheckIn from "../screens/CheckIn";
 import Trips from "../screens/Trips";
@@ -24,11 +24,11 @@ const Tab = createBottomTabNavigator();
 
 const TabArr = [
   {
-    route: "Home",
-    component: Home,
+    route: "Dashboard",
+    component: Dashboard,
     icon: "Home_Tab",
     headerShown: false,
-    titleText: "Home",
+    titleText: "Dashboard",
   },
   {
     route: "Flights",
@@ -138,7 +138,7 @@ const MyTabs = () => {
   const resolvedTabVisibility = React.useMemo(() => {
     // Default visible tabs on first app open (no persisted state yet)
     const DEFAULT_TAB_VISIBILITY = {
-      Home: true,
+      Dashboard: true,
       More: true,
       Flights: true,
       CheckIn: true,
@@ -156,13 +156,17 @@ const MyTabs = () => {
     }, {});
   }, [tabVisibility]);
 
-  // Always force Home and More to be visible
+  // Always force Dashboard and More to be visible
   const visibleRoutes = React.useMemo(() => {
-    const forcedVisible = { ...resolvedTabVisibility, Home: true, More: true };
+    const forcedVisible = {
+      ...resolvedTabVisibility,
+      Dashboard: true,
+      More: true,
+    };
 
     // Priority order to include when limiting to 5
     const priorityOrder = [
-      "Home",
+      "Dashboard",
       "More",
       "Flights",
       "CheckIn",
