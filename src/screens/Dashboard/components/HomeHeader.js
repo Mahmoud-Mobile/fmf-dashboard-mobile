@@ -99,12 +99,12 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_REGULAR,
   },
   username: {
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.White,
-    fontFamily: Fonts.FONT_REGULAR,
+    fontFamily: Fonts.FONT_MEDIUM,
   },
   userRole: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#E3E3E3",
     fontFamily: Fonts.FONT_REGULAR,
   },

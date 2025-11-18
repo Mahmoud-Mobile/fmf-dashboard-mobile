@@ -54,7 +54,7 @@ const BottomSheetComponent = forwardRef(
     }));
 
     const handleSheetChanges = useCallback((index) => {
-      console.log("Sheet index changed to:", index);
+      // console.log("Sheet index changed to:", index);
     }, []);
 
     const renderBackdrop = useCallback(

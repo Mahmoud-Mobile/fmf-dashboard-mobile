@@ -6,7 +6,7 @@ import { horizontalMargin } from "../../config/metrics";
 const styles = StyleSheet.create({
   safeAreaContainer: {
     paddingHorizontal: horizontalMargin,
-    paddingTop: 10,
+    paddingTop: 5,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
     backgroundColor: Colors.Primary,
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    marginBottom: 24,
+    marginBottom: 20,
   },
   eventContent: {
     flexDirection: "row",

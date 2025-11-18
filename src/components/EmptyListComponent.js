@@ -9,7 +9,7 @@ const EmptyListComponent = ({ icon, title, description }) => {
     <View style={styles.emptyContainer}>
       <ImagesWithProps
         source={icon ?? "Calendar_Icon"}
-        color={Colors.Gray}
+        color={Colors.PrimaryText}
         size={30}
       />
       <Text style={styles.emptyTitle}>{title ?? "Empty List"}</Text>
@@ -25,23 +25,21 @@ const styles = {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 60,
-    marginTop: "40%",
+    marginTop: "50%",
   },
   emptyTitle: {
-    fontSize: 20,
-    fontFamily: Fonts.FONT_Semi,
-    color: Colors.Gray,
+    fontSize: 18,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.PrimaryText,
     marginTop: 16,
     marginBottom: 8,
   },
   emptyDescription: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.LightGray,
+    color: Colors.SecondaryText,
     textAlign: "center",
     marginBottom: 24,
-    paddingHorizontal: 20,
   },
 };
 

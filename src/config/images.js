@@ -10,7 +10,7 @@ import Calendar_Icon from "../SVG/Calendar_Icon";
 import Location_Icon from "../SVG/Location_Icon";
 import User_Icon from "../SVG/User_Icon";
 import OverView_Icon from "../SVG/OverView_Icon";
-
+import FMF_Icon from "../SVG/FMF_Icon";
 const images = {
   Home_Tab: <Home_Tab />,
   More_Tab: <More_Tab />,
@@ -23,6 +23,7 @@ const images = {
   Location_Icon: <Location_Icon />,
   User_Icon: <User_Icon />,
   OverView_Icon: <OverView_Icon />,
+  FMF_Icon: <FMF_Icon />,
 };
 export const ImagesWithProps = ({
   props,
@@ -54,6 +55,8 @@ export const ImagesWithProps = ({
     <User_Icon color={color} size={size} />
   ) : source == "OverView_Icon" ? (
     <OverView_Icon color={color} size={size} />
+  ) : source == "FMF_Icon" ? (
+    <FMF_Icon color={color} size={size} />
   ) : null;
 
 export default images;

@@ -21,20 +21,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  leftColumn: {
-    minWidth: "48%",
-    gap: 8,
-  },
-  rightColumn: {
-    minWidth: "48%",
-    gap: 8,
-  },
   flexRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  cardHeader: {
     flexDirection: "row",
     alignItems: "center",
   },
@@ -44,57 +31,40 @@ const styles = StyleSheet.create({
     color: Colors.PrimaryText,
     marginLeft: 8,
   },
-
-  iconContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    backgroundColor: "rgba(41, 101, 184, 0.12)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  statusBadge: {
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    alignSelf: "flex-start",
-    backgroundColor: "#BEDBFF",
-    position: "absolute",
-    top: 0,
-    right: 0,
-  },
-  statusText: {
-    fontSize: 10,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: "#1447E6",
-  },
   detailItem: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
+    marginTop: 10,
   },
   detailText: {
     fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
   },
-
-  metaLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.FONT_MEDIUM,
-    color: Colors.Gray,
+  previewButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: "#EEF0F4",
+    alignItems: "center",
+    marginRight: 16,
   },
-  metaLabelBold: {
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.SecondaryText,
-  },
-  metaValue: {
-    fontFamily: Fonts.FONT_REGULAR,
+  previewButtonText: {
     color: Colors.PrimaryText,
-  },
-  activeText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
-    color: "#008236",
+  },
+  checkInButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: Colors.Primary,
+    alignItems: "center",
+  },
+  checkInButtonText: {
+    color: Colors.White,
+    fontSize: 14,
+    fontFamily: Fonts.FONT_MEDIUM,
   },
 });
 

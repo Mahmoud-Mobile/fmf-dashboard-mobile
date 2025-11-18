@@ -68,10 +68,9 @@ const CameraQRScanner = ({ onScanned }) => {
 
   if (!isReady) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <CustomHeader
-          title="Camera Scanner"
-          center={false}
+          leftLabel="Camera Scanner"
           onLeftButtonPress={handleBack}
         />
         <View style={styles.center}>
@@ -80,19 +79,15 @@ const CameraQRScanner = ({ onScanned }) => {
             Requesting camera permission...
           </Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <CustomHeader
-        title="Camera Scanner"
-        center={false}
-        onLeftButtonPress={handleBack}
-      />
+    <View style={styles.container}>
+      <CustomHeader leftLabel="Camera Scanner" onLeftButtonPress={handleBack} />
 
-      <View style={styles.cameraContainer}>
+      <View style={styles.container}>
         {isFocused ? (
           <CameraView
             style={StyleSheet.absoluteFill}
@@ -113,8 +108,7 @@ const CameraQRScanner = ({ onScanned }) => {
           <Text style={styles.scanText}>Position QR code within the frame</Text>
         </View>
       </View>
-      <FloatingChatIcon />
-    </SafeAreaView>
+    </View>
   );
 };
 

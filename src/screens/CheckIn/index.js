@@ -1,63 +1,122 @@
-import React, { useState, useCallback } from "react";
-import { View, Text, FlatList, RefreshControl, Alert } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState, useCallback, useMemo } from "react";
+import { View, FlatList, RefreshControl, Alert } from "react-native";
 import { Colors } from "../../Global/colors";
-import { getGridColumns } from "../../constant";
+import { getDeviceDimensions } from "../../constant/deviceUtils";
 import navigationService from "../../Global/navRef";
-import CustomHeader from "../../components/CustomHeader";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
-import SearchBar from "../../components/SearchBar";
-import EventCard from "./components/EventCard";
+import HomeHeader from "../Dashboard/components/HomeHeader";
+import SearchActionRow from "../../components/SearchActionRow";
+import LoadingModal from "../../components/LoadingModal";
+import EmptyListComponent from "../../components/EmptyListComponent";
+import DateSearchModal from "../../components/DateSearchModal";
+import CustomCheckInCard from "./components";
 import { styles } from "./Styles";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { horizontalMargin } from "../../config/metrics";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import CustomEventHeader from "../../components/CustomEventHeader";
 
 const mockEvents = [
   {
     id: "1",
-    title: "Riyadh Season",
-    subtitle: "Riyadh Season Opening Ceremony",
+    title: "Riyadh Season Riyadh ",
+    capacity: "Riyadh Season Opening Ceremony",
     location: "Saudi Arabia",
-    date: "2024-10-24",
+    startDate: "2024-10-24 12:30",
+    endDate: "2024-10-25 18:40",
     isCheckedIn: false,
   },
   {
     id: "2",
     title: "Riyadh Season",
-    subtitle: "Riyadh Season Opening Ceremony",
+    capacity: "Riyadh Season Opening Ceremony",
     location: "Saudi Arabia",
-    date: "2024-10-24",
+    startDate: "2024-10-24 12:30",
+    endDate: "2024-10-25 18:40",
     isCheckedIn: true,
   },
   {
     id: "3",
     title: "Riyadh Season",
-    subtitle: "Riyadh Season Opening Ceremony",
-    location: "Saudi Arabia",
-    date: "2024-10-24",
+    capacity: "Riyadh Season Opening Ceremony",
+    location: "Saudi Arabia Saudi Arabia Saudi Arabia",
+    startDate: "2024-10-24 12:30",
+    endDate: "2024-10-25 18:40",
     isCheckedIn: false,
   },
   {
     id: "4",
     title: "Riyadh Season",
-    subtitle: "Riyadh Season Opening Ceremony",
+    capacity: "Riyadh Season Opening Ceremony",
     location: "Saudi Arabia",
-    date: "2024-10-24",
+    startDate: "2024-10-24 12:30",
+    endDate: "2024-10-25 18:40",
     isCheckedIn: false,
   },
 ];
 
 const CheckInScreen = () => {
-  const [events, setEvents] = useState(mockEvents);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
-  const numColumns = getGridColumns();
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-  const filteredEvents = events.filter(
-    (event) =>
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [events, setEvents] = useState(mockEvents);
+  const [searchText, setSearchText] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [viewMode, setViewMode] = useState("list");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const { selectedEvent } = useSelector((state) => state.api);
+
+  const { width: screenWidth } = getDeviceDimensions();
+
+  const horizontalPadding = horizontalMargin * 2;
+
+  const numColumns = useMemo(() => {
+    if (viewMode === "list") {
+      return 1;
+    }
+    return 2;
+  }, [viewMode]);
+
+  const { cardWidth } = useMemo(() => {
+    const gapBetweenCards = (numColumns - 1) * 8;
+    const width =
+      (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
+    return { cardWidth: width };
+  }, [numColumns, screenWidth]);
+
+  const filteredEvents = useMemo(() => {
+    let filtered = events;
+
+    if (searchText.trim()) {
+      const searchLower = searchText.toLowerCase();
+      filtered = filtered.filter(
+        (event) =>
+          event.title.toLowerCase().includes(searchLower) ||
+          event.capacity.toLowerCase().includes(searchLower) ||
+          event.location.toLowerCase().includes(searchLower)
+      );
+    }
+
+    if (selectedDate) {
+      const selectedDateStr = selectedDate.toISOString().split("T")[0];
+      filtered = filtered.filter((event) => {
+        const startDate = event.startDate
+          ? event.startDate.includes("T")
+            ? event.startDate.split("T")[0]
+            : new Date(event.startDate).toISOString().split("T")[0]
+          : null;
+
+        if (startDate) {
+          return startDate >= selectedDateStr;
+        }
+        return false;
+      });
+    }
+
+    return filtered;
+  }, [events, searchText, selectedDate]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -66,7 +125,7 @@ const CheckInScreen = () => {
     }, 1000);
   }, []);
 
-  const handleCheckIn = (id) => {
+  const handleCheckIn = (event) => {
     Alert.alert(
       "Choose Scanner Type",
       "How would you like to scan the QR code?",
@@ -76,7 +135,9 @@ const CheckInScreen = () => {
           onPress: () => {
             console.log("Navigating to CameraQRScanner");
             if (navigationService.navigation) {
-              navigationService.navigation.navigate("CameraQRScanner");
+              navigationService.navigation.navigate("CameraQRScanner", {
+                eventId: event?.id,
+              });
             } else {
               console.log("Navigation service not available");
               Alert.alert(
@@ -91,7 +152,9 @@ const CheckInScreen = () => {
           onPress: () => {
             console.log("Navigating to ZebraQR");
             if (navigationService.navigation) {
-              navigationService.navigation.navigate("ZebraQR");
+              navigationService.navigation.navigate("ZebraQR", {
+                eventId: event?.id,
+              });
             } else {
               console.log("Navigation service not available");
               Alert.alert(
@@ -110,72 +173,146 @@ const CheckInScreen = () => {
     );
   };
 
-  const handlePreview = (id) => {
-    const event = events.find((e) => e.id === id);
+  const handlePreview = (event) => {
     if (event) {
-      console.log("Navigating to PreviewSeats with event:", event);
       if (navigationService.navigation) {
         navigationService.navigation.navigate("PreviewSeats", {
           eventTitle: event.title,
-          eventSubtitle: event.subtitle,
+          eventcapacity: event.capacity,
           location: event.location,
           date: event.date,
         });
       } else {
-        console.log("Navigation service not available");
         Alert.alert("Navigation Error", "Navigation service not available");
       }
     }
   };
 
-  const renderEventCard = ({ item }) => (
-    <EventCard
-      event={item}
-      onCheckIn={handleCheckIn}
-      onPreview={handlePreview}
-    />
+  const handleSearchClear = () => {
+    setSearchText("");
+  };
+
+  const handleDateSelect = (date) => {
+    setSelectedDate(date);
+  };
+
+  const handleDateModalClose = () => {
+    setShowDateModal(false);
+  };
+
+  const printToFile = async () => {};
+
+  const cardSettings = useMemo(() => {
+    const isGrid = viewMode === "grid" && numColumns > 1;
+    return {
+      isGrid,
+      numColumns: numColumns,
+      columnWrapper: isGrid ? styles.columnWrapper : undefined,
+    };
+  }, [numColumns, viewMode]);
+
+  const renderEventCard = useCallback(
+    ({ item }) => {
+      const handlePreviewPress = (eventIdOrItem) => {
+        const event =
+          typeof eventIdOrItem === "string"
+            ? events.find((e) => e.id === eventIdOrItem) || item
+            : eventIdOrItem || item;
+        handlePreview(event);
+      };
+
+      const handleCheckInPress = (eventIdOrItem) => {
+        const event =
+          typeof eventIdOrItem === "string"
+            ? events.find((e) => e.id === eventIdOrItem) || item
+            : eventIdOrItem || item;
+        handleCheckIn(event);
+      };
+
+      return (
+        <CustomCheckInCard
+          item={item}
+          onPress={handlePreview}
+          onPreview={handlePreviewPress}
+          onCheckIn={handleCheckInPress}
+          width={cardWidth}
+        />
+      );
+    },
+    [cardWidth, events, handlePreview, handleCheckIn]
   );
+
+  const listKeyExtractor = useCallback((item) => {
+    return String(item.id);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <CustomHeader title="Check In" />
+      <CustomEventHeader
+        event={selectedEvent}
+        onLeftButtonPress={() => navigation.goBack()}
+        onRightButtonPress={() => navigation.navigate("NotificationScreen")}
+      />
 
-      <View style={styles.searchContainer}>
-        <SearchBar
-          onChangeText={setSearchTerm}
-          placeholder="Search....."
-          value={searchTerm}
-        />
-      </View>
-
-      {filteredEvents.length > 0 ? (
+      <SearchActionRow
+        searchPlaceholder="Search check-in events..."
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        onSearchClear={handleSearchClear}
+        viewMode={viewMode}
+        onToggleViewMode={setViewMode}
+        onPressPrint={printToFile}
+        isPrinting={isPrinting}
+        onPressDate={() => setShowDateModal(true)}
+        selectedDate={selectedDate}
+        onClearDate={() => setSelectedDate(null)}
+      />
+      {loading ? (
+        <LoadingModal visible={loading} />
+      ) : (
         <FlatList
+          key={viewMode}
           data={filteredEvents}
           renderItem={renderEventCard}
-          keyExtractor={(item) => item.id}
-          numColumns={numColumns}
-          key={numColumns}
+          keyExtractor={listKeyExtractor}
+          numColumns={cardSettings.numColumns}
+          columnWrapperStyle={cardSettings.columnWrapper}
           contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
-              tintColor={Colors.Primary}
               refreshing={refreshing}
               onRefresh={onRefresh}
+              colors={[Colors.Primary]}
+              tintColor={Colors.Primary}
             />
           }
-          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => (
+            <EmptyListComponent
+              title={
+                searchText
+                  ? "No Check-In Events Found"
+                  : "No Check-In Events Available"
+              }
+              description={
+                searchText
+                  ? `No check-in events match "${searchText}". Try a different search term.`
+                  : "There are no check-in events available at the moment."
+              }
+            />
+          )}
+          contentInsetAdjustmentBehavior="always"
         />
-      ) : (
-        <View style={styles.emptyContainer}>
-          <MaterialIcons name="event-busy" size={96} color={Colors.gray} />
-          <Text style={styles.emptyText}>
-            {searchTerm
-              ? "No events found matching your search"
-              : "No events available"}
-          </Text>
-        </View>
       )}
-      <FloatingChatIcon />
+
+      <DateSearchModal
+        visible={showDateModal}
+        onClose={handleDateModalClose}
+        onDateSelect={handleDateSelect}
+        selectedDate={selectedDate}
+        title="Filter Check-In Events by Date"
+        placeholder="Select a date to show check-in events from that date onwards"
+      />
     </View>
   );
 };

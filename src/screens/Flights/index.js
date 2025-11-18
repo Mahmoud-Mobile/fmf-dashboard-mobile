@@ -147,8 +147,14 @@ const Flights = () => {
   };
 
   const handleFlightPress = (flight) => {
-    const actionButtons = getActionButtons(flight);
-    navigation.navigate("FlightDetails", { flight, actionButtons });
+    const selectedCategoryName =
+      categories.find((c) => c.id === selectedCategory)?.label ||
+      selectedCategory;
+    navigation.navigate("FlightDetails", {
+      flight,
+      selectedCategory,
+      selectedCategoryName,
+    });
   };
 
   const handleSearchClear = () => {
@@ -458,8 +464,6 @@ const Flights = () => {
         categories={categories}
         selectedCategory={selectedCategory}
         onCategorySelect={setSelectedCategory}
-        horizontal={true}
-        scrollable={true}
       />
       <LoadingModal visible={loading} />
       {!loading && (

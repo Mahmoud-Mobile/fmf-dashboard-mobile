@@ -1,13 +1,13 @@
-import React from "react";
-import { View, Text, ScrollView, Image } from "react-native";
+import React, { useMemo } from "react";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./Styles";
 import moment from "moment";
-import { ActionButtonGroup, ActionButton } from "../../components/ActionButton";
+import { ActionButton } from "../../components/ActionButton";
 
 const FlightDetails = ({ route }) => {
-  const { flight } = route.params;
+  const { flight, selectedCategory } = route.params;
   const navigation = useNavigation();
 
   const formatDate = (dateString) => {
@@ -24,10 +24,80 @@ const FlightDetails = ({ route }) => {
     }
   };
 
+  const actionButtons = useMemo(() => {
+    const isDisabled =
+      flight.isLuggageReceived === true ||
+      flight.isParticipantArrived === true ||
+      flight.isParticipantDeparted === true;
+
+    const isSelected = !isDisabled;
+
+    if (selectedCategory === "return") {
+      return [
+        {
+          icon: "flight-takeoff",
+          text: "Plane Taken Off",
+          iconSize: 24,
+          isSelected: isSelected,
+          disabled: isDisabled,
+          onPress: () => {
+            Alert.alert(
+              "Plane Taken Off",
+              `Flight ${flight.returnFlightNumber} has taken off successfully!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+      ];
+    } else {
+      return [
+        {
+          icon: "flight-land",
+          text: "Plane Landed",
+          isSelected: isSelected,
+          disabled: isDisabled,
+          onPress: () => {
+            Alert.alert(
+              "Plane Landed",
+              `Flight ${flight.arrivalFlightNumber} has landed successfully!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+        {
+          icon: "check-circle",
+          text: "Logged Arrived",
+          isSelected: isSelected,
+          disabled: isDisabled,
+          onPress: () => {
+            Alert.alert(
+              "Logged Arrived",
+              `Passenger arrival has been logged for flight ${flight.arrivalFlightNumber}!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+        {
+          icon: "verified-user",
+          text: "Guest Granted",
+          isSelected: isSelected,
+          disabled: isDisabled,
+          onPress: () => {
+            Alert.alert(
+              "Guest Granted",
+              `Guest access has been granted for flight ${flight.arrivalFlightNumber}!`,
+              [{ text: "OK", style: "default" }]
+            );
+          },
+        },
+      ];
+    }
+  }, [flight, selectedCategory]);
+
   return (
     <View style={styles.container}>
       <CustomHeader
-        leftLabel={flight.flightType === "Return" ? "Return" : "Arrival"}
+        leftLabel={route.params?.selectedCategoryName}
         title={flight.arrivalFlightNumber}
         subtitle={flight.arrivalAirlinesName}
         onLeftButtonPress={() => navigation.goBack()}
@@ -60,25 +130,24 @@ const FlightDetails = ({ route }) => {
                 </View>
               </View>
               <View style={[styles.flexOne, { paddingLeft: 12 }]}>
-                {!!route.params?.actionButtons &&
-                  route.params.actionButtons.length > 0 && (
-                    <View style={{ flexDirection: "column", gap: 8 }}>
-                      {route.params.actionButtons.length === 1 ? (
+                {actionButtons && actionButtons.length > 0 && (
+                  <View style={{ flexDirection: "column", gap: 8 }}>
+                    {actionButtons.length === 1 ? (
+                      <ActionButton
+                        {...actionButtons[0]}
+                        style={{ width: "100%" }}
+                      />
+                    ) : (
+                      actionButtons.map((btn, idx) => (
                         <ActionButton
-                          {...route.params.actionButtons[0]}
+                          key={idx}
+                          {...btn}
                           style={{ width: "100%" }}
                         />
-                      ) : (
-                        route.params.actionButtons.map((btn, idx) => (
-                          <ActionButton
-                            key={idx}
-                            {...btn}
-                            style={{ width: "100%" }}
-                          />
-                        ))
-                      )}
-                    </View>
-                  )}
+                      ))
+                    )}
+                  </View>
+                )}
               </View>
             </View>
 
