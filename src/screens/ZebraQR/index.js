@@ -23,45 +23,73 @@ const ZebraQR = () => {
   const debounceRef = useRef(null);
   const immediateSubmitRef = useRef(null);
   const lastFocusAtRef = useRef(0);
+  const isLockedRef = useRef(false);
   const isFocused = useIsFocused();
+
+  const handleScanned = useCallback(async (data) => {
+    console.log("QR Code scanned:", data);
+    // Show alert with options to go to ShowSeats or scan another
+    Alert.alert(
+      "QR Code Scanned",
+      `Scanned data: ${data}`,
+      [
+        {
+          text: "Scan Another",
+          style: "cancel",
+          onPress: () => {
+            // Reset lock to allow another scan
+            isLockedRef.current = false;
+            setBuffer("");
+            // Re-focus for next scan
+            requestAnimationFrame(() => inputRef.current?.focus());
+          },
+        },
+        {
+          text: "Show Seats",
+          onPress: () => {
+            // Navigate to ShowSeats screen
+            navigationService.navigation?.navigate("ShowSeats", {
+              title: "Show Seats",
+              // imageUri: data, // Uncomment if QR code contains image URL
+            });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }, []);
 
   const handleSubmit = useCallback(
     async (forced) => {
       if (!isFocused) return;
       const data = (forced ?? buffer).trim();
-      if (!data || isProcessing) return;
+      if (!data || isProcessing || isLockedRef.current) return;
+
+      isLockedRef.current = true;
       setIsProcessing(true);
       try {
         console.log("verifyQrCode body:", { qr: data });
         const res = await verifyQrCode({ qr: data });
         const isValid = Boolean(res?.valid);
 
-        // Show result alert
-        Alert.alert(
-          "QR Code Scanned",
-          `Scanned data: ${data}\nStatus: ${isValid ? "Valid" : "Invalid"}`,
-          [
-            {
-              text: "OK",
-              onPress: () => navigationService.navigation?.goBack(),
-            },
-          ]
-        );
+        // Show alert with options
+        await handleScanned(data);
       } catch (e) {
         console.error("Error verifying QR code:", e);
+        // On error, reset lock
+        isLockedRef.current = false;
       } finally {
         setIsProcessing(false);
         setBuffer("");
-        // re-focus for next scan
-        requestAnimationFrame(() => inputRef.current?.focus());
+        // Don't auto-refocus - wait for user choice in alert
       }
     },
-    [buffer, isProcessing, isFocused]
+    [buffer, isProcessing, isFocused, handleScanned]
   );
 
   const onChangeText = useCallback(
     (text) => {
-      if (!isFocused) return;
+      if (!isFocused || isLockedRef.current) return;
       // Ignore any keystrokes that arrive immediately after regaining focus.
       // Many hardware scanners buffer keystrokes during navigation and flush them on focus.
       if (Date.now() - lastFocusAtRef.current < 150) {
@@ -91,7 +119,10 @@ const ZebraQR = () => {
   useEffect(() => {
     if (isFocused) {
       lastFocusAtRef.current = Date.now();
-      requestAnimationFrame(() => inputRef.current?.focus());
+      // Only focus if not locked (waiting for user choice)
+      if (!isLockedRef.current) {
+        requestAnimationFrame(() => inputRef.current?.focus());
+      }
     } else {
       // On blur: stop any pending submits and blur the hidden input
       if (debounceRef.current) {
@@ -104,6 +135,7 @@ const ZebraQR = () => {
       }
       inputRef.current?.blur();
       setBuffer("");
+      isLockedRef.current = false;
     }
   }, [isFocused]);
 

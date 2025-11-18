@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { Fonts } from "../../Global/fonts";
 import { Colors } from "../../Global/colors";
 import { horizontalMargin } from "../../config/metrics";
@@ -6,7 +6,7 @@ import { horizontalMargin } from "../../config/metrics";
 const styles = StyleSheet.create({
   safeAreaContainer: {
     paddingHorizontal: horizontalMargin,
-    paddingTop: 5,
+    paddingTop: Platform.OS === "ios" ? 5 : 15,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
     backgroundColor: Colors.Primary,

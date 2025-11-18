@@ -1,5 +1,12 @@
 import React, { useMemo } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Platform,
+} from "react-native";
 import { Fonts } from "../../../Global/fonts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -75,7 +82,7 @@ const HomeHeader = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: horizontalMargin,
-    paddingTop: 8,
+    paddingVertical: Platform.OS === "ios" ? 5 : 15,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
     backgroundColor: Colors.Primary,
@@ -87,19 +94,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e4681",
     borderRadius: 20,
     paddingVertical: 18,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   userInfo: {
     flexDirection: "row",
     alignItems: "center",
   },
   greeting: {
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.White,
     fontFamily: Fonts.FONT_REGULAR,
   },
   username: {
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.White,
     fontFamily: Fonts.FONT_MEDIUM,
   },

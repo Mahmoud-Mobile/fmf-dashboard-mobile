@@ -13,6 +13,39 @@ const CameraQRScanner = ({ onScanned }) => {
   const isLockedRef = useRef(false);
   const isFocused = useIsFocused();
 
+  const handleBack = () => {
+    navigationService.navigation?.goBack();
+  };
+
+  const handleScanned = useCallback(async (data) => {
+    console.log("QR Code scanned:", data);
+    // Show alert with options to go to ShowSeats or scan another
+    Alert.alert(
+      "QR Code Scanned",
+      `Scanned data: ${data}`,
+      [
+        {
+          text: "Scan Another",
+          style: "cancel",
+          onPress: () => {
+            // Reset lock to allow another scan
+            isLockedRef.current = false;
+          },
+        },
+        {
+          text: "Show Seats",
+          onPress: () => {
+            navigationService.navigation?.navigate("ShowSeats", {
+              title: "Show Seats",
+              // imageUri: data, // Uncomment if QR code contains image URL
+            });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }, []);
+
   const handleBarCodeScanned = useCallback(
     async ({ data }) => {
       if (isLockedRef.current || !data) return;
@@ -22,12 +55,9 @@ const CameraQRScanner = ({ onScanned }) => {
         await handleScanned(String(data));
       } finally {
         setIsProcessing(false);
-        setTimeout(() => {
-          isLockedRef.current = false;
-        }, 1000);
       }
     },
-    [onScanned]
+    [handleScanned]
   );
 
   useEffect(() => {
@@ -41,27 +71,10 @@ const CameraQRScanner = ({ onScanned }) => {
 
   useEffect(() => {
     if (!isFocused) {
-      // Ensure we don't stay locked or processing when leaving the screen
       isLockedRef.current = false;
       setIsProcessing(false);
     }
   }, [isFocused]);
-
-  const handleBack = () => {
-    navigationService.navigation?.goBack();
-  };
-
-  const handleScanned = async (data) => {
-    console.log("QR Code scanned:", data);
-    // Handle the scanned data here
-    // You can add your logic to process the QR code
-    Alert.alert("QR Code Scanned", `Scanned data: ${data}`, [
-      {
-        text: "OK",
-        onPress: () => navigationService.navigation?.goBack(),
-      },
-    ]);
-  };
 
   if (!isReady) {
     return (

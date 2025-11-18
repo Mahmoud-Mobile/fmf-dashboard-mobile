@@ -7,6 +7,7 @@ import MyTabs from "../Navigation/MyTabs";
 import NoInternetScreen from "../screens/NoInternetScreen";
 import FlightDetails from "../screens/FlightDetails";
 import PreviewSeats from "../screens/PreviewSeats";
+import ShowSeats from "../screens/ShowSeats";
 import CameraQRScanner from "../screens/CameraQRScanner";
 import ZebraQR from "../screens/ZebraQR";
 import Chat from "../screens/Chat";
@@ -111,6 +112,13 @@ const NavStack = () => {
       <Stack.Screen
         name="PreviewSeats"
         component={PreviewSeats}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ShowSeats"
+        component={ShowSeats}
         options={{
           headerShown: false,
         }}
