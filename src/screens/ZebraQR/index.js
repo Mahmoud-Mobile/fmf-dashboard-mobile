@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, Platform, Text, TextInput, View, Animated } from "react-native";
+import { Platform, Text, TextInput, View, Animated } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
 import navigationService from "../../Global/navRef";
+import QRScanResultModal from "../../components/QRScanResultModal";
 import { styles } from "./Styles";
 import { Colors } from "../../Global/colors";
 
@@ -15,49 +16,84 @@ const verifyQrCode = async ({ qr }) => {
   });
 };
 
+// Mock function to fetch user info from QR code
+// Replace this with your actual API call
+const fetchUserInfoFromQR = async (qrData) => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // In a real app, you would parse the QR data or make an API call
+      // For now, return mock data
+      resolve({
+        name: "John Doe",
+        email: "john.doe@example.com",
+        mobile: "+1 234 567 8900",
+        address: "123 Main Street, City, State 12345",
+        image: null, // You can add image URL here if available
+      });
+    }, 1000);
+  });
+};
+
 const ZebraQR = () => {
   const inputRef = useRef(null);
   const [buffer, setBuffer] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const [scannedData, setScannedData] = useState(null);
   const [scrollY] = useState(new Animated.Value(0));
   const debounceRef = useRef(null);
   const immediateSubmitRef = useRef(null);
   const lastFocusAtRef = useRef(0);
   const isLockedRef = useRef(false);
   const isFocused = useIsFocused();
+  const modalRef = useRef(null);
 
   const handleScanned = useCallback(async (data) => {
     console.log("QR Code scanned:", data);
-    // Show alert with options to go to ShowSeats or scan another
-    Alert.alert(
-      "QR Code Scanned",
-      `Scanned data: ${data}`,
-      [
-        {
-          text: "Scan Another",
-          style: "cancel",
-          onPress: () => {
-            // Reset lock to allow another scan
-            isLockedRef.current = false;
-            setBuffer("");
-            // Re-focus for next scan
-            requestAnimationFrame(() => inputRef.current?.focus());
-          },
-        },
-        {
-          text: "Show Seats",
-          onPress: () => {
-            // Navigate to ShowSeats screen
-            navigationService.navigation?.navigate("ShowSeats", {
-              title: "Show Seats",
-              // imageUri: data, // Uncomment if QR code contains image URL
-            });
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    setScannedData(data);
+    setIsLoadingUserInfo(true);
+
+    try {
+      // Fetch user info from QR code
+      const info = await fetchUserInfoFromQR(data);
+      setUserInfo(info);
+      // Open modal
+      modalRef.current?.open();
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      // Still show modal with basic info
+      setUserInfo({ name: "User", email: null, mobile: null, address: null });
+      modalRef.current?.open();
+    } finally {
+      setIsLoadingUserInfo(false);
+    }
   }, []);
+
+  const handleScanAnother = useCallback(() => {
+    // Reset lock to allow another scan
+    isLockedRef.current = false;
+    setBuffer("");
+    setUserInfo(null);
+    setScannedData(null);
+    // Re-focus for next scan
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }, []);
+
+  const handleShowSeats = useCallback(() => {
+    // Navigate to ShowSeats screen
+    navigationService.navigation?.navigate("ShowSeats", {
+      title: "Show Seats",
+      // imageUri: scannedData, // Uncomment if QR code contains image URL
+    });
+  }, [scannedData]);
+
+  const handleShowProfile = useCallback(() => {
+    navigationService.navigation?.navigate("AudienceProfile", {
+      userInfo: userInfo,
+    });
+  }, [userInfo]);
 
   const handleSubmit = useCallback(
     async (forced) => {
@@ -189,6 +225,15 @@ const ZebraQR = () => {
           />
         ) : null}
       </View>
+
+      <QRScanResultModal
+        ref={modalRef}
+        onScanAnother={handleScanAnother}
+        onShowSeats={handleShowSeats}
+        onShowProfile={handleShowProfile}
+        userInfo={userInfo}
+        isLoading={isLoadingUserInfo}
+      />
     </View>
   );
 };

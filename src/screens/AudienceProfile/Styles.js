@@ -1,0 +1,100 @@
+import { StyleSheet } from "react-native";
+import { Colors } from "../../Global/colors";
+import { Fonts } from "../../Global/fonts";
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.Background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  profileHeader: {
+    alignItems: "center",
+    paddingVertical: 32,
+    paddingHorizontal: 24,
+    backgroundColor: Colors.White,
+    marginBottom: 16,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 16,
+    borderWidth: 4,
+    borderColor: Colors.Primary,
+  },
+  profileImagePlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: Colors.LightGray,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+    borderWidth: 4,
+    borderColor: Colors.Primary,
+  },
+  profileName: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: Colors.PrimaryText,
+    textAlign: "center",
+  },
+  infoCard: {
+    backgroundColor: Colors.White,
+    marginHorizontal: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: Colors.Black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: 12,
+  },
+  infoIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.Background,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+  },
+  infoContent: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: Colors.SecondaryText,
+    marginBottom: 4,
+    fontFamily: Fonts.FONT_REGULAR,
+  },
+  infoValue: {
+    fontSize: 16,
+    color: Colors.PrimaryText,
+    fontFamily: Fonts.FONT_REGULAR,
+    lineHeight: 22,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.borderColor,
+    marginVertical: 8,
+    marginLeft: 64,
+  },
+});
+
+export default styles;
+

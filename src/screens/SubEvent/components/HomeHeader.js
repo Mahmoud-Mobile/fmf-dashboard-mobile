@@ -45,7 +45,7 @@ const HomeHeader = () => {
   }, [userInfo]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.headerCard}>
         <View style={styles.userInfo}>
           {profileData.profileImage ? (
@@ -82,7 +82,8 @@ const HomeHeader = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: horizontalMargin,
-    paddingVertical: Platform.OS === "ios" ? 5 : 15,
+    paddingTop: 30,
+    paddingBottom: Platform.OS === "ios" ? 15 : 10,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
     backgroundColor: Colors.Primary,
@@ -93,8 +94,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#1e4681",
     borderRadius: 20,
-    paddingVertical: 18,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
   },
   userInfo: {
     flexDirection: "row",
@@ -136,6 +137,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.White,
     fontFamily: Fonts.FONT_REGULAR,
+  },
+  notificationContainer: {
+    marginRight: 10,
   },
 });
 

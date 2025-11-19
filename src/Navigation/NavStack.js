@@ -15,6 +15,7 @@ import DesignatedCars from "../screens/DesignatedCars";
 import Hotels from "../screens/Hotels";
 import NotificationScreen from "../screens/NotificationScreen";
 import Profile from "../screens/Profile";
+import AudienceProfile from "../screens/AudienceProfile";
 import Survey from "../screens/Survey";
 import PrivacyPolicy from "../screens/PrivacyPolicy";
 import About from "../screens/About";
@@ -168,6 +169,13 @@ const NavStack = () => {
       <Stack.Screen
         name="Profile"
         component={Profile}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="AudienceProfile"
+        component={AudienceProfile}
         options={{
           headerShown: false,
         }}
