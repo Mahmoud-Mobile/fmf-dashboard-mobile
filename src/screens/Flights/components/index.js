@@ -174,7 +174,7 @@ const FlightCard = ({
         {statusConfig.icon && (
           <MaterialIcons
             name={statusConfig.icon}
-            size={14}
+            size={12}
             color={statusConfig.color}
           />
         )}

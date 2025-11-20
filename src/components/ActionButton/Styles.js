@@ -3,42 +3,16 @@ import { Fonts } from "../../Global/fonts";
 import { Colors } from "../../Global/colors";
 
 const styles = StyleSheet.create({
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 8,
-    height: 30,
-  },
-  buttonActive: {
-    backgroundColor: Colors.Primary,
-  },
-  buttonInactive: {
-    backgroundColor: "#EEF0F4",
-    borderWidth: 1,
-    borderColor: "#EEF0F4",
-  },
-  buttonSingle: {
+  swipeContainer: {
     width: "100%",
   },
-
-  text: {
-    fontSize: 10,
+  disabledText: {
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
-    marginLeft: 4,
+    color: Colors.Primary,
+    marginBottom: 8,
   },
-  textActive: {
-    color: Colors.White,
-  },
-  textInactive: {
-    color: Colors.Black,
-  },
-  buttonGroup: {
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  buttonGroup: {},
 });
 
 export default styles;

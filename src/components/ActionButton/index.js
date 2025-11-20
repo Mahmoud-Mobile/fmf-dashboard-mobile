@@ -1,49 +1,28 @@
 import React from "react";
-import { TouchableOpacity, View, Text } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { View } from "react-native";
+import SwipeToggle from "./SwipeToggle";
 import styles from "./Styles";
-import { Colors } from "../../Global/colors";
 
 const ActionButton = ({
-  icon,
   text,
   onPress,
   style,
-  textStyle,
-  flex,
-  isSelected = false,
   disabled = false,
+  swipeTitle,
+  onSwipeSuccess,
+  swipeContainerStyle,
+  disabledText,
+  icon,
 }) => {
-  const isButtonActive = isSelected && !disabled;
-
   return (
-    <TouchableOpacity
-      style={[
-        styles.button,
-        isButtonActive ? styles.buttonActive : styles.buttonInactive,
-        style?.width ? null : { flex: flex !== undefined ? flex : 1 },
-        style,
-        disabled && { opacity: 0.5 },
-      ]}
-      onPress={disabled ? undefined : onPress}
-      activeOpacity={disabled ? 1 : 0.8}
+    <SwipeToggle
+      title={swipeTitle || text || "Swipe to submit"}
+      onSwipeSuccess={onSwipeSuccess || onPress}
       disabled={disabled}
-    >
-      <MaterialIcons
-        name={icon}
-        size={12}
-        color={isButtonActive ? Colors.White : Colors.Black}
-      />
-      <Text
-        style={[
-          styles.text,
-          isButtonActive ? styles.textActive : styles.textInactive,
-          textStyle,
-        ]}
-      >
-        {text}
-      </Text>
-    </TouchableOpacity>
+      containerStyle={swipeContainerStyle || style}
+      disabledText={disabledText}
+      icon={icon}
+    />
   );
 };
 
@@ -59,3 +38,4 @@ const ActionButtonGroup = ({ buttons, containerStyle }) => {
 
 export default ActionButton;
 export { ActionButton, ActionButtonGroup };
+export { default as SwipeToggle } from "./SwipeToggle";
