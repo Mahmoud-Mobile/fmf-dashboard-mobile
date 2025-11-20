@@ -4,7 +4,8 @@ import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./Styles";
 import moment from "moment";
-import { ActionButton } from "../../components/ActionButton";
+import { ActionButton, ActionButtonGroup } from "../../components/ActionButton";
+import { horizontalMargin } from "../../config/metrics";
 
 const FlightDetails = ({ route }) => {
   const { flight, selectedCategory } = route.params;
@@ -94,6 +95,16 @@ const FlightDetails = ({ route }) => {
     }
   }, [flight, selectedCategory]);
 
+  const renderActions = () => {
+    if (!actionButtons || actionButtons.length === 0) return null;
+    if (actionButtons.length === 1) {
+      const button = actionButtons[0];
+      return <ActionButton {...button} endPosition />;
+    }
+
+    return <ActionButtonGroup buttons={actionButtons} />;
+  };
+
   return (
     <View style={styles.container}>
       <CustomHeader
@@ -110,44 +121,20 @@ const FlightDetails = ({ route }) => {
       >
         <View style={styles.card}>
           <View style={styles.cardContent}>
-            <View style={styles.topRow}>
-              <View style={[styles.flexOne, { paddingRight: 12 }]}>
-                <Text style={styles.sectionTitle}>Participant Information</Text>
-                <View style={styles.participantContainer}>
-                  <Image
-                    source={{
-                      uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-                    }}
-                    style={styles.participantPhoto}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.participantInfo}>
-                    <Text style={styles.participantName}>Ahmed Mohamed</Text>
-                    <Text style={styles.participantMobile}>
-                      +966 11 111 1111
-                    </Text>
-                  </View>
+            <View style={styles.flexOne}>
+              <Text style={styles.sectionTitle}>Participant Information</Text>
+              <View style={styles.participantContainer}>
+                <Image
+                  source={{
+                    uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                  }}
+                  style={styles.participantPhoto}
+                  resizeMode="cover"
+                />
+                <View style={styles.participantInfo}>
+                  <Text style={styles.participantName}>Ahmed Mohamed</Text>
+                  <Text style={styles.participantMobile}>+966 11 111 1111</Text>
                 </View>
-              </View>
-              <View style={[styles.flexOne, { paddingLeft: 12 }]}>
-                {actionButtons && actionButtons.length > 0 && (
-                  <View style={{ flexDirection: "column", gap: 8 }}>
-                    {actionButtons.length === 1 ? (
-                      <ActionButton
-                        {...actionButtons[0]}
-                        style={{ width: "100%" }}
-                      />
-                    ) : (
-                      actionButtons.map((btn, idx) => (
-                        <ActionButton
-                          key={idx}
-                          {...btn}
-                          style={{ width: "100%" }}
-                        />
-                      ))
-                    )}
-                  </View>
-                )}
               </View>
             </View>
 
@@ -322,6 +309,11 @@ const FlightDetails = ({ route }) => {
                   : "No special requests"}
               </Text>
             </View>
+          </View>
+          <View
+            style={{ marginBottom: 100, marginHorizontal: horizontalMargin }}
+          >
+            {renderActions()}
           </View>
         </View>
       </ScrollView>

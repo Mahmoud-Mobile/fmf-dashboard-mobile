@@ -12,7 +12,9 @@ const styles = StyleSheet.create({
     color: Colors.Primary,
     marginBottom: 8,
   },
-  buttonGroup: {},
+  buttonGroup: {
+    gap: 10,
+  },
 });
 
 export default styles;
