@@ -19,6 +19,7 @@ import AudienceProfile from "../screens/AudienceProfile";
 import Survey from "../screens/Survey";
 import PrivacyPolicy from "../screens/PrivacyPolicy";
 import About from "../screens/About";
+import TripsDetails from "../screens/TripsDetails";
 import { Colors } from "../Global/colors";
 import { Fonts } from "../Global/fonts";
 import NetInfo from "@react-native-community/netinfo";
@@ -197,6 +198,13 @@ const NavStack = () => {
       <Stack.Screen
         name="About"
         component={About}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="TripsDetails"
+        component={TripsDetails}
         options={{
           headerShown: false,
         }}

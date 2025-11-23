@@ -32,21 +32,22 @@ const Profile = () => {
       mobile: user.mobile || user.phone || user.phoneNumber || "",
       address: user.address || "",
       role: user.role || user.userRole || user.title || "",
-      profileImage: user.profileImage || user.profile_image || user.avatar || null,
+      profileImage:
+        user.profileImage || user.profile_image || user.avatar || null,
     };
   }, [authUser, profile]);
 
-  const displayName = [userInfo.firstName, userInfo.lastName]
-    .filter(Boolean)
-    .join(" ") || "User";
+  const displayName =
+    [userInfo.firstName, userInfo.lastName].filter(Boolean).join(" ") || "User";
 
-  const initials = displayName
-    .split(" ")
-    .filter(Boolean)
-    .map((word) => word[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase() || "U";
+  const initials =
+    displayName
+      .split(" ")
+      .filter(Boolean)
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "U";
 
   if (loading) {
     return (
@@ -67,9 +68,8 @@ const Profile = () => {
   return (
     <View style={styles.container}>
       <CustomHeader
-        title="Profile"
+        leftLabel="Profile"
         onLeftButtonPress={() => navigation.goBack()}
-        top={50}
       />
       <ScrollView
         style={styles.scrollView}
@@ -124,7 +124,11 @@ const Profile = () => {
 
           <View style={styles.infoRow}>
             <View style={styles.infoIconContainer}>
-              <MaterialIcons name="location-on" size={24} color={Colors.Primary} />
+              <MaterialIcons
+                name="location-on"
+                size={24}
+                color={Colors.Primary}
+              />
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Address</Text>

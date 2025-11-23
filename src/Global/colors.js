@@ -3,7 +3,7 @@ export const Colors = {
   Black: "#000000",
 
   Primary: "#2965B8",
-  PrimaryGradient: ["#880CB9", "#368BBA"],
+  PrimaryGradient: ["#2965B8", "#368BBA"],
   Secondary: "#1E1E1E",
   borderErr: "#E82F2F",
   borderColor: "#E5E5E5",

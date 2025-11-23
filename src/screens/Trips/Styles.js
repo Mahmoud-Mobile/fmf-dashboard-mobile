@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { Fonts } from "../../Global/fonts";
 import { horizontalMargin } from "../../config/metrics";
 
 const styles = StyleSheet.create({
@@ -8,9 +7,13 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     marginHorizontal: horizontalMargin,
+    paddingTop: 8,
   },
   emptyContainer: {
     flexGrow: 1,
+  },
+  columnWrapper: {
+    justifyContent: "space-between",
   },
 });
 export default styles;

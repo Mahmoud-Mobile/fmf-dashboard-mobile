@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, FlatList, RefreshControl } from "react-native";
+import { View, FlatList, RefreshControl, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import CustomEventHeader from "../../components/CustomEventHeader";
@@ -8,9 +8,11 @@ import LoadingModal from "../../components/LoadingModal";
 import FloatingChatIcon from "../../components/FloatingChatIcon";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import DateSearchModal from "../../components/DateSearchModal";
-import TripCard from "./components/TripsCardGrid";
+import TripCard from "./components";
 import { Colors } from "../../Global/colors";
 import { fetchTrips } from "../../redux/actions/api";
+import { getDeviceDimensions } from "../../constant/deviceUtils";
+import { horizontalMargin } from "../../config/metrics";
 import styles from "./Styles";
 
 const Trips = () => {
@@ -23,6 +25,23 @@ const Trips = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+
+  const { width: screenWidth } = getDeviceDimensions();
+  const horizontalPadding = horizontalMargin * 2;
+
+  const numColumns = useMemo(() => {
+    if (viewMode === "list") {
+      return 1;
+    }
+    return 2;
+  }, [viewMode]);
+
+  const { cardWidth } = useMemo(() => {
+    const gapBetweenCards = (numColumns - 1) * 8;
+    const width =
+      (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
+    return { cardWidth: width };
+  }, [numColumns, screenWidth, horizontalPadding]);
 
   const fetchTripsData = useCallback(() => {
     if (selectedEvent?.id) {
@@ -115,6 +134,96 @@ const Trips = () => {
     }, 1000);
   };
 
+  const cardSettings = useMemo(() => {
+    const isGrid = viewMode === "grid" && numColumns > 1;
+    return {
+      isGrid,
+      numColumns: numColumns,
+      columnWrapper: isGrid ? styles.columnWrapper : undefined,
+    };
+  }, [numColumns, viewMode]);
+
+  const getActionButtons = useCallback((trip) => {
+    const isDisabled =
+      trip.isVehicleReady === true ||
+      trip.isGuestPickedUp === true ||
+      trip.isTripCompleted === true;
+
+    const isSelected = !isDisabled;
+    const tripId = trip.id || trip.tripId || "unknown";
+
+    return [
+      {
+        icon: "directions-car",
+        text: "Vehicle Ready",
+        isSelected: isSelected,
+        disabled: isDisabled,
+        iconId: `vehicle-ready-${tripId}`,
+        onPress: () => {
+          Alert.alert("Vehicle Ready", `Vehicle is ready for trip ${tripId}!`, [
+            { text: "OK", style: "default" },
+          ]);
+        },
+      },
+      {
+        icon: "person",
+        text: "Guest Picked up",
+        isSelected: isSelected,
+        disabled: isDisabled,
+        iconId: `guest-picked-up-${tripId}`,
+        onPress: () => {
+          Alert.alert(
+            "Guest Picked up",
+            `Guest has been picked up for trip ${tripId}!`,
+            [{ text: "OK", style: "default" }]
+          );
+        },
+      },
+      {
+        icon: "check-circle",
+        text: "Trip Completed",
+        isSelected: isSelected,
+        disabled: isDisabled,
+        iconId: `trip-completed-${tripId}`,
+        onPress: () => {
+          Alert.alert(
+            "Trip Completed",
+            `Trip ${tripId} has been completed successfully!`,
+            [{ text: "OK", style: "default" }]
+          );
+        },
+      },
+    ];
+  }, []);
+
+  const handleTripPress = useCallback(
+    (item) => {
+      navigation.navigate("TripsDetails", {
+        trip: item,
+      });
+    },
+    [navigation]
+  );
+
+  const renderTripCard = useCallback(
+    ({ item }) => {
+      const actionButtons = getActionButtons(item);
+      return (
+        <TripCard
+          item={item}
+          width={cardWidth}
+          actionButtons={actionButtons}
+          onPress={() => handleTripPress(item)}
+        />
+      );
+    },
+    [cardWidth, getActionButtons, handleTripPress]
+  );
+
+  const listKeyExtractor = useCallback((item, index) => {
+    return item?.id?.toString() || index.toString();
+  }, []);
+
   return (
     <View style={styles.container}>
       <CustomEventHeader
@@ -140,11 +249,12 @@ const Trips = () => {
         <LoadingModal visible={loading} />
       ) : (
         <FlatList
+          key={viewMode}
           data={filteredTrips}
-          renderItem={({ item }) => <TripCard item={item} />}
-          keyExtractor={(item, index) =>
-            item?.id?.toString() || index.toString()
-          }
+          renderItem={renderTripCard}
+          keyExtractor={listKeyExtractor}
+          numColumns={cardSettings.numColumns}
+          columnWrapperStyle={cardSettings.columnWrapper}
           ListEmptyComponent={
             <EmptyListComponent
               title={
@@ -173,9 +283,9 @@ const Trips = () => {
               ? styles.emptyContainer
               : styles.listContainer
           }
+          contentInsetAdjustmentBehavior="always"
         />
       )}
-
       <FloatingChatIcon />
 
       <DateSearchModal
