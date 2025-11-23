@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, ActivityIndicator, StyleSheet, Text } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused, useRoute } from "@react-navigation/native";
 import { Colors } from "../../Global/colors";
 import CustomHeader from "../../components/CustomHeader";
 import navigationService from "../../Global/navRef";
 import QRScanResultModal from "../../components/QRScanResultModal";
+import QRScanErrorModal from "../../components/QRScanErrorModal";
 import { styles } from "./Styles";
 
 // Mock function to fetch user info from QR code
@@ -28,14 +29,18 @@ const fetchUserInfoFromQR = async (qrData) => {
 };
 
 const CameraQRScanner = ({ onScanned }) => {
+  const route = useRoute();
+  const eventId = route.params?.eventId;
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [scannedData, setScannedData] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const isLockedRef = useRef(false);
   const isFocused = useIsFocused();
-  const modalRef = useRef(null);
+  const successModalRef = useRef(null);
+  const errorModalRef = useRef(null);
 
   const handleBack = () => {
     navigationService.navigation?.goBack();
@@ -45,18 +50,19 @@ const CameraQRScanner = ({ onScanned }) => {
     console.log("QR Code scanned:", data);
     setScannedData(data);
     setIsLoadingUserInfo(true);
+    setErrorMessage(null);
 
     try {
       // Fetch user info from QR code
       const info = await fetchUserInfoFromQR(data);
       setUserInfo(info);
-      // Open modal
-      modalRef.current?.open();
+      // Open success modal
+      successModalRef.current?.open();
     } catch (error) {
       console.error("Error fetching user info:", error);
       // Still show modal with basic info
       setUserInfo({ name: "User", email: null, mobile: null, address: null });
-      modalRef.current?.open();
+      successModalRef.current?.open();
     } finally {
       setIsLoadingUserInfo(false);
     }
@@ -67,6 +73,13 @@ const CameraQRScanner = ({ onScanned }) => {
     isLockedRef.current = false;
     setUserInfo(null);
     setScannedData(null);
+    setErrorMessage(null);
+  }, []);
+
+  const handleTryAgain = useCallback(() => {
+    // Reset lock to allow another scan after error
+    isLockedRef.current = false;
+    setErrorMessage(null);
   }, []);
 
   const handleShowSeats = useCallback(() => {
@@ -85,15 +98,29 @@ const CameraQRScanner = ({ onScanned }) => {
   const handleBarCodeScanned = useCallback(
     async ({ data }) => {
       if (isLockedRef.current || !data) return;
+
+      // Lock immediately to prevent infinite loop
       isLockedRef.current = true;
       setIsProcessing(true);
+
+      // Check if event ID is "1" - if so, deny access
+      if (eventId === "1") {
+        setErrorMessage("This QR code does not have access to this event.");
+        setUserInfo(null);
+        setScannedData(null);
+        setIsProcessing(false);
+        // Open error modal
+        errorModalRef.current?.open();
+        return;
+      }
+
       try {
         await handleScanned(String(data));
       } finally {
         setIsProcessing(false);
       }
     },
-    [handleScanned]
+    [handleScanned, eventId]
   );
 
   useEffect(() => {
@@ -156,12 +183,18 @@ const CameraQRScanner = ({ onScanned }) => {
       </View>
 
       <QRScanResultModal
-        ref={modalRef}
+        ref={successModalRef}
         onScanAnother={handleScanAnother}
         onShowSeats={handleShowSeats}
         onShowProfile={handleShowProfile}
         userInfo={userInfo}
         isLoading={isLoadingUserInfo}
+      />
+
+      <QRScanErrorModal
+        ref={errorModalRef}
+        onTryAgain={handleTryAgain}
+        errorMessage={errorMessage}
       />
     </View>
   );

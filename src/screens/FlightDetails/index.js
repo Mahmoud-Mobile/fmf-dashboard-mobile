@@ -32,6 +32,11 @@ const FlightDetails = ({ route }) => {
       flight.isParticipantDeparted === true;
 
     const isSelected = !isDisabled;
+    const flightId =
+      flight.id ||
+      flight.arrivalFlightNumber ||
+      flight.returnFlightNumber ||
+      "unknown";
 
     if (selectedCategory === "return") {
       return [
@@ -41,6 +46,7 @@ const FlightDetails = ({ route }) => {
           iconSize: 24,
           isSelected: isSelected,
           disabled: isDisabled,
+          iconId: `flight-takeoff-${flightId}`,
           onPress: () => {
             Alert.alert(
               "Plane Taken Off",
@@ -57,6 +63,7 @@ const FlightDetails = ({ route }) => {
           text: "Plane Landed",
           isSelected: isSelected,
           disabled: isDisabled,
+          iconId: `flight-land-${flightId}`,
           onPress: () => {
             Alert.alert(
               "Plane Landed",
@@ -70,6 +77,7 @@ const FlightDetails = ({ route }) => {
           text: "Logged Arrived",
           isSelected: isSelected,
           disabled: isDisabled,
+          iconId: `check-circle-${flightId}`,
           onPress: () => {
             Alert.alert(
               "Logged Arrived",
@@ -83,6 +91,7 @@ const FlightDetails = ({ route }) => {
           text: "Guest Granted",
           isSelected: isSelected,
           disabled: isDisabled,
+          iconId: `verified-user-${flightId}`,
           onPress: () => {
             Alert.alert(
               "Guest Granted",

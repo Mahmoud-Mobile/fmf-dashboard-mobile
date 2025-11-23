@@ -4,6 +4,7 @@ import { LOGOUT } from "../actions/actionTypes";
 const initialState = {
   sectionVisibility: {},
   tabVisibility: {},
+  disabledIcons: {}, // Store disabled icon states: { "iconName-flightId": true }
 };
 
 const uiSlice = createSlice({
@@ -38,11 +39,39 @@ const uiSlice = createSlice({
     resetTabVisibility: (state) => {
       state.tabVisibility = {};
     },
+    setIconDisabled: (state, action) => {
+      const { iconId, disabled } = action.payload;
+      // Ensure disabledIcons is initialized
+      if (!state.disabledIcons) {
+        state.disabledIcons = {};
+      }
+      if (disabled) {
+        state.disabledIcons[iconId] = true;
+      } else {
+        delete state.disabledIcons[iconId];
+      }
+    },
+    toggleIconDisabled: (state, action) => {
+      const iconId = action.payload;
+      // Ensure disabledIcons is initialized
+      if (!state.disabledIcons) {
+        state.disabledIcons = {};
+      }
+      if (state.disabledIcons[iconId]) {
+        delete state.disabledIcons[iconId];
+      } else {
+        state.disabledIcons[iconId] = true;
+      }
+    },
+    resetDisabledIcons: (state) => {
+      state.disabledIcons = {};
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(LOGOUT, (state) => {
       state.sectionVisibility = {};
       state.tabVisibility = {};
+      state.disabledIcons = {};
     });
   },
 });
@@ -54,6 +83,9 @@ export const {
   setTabVisibility,
   toggleTabVisibility,
   resetTabVisibility,
+  setIconDisabled,
+  toggleIconDisabled,
+  resetDisabledIcons,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

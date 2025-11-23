@@ -175,6 +175,7 @@ const Dashboard = () => {
               },
             ]}
             data={arrivalGuestsData}
+            onPress={() => navigation.navigate("MyTabs", { screen: "Flights" })}
           />
         ),
       },
@@ -201,6 +202,7 @@ const Dashboard = () => {
               },
             ]}
             data={returnGuestsData}
+            onPress={() => navigation.navigate("MyTabs", { screen: "Flights" })}
           />
         ),
       },
@@ -228,8 +230,7 @@ const Dashboard = () => {
               },
             ]}
             data={flightsData}
-            onItemPress={handleItemPress}
-            navigationName="FlightDetails"
+            onPress={() => navigation.navigate("MyTabs", { screen: "Flights" })}
           />
         ),
       },
@@ -251,6 +252,7 @@ const Dashboard = () => {
               },
             ]}
             data={hotelOccupancyData}
+            onPress={() => {}}
           />
         ),
       },
@@ -292,6 +294,7 @@ const Dashboard = () => {
               },
             ]}
             data={hotelDetailsData}
+            onPress={() => {}}
           />
         ),
       },
@@ -305,6 +308,7 @@ const Dashboard = () => {
               { title: "Driver", key: "driver" },
             ]}
             data={tripListData}
+            onPress={() => navigation.navigate("MyTabs", { screen: "Trips" })}
           />
         ),
       },
@@ -318,6 +322,7 @@ const Dashboard = () => {
               { title: "Driver", key: "driver" },
             ]}
             data={tripsSummaryData}
+            onPress={() => navigation.navigate("MyTabs", { screen: "Trips" })}
           />
         ),
       },

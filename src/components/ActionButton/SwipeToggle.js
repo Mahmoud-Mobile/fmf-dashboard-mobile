@@ -77,12 +77,20 @@ const SwipeToggle = ({
         >
           {title}
         </Text>
-        {!disabled && (
+        {!disabled ? (
           <GestureDetector gesture={panGesture}>
             <Animated.View style={[customStyles.swipeBtn, animatedStyle]}>
               <MaterialIcons name={icon} size={22} color={Colors.PrimaryText} />
             </Animated.View>
           </GestureDetector>
+        ) : (
+          <View style={customStyles.disabledIconContainer}>
+            <MaterialIcons
+              name="check-circle"
+              size={20}
+              color="#10B981"
+            />
+          </View>
         )}
       </View>
     </View>
@@ -126,5 +134,25 @@ const customStyles = StyleSheet.create({
   disabledText: {
     color: "#9CA3AF",
     fontFamily: Fonts.FONT_REGULAR,
+  },
+  disabledIconContainer: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#D1FAE5",
+    position: "absolute",
+    left: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#10B981",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });

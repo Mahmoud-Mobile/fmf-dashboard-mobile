@@ -11,8 +11,14 @@ const authPersistConfig = {
   whitelist: ["user", "isLoggedIn"],
 };
 
+const uiPersistConfig = {
+  key: "ui",
+  storage: AsyncStorage,
+  whitelist: ["disabledIcons"], // Persist disabled icons state
+};
+
 export default combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   api: apiReducer,
-  ui: uiReducer,
+  ui: persistReducer(uiPersistConfig, uiReducer),
 });

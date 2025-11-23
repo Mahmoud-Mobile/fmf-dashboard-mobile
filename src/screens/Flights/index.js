@@ -337,6 +337,11 @@ const Flights = () => {
         flight.isParticipantDeparted === true;
 
       const isSelected = !isDisabled;
+      const flightId =
+        flight.id ||
+        flight.arrivalFlightNumber ||
+        flight.returnFlightNumber ||
+        "unknown";
 
       if (selectedCategory === "return") {
         return [
@@ -346,6 +351,7 @@ const Flights = () => {
             iconSize: 24,
             isSelected: isSelected,
             disabled: isDisabled,
+            iconId: `flight-takeoff-${flightId}`,
             onPress: () => {
               Alert.alert(
                 "Plane Taken Off",
@@ -362,6 +368,7 @@ const Flights = () => {
             text: "Plane Landed",
             isSelected: isSelected,
             disabled: isDisabled,
+            iconId: `flight-land-${flightId}`,
             onPress: () => {
               Alert.alert(
                 "Plane Landed",
@@ -375,6 +382,7 @@ const Flights = () => {
             text: "Logged Arrived",
             isSelected: isSelected,
             disabled: isDisabled,
+            iconId: `check-circle-${flightId}`,
             onPress: () => {
               Alert.alert(
                 "Logged Arrived",
@@ -388,6 +396,7 @@ const Flights = () => {
             text: "Guest Granted",
             isSelected: isSelected,
             disabled: isDisabled,
+            iconId: `verified-user-${flightId}`,
             onPress: () => {
               Alert.alert(
                 "Guest Granted",
@@ -479,7 +488,7 @@ const Flights = () => {
         />
       )}
 
-      <FloatingChatIcon />
+      {/* <FloatingChatIcon /> */}
 
       <DateSearchModal
         visible={showDateModal}

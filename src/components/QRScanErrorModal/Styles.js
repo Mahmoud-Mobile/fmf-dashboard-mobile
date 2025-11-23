@@ -41,65 +41,41 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: Colors.LightGray,
   },
-  successContainer: {
+  errorHeaderContainer: {
     alignItems: "center",
   },
-  successTitle: {
+  errorTitle: {
     fontSize: 16,
     fontFamily: Fonts.FONT_BOLD,
-    color: Colors.PrimaryText,
+    color: Colors.Error,
     marginTop: 8,
   },
-  loadingContainer: {
+  errorContainer: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 32,
+    flex: 1,
   },
-  loadingText: {
-    fontSize: 13,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.SecondaryText,
-    marginTop: 8,
-  },
-  userInfoContainer: {
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  userImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 12,
-    borderWidth: 3,
-    borderColor: Colors.Primary,
-  },
-  userImagePlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.LightGray,
+  errorIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
-    borderWidth: 3,
-    borderColor: Colors.Primary,
+    marginBottom: 20,
   },
-  userName: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.PrimaryText,
-    marginBottom: 4,
-    textAlign: "center",
-  },
-  userEmail: {
-    fontSize: 12,
+  errorMessage: {
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
-    marginTop: 4,
     textAlign: "center",
+    paddingHorizontal: 20,
+    lineHeight: 20,
   },
   buttonsContainer: {
     gap: 10,
+    paddingBottom: 20,
   },
   button: {
     flexDirection: "row",
@@ -117,14 +93,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  scanAnotherButton: {
+  tryAgainButton: {
     backgroundColor: Colors.gray,
-  },
-  showSeatsButton: {
-    backgroundColor: Colors.Primary,
-  },
-  showProfileButton: {
-    backgroundColor: Colors.Success,
   },
   buttonText: {
     fontSize: 14,
@@ -134,3 +104,4 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
+

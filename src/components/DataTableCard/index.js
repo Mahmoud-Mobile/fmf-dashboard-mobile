@@ -107,9 +107,11 @@ const DataTableCard = ({
     <View>
       <View style={styles.headerContainer}>
         <Text style={styles.title}>{title}</Text>
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{}}>
-          <Ionicons name="chevron-forward" size={20} color="#000" />
-        </TouchableOpacity>
+        {onPress && (
+          <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{}}>
+            <Ionicons name="chevron-forward" size={20} color="#000" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={[styles.container, containerStyle]}>

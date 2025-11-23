@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, Text, TextInput, View, Animated } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused, useRoute } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
 import navigationService from "../../Global/navRef";
 import QRScanResultModal from "../../components/QRScanResultModal";
+import QRScanErrorModal from "../../components/QRScanErrorModal";
 import { styles } from "./Styles";
 import { Colors } from "../../Global/colors";
 
@@ -36,36 +37,41 @@ const fetchUserInfoFromQR = async (qrData) => {
 };
 
 const ZebraQR = () => {
+  const route = useRoute();
+  const eventId = route.params?.eventId;
   const inputRef = useRef(null);
   const [buffer, setBuffer] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [scannedData, setScannedData] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [scrollY] = useState(new Animated.Value(0));
   const debounceRef = useRef(null);
   const immediateSubmitRef = useRef(null);
   const lastFocusAtRef = useRef(0);
   const isLockedRef = useRef(false);
   const isFocused = useIsFocused();
-  const modalRef = useRef(null);
+  const successModalRef = useRef(null);
+  const errorModalRef = useRef(null);
 
   const handleScanned = useCallback(async (data) => {
     console.log("QR Code scanned:", data);
     setScannedData(data);
     setIsLoadingUserInfo(true);
+    setErrorMessage(null);
 
     try {
       // Fetch user info from QR code
       const info = await fetchUserInfoFromQR(data);
       setUserInfo(info);
-      // Open modal
-      modalRef.current?.open();
+      // Open success modal
+      successModalRef.current?.open();
     } catch (error) {
       console.error("Error fetching user info:", error);
       // Still show modal with basic info
       setUserInfo({ name: "User", email: null, mobile: null, address: null });
-      modalRef.current?.open();
+      successModalRef.current?.open();
     } finally {
       setIsLoadingUserInfo(false);
     }
@@ -77,6 +83,16 @@ const ZebraQR = () => {
     setBuffer("");
     setUserInfo(null);
     setScannedData(null);
+    setErrorMessage(null);
+    // Re-focus for next scan
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }, []);
+
+  const handleTryAgain = useCallback(() => {
+    // Reset lock to allow another scan after error
+    isLockedRef.current = false;
+    setErrorMessage(null);
+    setBuffer("");
     // Re-focus for next scan
     requestAnimationFrame(() => inputRef.current?.focus());
   }, []);
@@ -103,12 +119,24 @@ const ZebraQR = () => {
 
       isLockedRef.current = true;
       setIsProcessing(true);
+      
       try {
+        // Check if event ID is "1" - if so, deny access
+        if (eventId === "1") {
+          setErrorMessage("This QR code does not have access to this event.");
+          setUserInfo(null);
+          setScannedData(null);
+          setIsProcessing(false);
+          // Open error modal
+          errorModalRef.current?.open();
+          return;
+        }
+
         console.log("verifyQrCode body:", { qr: data });
         const res = await verifyQrCode({ qr: data });
         const isValid = Boolean(res?.valid);
 
-        // Show alert with options
+        // Show success modal with options
         await handleScanned(data);
       } catch (e) {
         console.error("Error verifying QR code:", e);
@@ -117,10 +145,10 @@ const ZebraQR = () => {
       } finally {
         setIsProcessing(false);
         setBuffer("");
-        // Don't auto-refocus - wait for user choice in alert
+        // Don't auto-refocus - wait for user choice in modal
       }
     },
-    [buffer, isProcessing, isFocused, handleScanned]
+    [buffer, isProcessing, isFocused, handleScanned, eventId]
   );
 
   const onChangeText = useCallback(
@@ -227,12 +255,18 @@ const ZebraQR = () => {
       </View>
 
       <QRScanResultModal
-        ref={modalRef}
+        ref={successModalRef}
         onScanAnother={handleScanAnother}
         onShowSeats={handleShowSeats}
         onShowProfile={handleShowProfile}
         userInfo={userInfo}
         isLoading={isLoadingUserInfo}
+      />
+
+      <QRScanErrorModal
+        ref={errorModalRef}
+        onTryAgain={handleTryAgain}
+        errorMessage={errorMessage}
       />
     </View>
   );
