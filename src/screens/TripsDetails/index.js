@@ -195,7 +195,7 @@ const TripsDetails = ({ route }) => {
               </View>
             </View>
 
-            <View style={styles.row}>
+            {/* <View style={styles.row}>
               <View style={[styles.column, { marginRight: 8 }]}>
                 <Text style={styles.sectionTitle}>Trip Status</Text>
                 <View style={styles.infoRow}>
@@ -238,7 +238,7 @@ const TripsDetails = ({ route }) => {
                   </Text>
                 </View>
               </View>
-            </View>
+            </View> */}
 
             {tripData.notes && (
               <View style={styles.section}>

@@ -172,7 +172,7 @@ const HotelDetails = ({ route }) => {
                 </View>
               </View>
 
-              <View style={[styles.column, { marginTop: 16 }]}>
+              {/* <View style={[styles.column, { marginTop: 16 }]}>
                 <Text style={styles.sectionTitle}>Room Status</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Room Prepared:</Text>
@@ -211,7 +211,7 @@ const HotelDetails = ({ route }) => {
                   <Text style={styles.label}>Hotel ID:</Text>
                   <Text style={styles.value}>{hotel.id || "N/A"}</Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           </View>
           <View

@@ -254,7 +254,7 @@ const FlightDetails = ({ route }) => {
                 </View>
               </View>
 
-              <View style={[styles.column, { marginLeft: 8 }]}>
+              {/* <View style={[styles.column, { marginLeft: 8 }]}>
                 <Text style={styles.sectionTitle}> Status</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Luggage Received:</Text>
@@ -306,7 +306,7 @@ const FlightDetails = ({ route }) => {
                     {flight.isParticipantDeparted ? "Yes" : "No"}
                   </Text>
                 </View>
-              </View>
+              </View> */}
             </View>
 
             <View style={styles.section}>
