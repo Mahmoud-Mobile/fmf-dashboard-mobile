@@ -81,7 +81,7 @@ const More = () => {
       ) : (
         <>
           <LinearGradient
-            colors={["#368BBA", "#368BBA"]}
+            colors={["#2965B8", "#2965B8"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.backgroundImage}

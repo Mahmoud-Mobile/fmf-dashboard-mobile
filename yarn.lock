@@ -2848,6 +2848,11 @@ expo-print@~15.0.7:
   resolved "https://registry.yarnpkg.com/expo-print/-/expo-print-15.0.7.tgz#f30b6a38db48b7e7862b42bcebd70905b1a0c8b3"
   integrity sha512-DLjURmu4D2sfJrT7a/x4l4Hb0mlJSeu3OKCa2iIilO/AATddekTzgJejEV2QkMFMSX6CiU5g+h3PuyNq2I3rfQ==
 
+expo-screen-orientation@~9.0.7:
+  version "9.0.7"
+  resolved "https://registry.yarnpkg.com/expo-screen-orientation/-/expo-screen-orientation-9.0.7.tgz#27eb8c9f57af22e1917fc025d318dd9bf31e05c3"
+  integrity sha512-UH/XlB9eMw+I2cyHSkXhAHRAPk83WyA3k5bst7GLu14wRuWiTch9fb6I7qEJK5CN6+XelcWxlBJymys6Fr/FKA==
+
 expo-secure-store@^15.0.7:
   version "15.0.7"
   resolved "https://registry.yarnpkg.com/expo-secure-store/-/expo-secure-store-15.0.7.tgz#f74f928029889b8a32c0eafc2a214abee1e8b71e"

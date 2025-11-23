@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -20,7 +20,7 @@ const SwipeToggle = ({
   disabledText = "Disabled",
   icon = "arrow-forward",
 }) => {
-  const END_POSITION = Dimensions.get("window").width - 90;
+  const containerWidth = useSharedValue(0);
   const onLeft = useSharedValue(true);
   const position = useSharedValue(0);
 
@@ -36,18 +36,20 @@ const SwipeToggle = ({
     .enabled(!disabled)
     .runOnJS(true)
     .onUpdate((e) => {
+      const endPosition = Math.max(containerWidth.value - 90, 50);
       if (onLeft.value) {
-        position.value = Math.min(Math.max(0, e.translationX), END_POSITION);
+        position.value = Math.min(Math.max(0, e.translationX), endPosition);
       } else {
         position.value = Math.min(
-          Math.max(END_POSITION + e.translationX, 0),
-          END_POSITION
+          Math.max(endPosition + e.translationX, 0),
+          endPosition
         );
       }
     })
     .onEnd(() => {
-      if (position.value > END_POSITION / 2) {
-        position.value = withTiming(END_POSITION, { duration: 120 });
+      const endPosition = Math.max(containerWidth.value - 90, 50);
+      if (endPosition > 0 && position.value > endPosition / 2) {
+        position.value = withTiming(endPosition, { duration: 120 });
         onLeft.value = false;
         runOnJS(onSlideCompleted)(); // 👈 trigger callback + return back
       } else {
@@ -60,10 +62,18 @@ const SwipeToggle = ({
     transform: [{ translateX: position.value }],
   }));
 
+  const handleContainerLayout = (event) => {
+    const { width } = event.nativeEvent.layout;
+    if (width > 0) {
+      containerWidth.value = width;
+    }
+  };
+
   return (
     <View style={[styles.swipeContainer, containerStyle]}>
       {disabled && <Text style={styles.disabledText}>{disabledText}</Text>}
       <View
+        onLayout={handleContainerLayout}
         style={[
           customStyles.sliderContainer,
           disabled && customStyles.disabledContainer,
@@ -85,11 +95,7 @@ const SwipeToggle = ({
           </GestureDetector>
         ) : (
           <View style={customStyles.disabledIconContainer}>
-            <MaterialIcons
-              name="check-circle"
-              size={20}
-              color="#10B981"
-            />
+            <MaterialIcons name="check-circle" size={20} color="#10B981" />
           </View>
         )}
       </View>

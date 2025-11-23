@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
+    width: "90%",
   },
   detailText: {
     fontSize: 12,

@@ -54,7 +54,7 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
       style={[styles.cardContainer, width && { width }]}
     >
       <View style={styles.flexWrap}>
-        <View style={{ width: "80%" }}>
+        <View style={{ width: "100%" }}>
           <View style={styles.flexRow}>
             <ImagesWithProps source="FMF_Icon" />
             <Text style={styles.eventTitle}>{item?.title}</Text>
