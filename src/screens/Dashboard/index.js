@@ -294,7 +294,9 @@ const Dashboard = () => {
               },
             ]}
             data={hotelDetailsData}
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate("Hotels");
+            }}
           />
         ),
       },

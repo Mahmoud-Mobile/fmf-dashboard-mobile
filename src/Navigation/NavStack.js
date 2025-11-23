@@ -13,6 +13,7 @@ import ZebraQR from "../screens/ZebraQR";
 import Chat from "../screens/Chat";
 import DesignatedCars from "../screens/DesignatedCars";
 import Hotels from "../screens/Hotels";
+import HotelDetails from "../screens/HotelDetails";
 import NotificationScreen from "../screens/NotificationScreen";
 import Profile from "../screens/Profile";
 import AudienceProfile from "../screens/AudienceProfile";
@@ -156,6 +157,13 @@ const NavStack = () => {
       <Stack.Screen
         name="Hotels"
         component={Hotels}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="HotelDetails"
+        component={HotelDetails}
         options={{
           headerShown: false,
         }}

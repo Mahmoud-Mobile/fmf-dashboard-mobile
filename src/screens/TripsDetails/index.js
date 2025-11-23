@@ -19,10 +19,8 @@ const TripsDetails = ({ route }) => {
   const driver = driverShift.driver || {};
   const vehicle = tripData.vehicle || {};
 
-  const userName =
-    participant?.name || participant?.fullName || "N/A";
-  const userMobile =
-    participant?.mobile || participant?.phone || "N/A";
+  const userName = participant?.name || participant?.fullName || "N/A";
+  const userMobile = participant?.mobile || participant?.phone || "N/A";
   const userPhoto =
     participant?.photo ||
     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face";
@@ -146,7 +144,7 @@ const TripsDetails = ({ route }) => {
             </View>
 
             <View style={styles.row}>
-              <View style={[styles.column, { marginRight: 8 }]}>
+              <View style={[styles.column, { marginRight: 8, marginTop: 16 }]}>
                 <Text style={styles.sectionTitle}>Trip Details</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Pickup Location:</Text>
@@ -164,9 +162,7 @@ const TripsDetails = ({ route }) => {
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Trip Type:</Text>
-                  <Text style={styles.value}>
-                    {tripData.tripType || "N/A"}
-                  </Text>
+                  <Text style={styles.value}>{tripData.tripType || "N/A"}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Status:</Text>
@@ -176,7 +172,7 @@ const TripsDetails = ({ route }) => {
                 </View>
               </View>
 
-              <View style={[styles.column, { marginLeft: 8 }]}>
+              <View style={[styles.column, { marginTop: 16 }]}>
                 <Text style={styles.sectionTitle}>Vehicle & Driver</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Driver:</Text>
