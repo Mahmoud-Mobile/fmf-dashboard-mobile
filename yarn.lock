@@ -2838,11 +2838,6 @@ expo-notifications@^0.32.12:
     expo-application "~7.0.7"
     expo-constants "~18.0.10"
 
-expo-permissions@^14.4.0:
-  version "14.4.0"
-  resolved "https://registry.yarnpkg.com/expo-permissions/-/expo-permissions-14.4.0.tgz#d7bb2f0026b87e1294ee551969c35306193f4ad3"
-  integrity sha512-oAcnJ7dlZhpBydK73cwomA2xofizayVUz+FW5REl7dMu7MYyeN/3aqhlpZ3mYddrxvG161bqu97MQr01UixUnw==
-
 expo-print@~15.0.7:
   version "15.0.7"
   resolved "https://registry.yarnpkg.com/expo-print/-/expo-print-15.0.7.tgz#f30b6a38db48b7e7862b42bcebd70905b1a0c8b3"
@@ -4624,11 +4619,6 @@ queue@6.0.2:
   integrity sha512-iHZWu+q3IdFZFX36ro/lKBkSvfkztY5Y7HMiPlOUjhupPcG2JMfst2KKEpu5XndviX/3UhFbRngUPNKtgvtZiA==
   dependencies:
     inherits "~2.0.3"
-
-radio-buttons-react-native@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/radio-buttons-react-native/-/radio-buttons-react-native-1.0.4.tgz#ee450f6e81d8f5c22882f338b0ce979f70ab8980"
-  integrity sha512-5AKM/p3a9mykQ1BCIbBnHrDwXZZ6iJuDEDFaiNb2Pa2Nx9EgUMgU5owcrU9g9eaK7didA5rJ3yAUKGnyfhBqcw==
 
 range-parser@~1.2.1:
   version "1.2.1"

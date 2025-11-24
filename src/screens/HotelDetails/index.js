@@ -118,8 +118,7 @@ const HotelDetails = ({ route }) => {
     <View style={styles.container}>
       <CustomHeader
         leftLabel="Hotels"
-        // title={hotelName}
-        // subtitle={`Room ${roomNumber}`}
+        title={hotelName || "Hotel Details"}
         onLeftButtonPress={() => navigation.goBack()}
       />
 

@@ -11,11 +11,10 @@ const CustomHeader = ({
   rightIcon,
   onLeftButtonPress,
   onRightButtonPress,
-  top,
   textColor = "#FFFFFF",
 }) => {
   return (
-    <SafeAreaView style={styles.safeAreaContainer}>
+    <SafeAreaView style={styles.safeAreaContainer} edges={["top"]}>
       <TouchableOpacity onPress={onLeftButtonPress} style={styles.leftAction}>
         <ImagesWithProps source="Arrow_Icon" color="#fff" />
         {leftLabel ? (

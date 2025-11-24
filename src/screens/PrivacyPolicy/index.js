@@ -14,12 +14,12 @@ const PrivacyPolicy = () => {
         onLeftButtonPress={() => navigation.goBack()}
       />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>WMF Client Mobile App – Privacy Policy</Text>
+        <Text style={styles.title}>FMF Client Mobile App – Privacy Policy</Text>
 
         <Text style={styles.lastUpdated}>Last Updated: 20 November 2025</Text>
 
         <Text style={styles.description}>
-          This Privacy Policy describes how the WMF Client Mobile App ("we",
+          This Privacy Policy describes how the FMF Client Mobile App ("we",
           "us", "our") collects, uses, and protects your personal information.
           By using the App, you agree to the practices outlined in this policy.
         </Text>
@@ -331,7 +331,7 @@ const PrivacyPolicy = () => {
           <Text style={styles.sectionText}>
             For any questions or requests regarding this Privacy Policy:
           </Text>
-          <Text style={styles.contactInfo}>WMF Support Team</Text>
+          <Text style={styles.contactInfo}>FMF Support Team</Text>
           <Text style={styles.contactInfo}>
             Email: support@futuremineralsforum.com.sa
           </Text>

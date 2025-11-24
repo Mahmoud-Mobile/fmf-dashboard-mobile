@@ -82,7 +82,7 @@ const HomeHeader = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: horizontalMargin,
-    paddingTop: 30,
+    paddingTop: 10,
     paddingBottom: Platform.OS === "ios" ? 15 : 10,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,

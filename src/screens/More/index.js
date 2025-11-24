@@ -67,7 +67,7 @@ const More = () => {
     },
     {
       id: 5,
-      title: "logout",
+      title: "Logout",
       icon: "Logout_Icon",
       iconColor: "#EF4444",
       navigation: null,

@@ -8,8 +8,9 @@ import Flights_Icon from "../SVG/Flights_Icon";
 import CheckIn_Icon from "../SVG/CheckIn_Icon";
 import Calendar_Icon from "../SVG/Calendar_Icon";
 import Location_Icon from "../SVG/Location_Icon";
+import DesignatedCar_Icon from "../SVG/DesignatedCar_Icon";
 import User_Icon from "../SVG/User_Icon";
-import OverView_Icon from "../SVG/OverView_Icon";
+import Hotels_Icon from "../SVG/Hotels_Icon";
 import FMF_Icon from "../SVG/FMF_Icon";
 const images = {
   Home_Tab: <Home_Tab />,
@@ -21,8 +22,9 @@ const images = {
   CheckIn_Icon: <CheckIn_Icon />,
   Calendar_Icon: <Calendar_Icon />,
   Location_Icon: <Location_Icon />,
+  DesignatedCar_Icon: <DesignatedCar_Icon />,
   User_Icon: <User_Icon />,
-  OverView_Icon: <OverView_Icon />,
+  Hotels_Icon: <Hotels_Icon />,
   FMF_Icon: <FMF_Icon />,
 };
 export const ImagesWithProps = ({
@@ -51,10 +53,12 @@ export const ImagesWithProps = ({
     <Calendar_Icon color={color} size={size} />
   ) : source == "Location_Icon" ? (
     <Location_Icon color={color} size={size} />
+  ) : source == "DesignatedCar_Icon" ? (
+    <DesignatedCar_Icon color={color} size={size} />
   ) : source == "User_Icon" ? (
     <User_Icon color={color} size={size} />
-  ) : source == "OverView_Icon" ? (
-    <OverView_Icon color={color} size={size} />
+  ) : source == "Hotels_Icon" ? (
+    <Hotels_Icon color={color} size={size} />
   ) : source == "FMF_Icon" ? (
     <FMF_Icon color={color} size={size} />
   ) : null;

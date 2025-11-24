@@ -12,6 +12,7 @@ import CameraQRScanner from "../screens/CameraQRScanner";
 import ZebraQR from "../screens/ZebraQR";
 import Chat from "../screens/Chat";
 import DesignatedCars from "../screens/DesignatedCars";
+import DesignatedCarDetails from "../screens/DesignatedCarDetails";
 import Hotels from "../screens/Hotels";
 import HotelDetails from "../screens/HotelDetails";
 import NotificationScreen from "../screens/NotificationScreen";
@@ -150,6 +151,13 @@ const NavStack = () => {
       <Stack.Screen
         name="DesignatedCars"
         component={DesignatedCars}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="DesignatedCarDetails"
+        component={DesignatedCarDetails}
         options={{
           headerShown: false,
         }}

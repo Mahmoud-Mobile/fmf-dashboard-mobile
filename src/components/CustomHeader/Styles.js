@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { Fonts } from "../../Global/fonts";
 import { Colors } from "../../Global/colors";
 import { horizontalMargin } from "../../config/metrics";
@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
     backgroundColor: Colors.Primary,
+    paddingBottom: Platform.OS === "ios" ? 15 : 10,
   },
   leftAction: {
     flexDirection: "row",
