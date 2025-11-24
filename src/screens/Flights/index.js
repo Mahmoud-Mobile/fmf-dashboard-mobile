@@ -99,15 +99,31 @@ const Flights = () => {
     }
 
     if (selectedDate) {
-      const selectedDateStr = moment(selectedDate).format("YYYY-MM-DD");
+      const selectedMoment = moment(selectedDate);
+      const selectedDateStr = selectedMoment.isValid()
+        ? selectedMoment.format("YYYY-MM-DD")
+        : null;
+
+      if (!selectedDateStr) {
+        return filtered;
+      }
 
       filtered = filtered.filter((flight) => {
-        const arrivalDate = flight.arrivalDate
-          ? moment(flight.arrivalDate).format("YYYY-MM-DD")
+        const arrivalMoment = flight.arrivalDate
+          ? moment(flight.arrivalDate)
           : null;
-        const returnDate = flight.returnDate
-          ? moment(flight.returnDate).format("YYYY-MM-DD")
+        const returnMoment = flight.returnDate
+          ? moment(flight.returnDate)
           : null;
+
+        const arrivalDate =
+          arrivalMoment && arrivalMoment.isValid()
+            ? arrivalMoment.format("YYYY-MM-DD")
+            : null;
+        const returnDate =
+          returnMoment && returnMoment.isValid()
+            ? returnMoment.format("YYYY-MM-DD")
+            : null;
 
         return (
           (arrivalDate && arrivalDate >= selectedDateStr) ||

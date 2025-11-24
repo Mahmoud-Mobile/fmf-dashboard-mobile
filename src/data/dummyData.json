@@ -118,25 +118,25 @@
   "hotelDetailsData": [
     {
       "id": "1",
-      "hotel": "Marriott",
+      "hotel": "Ritz Carlton",
       "guest": "Ahmed Al-Rashid",
       "status": "Checked In"
     },
     {
       "id": "2",
-      "hotel": "Hilton",
+      "hotel": "Ritz Carlton",
       "guest": "Sarah Johnson",
       "status": "Checked Out"
     },
     {
       "id": "3",
-      "hotel": "Hyatt",
+      "hotel": "Ritz Carlton",
       "guest": "Mohammed Hassan",
       "status": "Checked In"
     },
     {
       "id": "4",
-      "hotel": "Sheraton",
+      "hotel": "Ritz Carlton",
       "guest": "Fatima Al-Zahra",
       "status": "Pending"
     }
