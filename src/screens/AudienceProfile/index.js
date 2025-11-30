@@ -15,7 +15,7 @@ const AudienceProfile = () => {
   return (
     <View style={styles.container}>
       <CustomHeader
-        title="Audience Profile"
+        title="Guest Profile"
         onLeftButtonPress={() => navigation.goBack()}
         top={50}
       />

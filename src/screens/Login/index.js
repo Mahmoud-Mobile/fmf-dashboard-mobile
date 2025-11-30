@@ -69,7 +69,7 @@ const Login = () => {
   };
 
   useEffect(() => {
-    dispatch(setEmail("khaled@lead-360.co"));
+    dispatch(setEmail("fmf@lead-360.co"));
     dispatch(setPassword("password123"));
   }, []);
 

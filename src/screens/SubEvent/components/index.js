@@ -61,7 +61,7 @@ const CustomEventCard = ({ item, onPress, width }) => {
               name="location-outline"
               size={16}
               color={Colors.Gray}
-              style={{ marginRight: 4, marginTop: 2 }}
+              style={{ marginRight: 4 }}
             />
             <Text style={styles.detailText}>{item?.location}</Text>
           </View>
@@ -70,7 +70,7 @@ const CustomEventCard = ({ item, onPress, width }) => {
               name="calendar-outline"
               size={16}
               color={Colors.Gray}
-              style={{ marginRight: 4, marginTop: 2 }}
+              style={{ marginRight: 4 }}
             />
             <Text style={styles.detailText}>
               {formatDateRange(item?.startDate, item?.endDate)}
@@ -86,11 +86,10 @@ const CustomEventCard = ({ item, onPress, width }) => {
             <Text style={styles.metaLabelBold}>Level: </Text>
             <Text style={styles.metaValue}>{item?.eventLevel}</Text>
           </Text>
-          <Text style={styles.activeText}> Status: {item?.status}</Text>
         </View>
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>{item?.status}</Text>
-        </View>
+      </View>
+      <View style={styles.statusBadge}>
+        <Text style={styles.statusText}>{item?.status}</Text>
       </View>
     </TouchableOpacity>
   );

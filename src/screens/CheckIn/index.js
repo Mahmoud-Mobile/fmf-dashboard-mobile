@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { View, FlatList, RefreshControl, Alert } from "react-native";
+import { View, FlatList, RefreshControl, Alert, Platform } from "react-native";
 import { Colors } from "../../Global/colors";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
 import navigationService from "../../Global/navRef";
@@ -13,6 +13,7 @@ import { horizontalMargin } from "../../config/metrics";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import CustomEventHeader from "../../components/CustomEventHeader";
+import CustomCategories from "../../components/CustomCategories";
 import {
   exportToExcel,
   formatDateTime,
@@ -28,6 +29,7 @@ const mockEvents = [
     startDate: "2026-01-13 12:30",
     endDate: "2026-01-13 18:40",
     isCheckedIn: false,
+    type: "subEvent",
   },
   {
     id: "2",
@@ -37,6 +39,7 @@ const mockEvents = [
     startDate: "2026-01-14 12:30",
     endDate: "2026-01-14 18:40",
     isCheckedIn: true,
+    type: "resource",
   },
 ];
 
@@ -52,6 +55,7 @@ const CheckInScreen = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("subEvent");
   const { selectedEvent } = useSelector((state) => state.api);
 
   const { width: screenWidth } = getDeviceDimensions();
@@ -72,8 +76,18 @@ const CheckInScreen = () => {
     return { cardWidth: width };
   }, [numColumns, screenWidth]);
 
+  const categories = [
+    { id: "subEvent", label: "Sub Event", key: "subEvent" },
+    { id: "resource", label: "Resource", key: "resource" },
+  ];
+
   const filteredEvents = useMemo(() => {
     let filtered = events;
+
+    // Filter by category
+    if (selectedCategory) {
+      filtered = filtered.filter((event) => event.type === selectedCategory);
+    }
 
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase();
@@ -102,7 +116,7 @@ const CheckInScreen = () => {
     }
 
     return filtered;
-  }, [events, searchText, selectedDate]);
+  }, [events, searchText, selectedDate, selectedCategory]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -112,49 +126,77 @@ const CheckInScreen = () => {
   }, []);
 
   const handleCheckIn = (event) => {
+    const alertButtons = [
+      {
+        text: "Camera Scanner",
+        onPress: () => {
+          console.log("Navigating to CameraQRScanner");
+          if (navigationService.navigation) {
+            navigationService.navigation.navigate("CameraQRScanner", {
+              eventId: event?.id,
+            });
+          } else {
+            console.log("Navigation service not available");
+            Alert.alert(
+              "Navigation Error",
+              "Navigation service not available"
+            );
+          }
+        },
+      },
+    ];
+
+    // Only show Zebra Scanner option on Android
+    if (Platform.OS !== "ios") {
+      alertButtons.push({
+        text: "Zebra Scanner",
+        onPress: () => {
+          console.log("Navigating to ZebraQR");
+          if (navigationService.navigation) {
+            navigationService.navigation.navigate("ZebraQR", {
+              eventId: event?.id,
+              manualMode: false,
+            });
+          } else {
+            console.log("Navigation service not available");
+            Alert.alert(
+              "Navigation Error",
+              "Navigation service not available"
+            );
+          }
+        },
+      });
+    }
+
+    alertButtons.push(
+      {
+        text: "Check guest code manually",
+        onPress: () => {
+          console.log("Navigating to ZebraQR with manual mode");
+          if (navigationService.navigation) {
+            navigationService.navigation.navigate("ZebraQR", {
+              eventId: event?.id,
+              manualMode: true,
+            });
+          } else {
+            console.log("Navigation service not available");
+            Alert.alert(
+              "Navigation Error",
+              "Navigation service not available"
+            );
+          }
+        },
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
+      }
+    );
+
     Alert.alert(
       "Choose Scanner Type",
       "How would you like to scan the QR code?",
-      [
-        {
-          text: "Camera Scanner",
-          onPress: () => {
-            console.log("Navigating to CameraQRScanner");
-            if (navigationService.navigation) {
-              navigationService.navigation.navigate("CameraQRScanner", {
-                eventId: event?.id,
-              });
-            } else {
-              console.log("Navigation service not available");
-              Alert.alert(
-                "Navigation Error",
-                "Navigation service not available"
-              );
-            }
-          },
-        },
-        {
-          text: "Zebra Scanner",
-          onPress: () => {
-            console.log("Navigating to ZebraQR");
-            if (navigationService.navigation) {
-              navigationService.navigation.navigate("ZebraQR", {
-                eventId: event?.id,
-              });
-            } else {
-              console.log("Navigation service not available");
-              Alert.alert(
-                "Navigation Error",
-                "Navigation service not available"
-              );
-            }
-          },
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-      ],
+      alertButtons,
       { cancelable: true }
     );
   };
@@ -298,6 +340,13 @@ const CheckInScreen = () => {
         selectedDate={selectedDate}
         onClearDate={() => setSelectedDate(null)}
       />
+
+      <CustomCategories
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategorySelect={setSelectedCategory}
+      />
+
       {loading ? (
         <LoadingModal visible={loading} />
       ) : (

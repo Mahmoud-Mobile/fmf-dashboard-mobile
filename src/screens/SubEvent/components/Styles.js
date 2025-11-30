@@ -55,14 +55,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statusBadge: {
-    borderRadius: 8,
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 2,
     alignSelf: "flex-start",
     backgroundColor: "#BEDBFF",
     position: "absolute",
     top: 0,
     right: 0,
+    borderBottomLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   statusText: {
     fontSize: 10,

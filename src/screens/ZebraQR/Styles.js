@@ -51,4 +51,33 @@ export const styles = StyleSheet.create({
     height: 0,
     width: 0,
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+  },
+  manualInputContainer: {
+    width: "100%",
+    marginTop: 32,
+    paddingHorizontal: 20,
+  },
+  manualInput: {
+    width: "100%",
+    height: 56,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.Secondary,
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.LightGray,
+    textAlign: "left",
+    marginBottom: 16,
+  },
+  submitButton: {
+    width: "100%",
+    marginTop: 8,
+  },
 });

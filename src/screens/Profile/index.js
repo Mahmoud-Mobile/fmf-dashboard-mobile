@@ -14,7 +14,7 @@ const Profile = () => {
   const dispatch = useDispatch();
   const { profile, loading } = useSelector((state) => state.api);
   const authUser = useSelector((state) => state.auth.user);
-
+  console.log(authUser);
   useEffect(() => {
     // Fetch profile data if not already loaded
     if (!profile || Object.keys(profile).length === 0) {
@@ -115,7 +115,7 @@ const Profile = () => {
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Mobile</Text>
               <Text style={styles.infoValue}>
-                {userInfo.mobile || "Not provided"}
+                {userInfo.mobile || "+966 591161089"}
               </Text>
             </View>
           </View>
@@ -133,7 +133,7 @@ const Profile = () => {
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Address</Text>
               <Text style={styles.infoValue}>
-                {userInfo.address || "Not provided"}
+                {userInfo.address || "Riyadh "}
               </Text>
             </View>
           </View>

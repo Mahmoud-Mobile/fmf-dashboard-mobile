@@ -1,8 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Platform, Text, TextInput, View, Animated } from "react-native";
+import {
+  Platform,
+  Text,
+  TextInput,
+  View,
+  Animated,
+  KeyboardAvoidingView,
+  ScrollView,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useIsFocused, useRoute } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
+import CustomPressable from "../../components/CustomPressable";
 import navigationService from "../../Global/navRef";
 import QRScanResultModal from "../../components/QRScanResultModal";
 import QRScanErrorModal from "../../components/QRScanErrorModal";
@@ -39,8 +48,11 @@ const fetchUserInfoFromQR = async (qrData) => {
 const ZebraQR = () => {
   const route = useRoute();
   const eventId = route.params?.eventId;
+  const manualMode = route.params?.manualMode ?? false;
   const inputRef = useRef(null);
+  const manualInputRef = useRef(null);
   const [buffer, setBuffer] = useState("");
+  const [manualInput, setManualInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
@@ -81,21 +93,31 @@ const ZebraQR = () => {
     // Reset lock to allow another scan
     isLockedRef.current = false;
     setBuffer("");
+    setManualInput("");
     setUserInfo(null);
     setScannedData(null);
     setErrorMessage(null);
     // Re-focus for next scan
-    requestAnimationFrame(() => inputRef.current?.focus());
-  }, []);
+    if (manualMode) {
+      requestAnimationFrame(() => manualInputRef.current?.focus());
+    } else {
+      requestAnimationFrame(() => inputRef.current?.focus());
+    }
+  }, [manualMode]);
 
   const handleTryAgain = useCallback(() => {
     // Reset lock to allow another scan after error
     isLockedRef.current = false;
     setErrorMessage(null);
     setBuffer("");
+    setManualInput("");
     // Re-focus for next scan
-    requestAnimationFrame(() => inputRef.current?.focus());
-  }, []);
+    if (manualMode) {
+      requestAnimationFrame(() => manualInputRef.current?.focus());
+    } else {
+      requestAnimationFrame(() => inputRef.current?.focus());
+    }
+  }, [manualMode]);
 
   const handleShowSeats = useCallback(() => {
     // Navigate to ShowSeats screen
@@ -114,12 +136,12 @@ const ZebraQR = () => {
   const handleSubmit = useCallback(
     async (forced) => {
       if (!isFocused) return;
-      const data = (forced ?? buffer).trim();
+      const data = (forced ?? (manualMode ? manualInput : buffer)).trim();
       if (!data || isProcessing || isLockedRef.current) return;
 
       isLockedRef.current = true;
       setIsProcessing(true);
-      
+
       try {
         // Check if event ID is "1" - if so, deny access
         if (eventId === "1") {
@@ -145,10 +167,19 @@ const ZebraQR = () => {
       } finally {
         setIsProcessing(false);
         setBuffer("");
+        setManualInput("");
         // Don't auto-refocus - wait for user choice in modal
       }
     },
-    [buffer, isProcessing, isFocused, handleScanned, eventId]
+    [
+      buffer,
+      manualInput,
+      manualMode,
+      isProcessing,
+      isFocused,
+      handleScanned,
+      eventId,
+    ]
   );
 
   const onChangeText = useCallback(
@@ -179,16 +210,16 @@ const ZebraQR = () => {
     [handleSubmit, isFocused]
   );
 
-  // Ensure hidden input regains focus when screen becomes active
+  // Ensure hidden input regains focus when screen becomes active (only for Zebra scanner mode)
   useEffect(() => {
-    if (isFocused) {
+    if (isFocused && !manualMode) {
       lastFocusAtRef.current = Date.now();
       // Only focus if not locked (waiting for user choice)
       if (!isLockedRef.current) {
         requestAnimationFrame(() => inputRef.current?.focus());
       }
-    } else {
-      // On blur: stop any pending submits and blur the hidden input
+    } else if (!isFocused) {
+      // On blur: stop any pending submits and blur the input
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
         debounceRef.current = null;
@@ -198,61 +229,120 @@ const ZebraQR = () => {
         immediateSubmitRef.current = null;
       }
       inputRef.current?.blur();
+      manualInputRef.current?.blur();
       setBuffer("");
+      setManualInput("");
       isLockedRef.current = false;
+    } else if (isFocused && manualMode) {
+      // Focus manual input when in manual mode
+      if (!isLockedRef.current) {
+        requestAnimationFrame(() => manualInputRef.current?.focus());
+      }
     }
-  }, [isFocused]);
+  }, [isFocused, manualMode]);
 
   const handleBack = () => {
     navigationService.navigation?.goBack();
   };
 
+  const handleManualInputChange = useCallback((text) => {
+    setManualInput(text);
+  }, []);
+
+  const handleManualSubmit = useCallback(() => {
+    handleSubmit(manualInput);
+  }, [manualInput, handleSubmit]);
+
   return (
     <View style={styles.container}>
-      <CustomHeader leftLabel="Zebra Scanner" onLeftButtonPress={handleBack} />
+      <CustomHeader
+        leftLabel={manualMode ? "Manual Entry" : "Zebra Scanner"}
+        onLeftButtonPress={handleBack}
+      />
 
-      <View style={styles.body}>
-        <View style={styles.scannerInfo}>
-          <MaterialIcons
-            name="qr-code-scanner"
-            size={64}
-            color={Colors.Primary}
-          />
-          <Text style={styles.infoTitle}>Zebra Scanner Ready</Text>
-          <Text style={styles.infoText}>
-            Use your Zebra scanner to scan QR codes. The scanner will
-            automatically detect and process the codes.
-          </Text>
-          {isProcessing && (
-            <View style={styles.processingContainer}>
-              <Text style={styles.processingText}>Processing QR Code...</Text>
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollViewContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.body}>
+            <View style={styles.scannerInfo}>
+              <MaterialIcons
+                name={manualMode ? "keyboard" : "qr-code-scanner"}
+                size={64}
+                color={Colors.Primary}
+              />
+              <Text style={styles.infoTitle}>
+                {manualMode ? "Manual Entry" : "Zebra Scanner Ready"}
+              </Text>
+              <Text style={styles.infoText}>
+                {manualMode
+                  ? "Enter the guest QR code manually in the field below."
+                  : "Use your Zebra scanner to scan QR codes. The scanner will automatically detect and process the codes."}
+              </Text>
+              {isProcessing && (
+                <View style={styles.processingContainer}>
+                  <Text style={styles.processingText}>
+                    Processing QR Code...
+                  </Text>
+                </View>
+              )}
             </View>
-          )}
-        </View>
 
-        {isFocused ? (
-          <TextInput
-            ref={inputRef}
-            value={buffer}
-            onChangeText={onChangeText}
-            onSubmitEditing={() => handleSubmit()}
-            autoFocus
-            style={styles.hiddenInput}
-            editable
-            autoCorrect={false}
-            autoCapitalize="none"
-            {...(Platform.OS === "android"
-              ? { showSoftInputOnFocus: false }
-              : {})}
-            caretHidden
-            contextMenuHidden
-            placeholder={Platform.select({
-              ios: "Scan here",
-              android: "Scan here",
-            })}
-          />
-        ) : null}
-      </View>
+            {manualMode ? (
+              <View style={styles.manualInputContainer}>
+                <TextInput
+                  ref={manualInputRef}
+                  value={manualInput}
+                  onChangeText={handleManualInputChange}
+                  onSubmitEditing={handleManualSubmit}
+                  autoFocus
+                  style={styles.manualInput}
+                  editable={!isProcessing}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  placeholder="Enter QR code here"
+                  placeholderTextColor="#828282"
+                  returnKeyType="done"
+                />
+                <CustomPressable
+                  title="Submit"
+                  onPress={handleManualSubmit}
+                  disabled={!manualInput.trim() || isProcessing}
+                  isLoading={isProcessing}
+                  style={styles.submitButton}
+                />
+              </View>
+            ) : isFocused ? (
+              <TextInput
+                ref={inputRef}
+                value={buffer}
+                onChangeText={onChangeText}
+                onSubmitEditing={() => handleSubmit()}
+                autoFocus
+                style={styles.hiddenInput}
+                editable
+                autoCorrect={false}
+                autoCapitalize="none"
+                {...(Platform.OS === "android"
+                  ? { showSoftInputOnFocus: false }
+                  : {})}
+                caretHidden
+                contextMenuHidden
+                placeholder={Platform.select({
+                  ios: "Scan here",
+                  android: "Scan here",
+                })}
+              />
+            ) : null}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <QRScanResultModal
         ref={successModalRef}

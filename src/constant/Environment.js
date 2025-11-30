@@ -4,7 +4,7 @@ const ENV = {
     apiUrl: "https://dev-api.lead-360.co/api/v1/",
   },
   dev: {
-    apiUrl: "https://dev-api.lead-360.co/api/v1/",
+    apiUrl: "https://fmf-api.lead-360.co/api/v1/",
   },
 };
 

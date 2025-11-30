@@ -3,7 +3,6 @@ import { TouchableOpacity, View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { Colors } from "../../../Global/colors";
 import { ImagesWithProps } from "../../../config/images";
 import styles from "./Styles";
 
@@ -93,9 +92,9 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
           </View>
         </View>
         <View style={[styles.flexRow, { marginTop: 20 }]}>
-          {/* <Pressable style={styles.previewButton} onPress={handlePreviewPress}>
+          <Pressable style={styles.previewButton} onPress={handlePreviewPress}>
             <Text style={styles.previewButtonText}>Preview</Text>
-          </Pressable> */}
+          </Pressable>
 
           <Pressable style={styles.checkInButton} onPress={handleCheckInPress}>
             <Text style={styles.checkInButtonText}>Check-In</Text>

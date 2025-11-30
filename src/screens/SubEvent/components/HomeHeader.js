@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { Profiler, useMemo } from "react";
 import {
   View,
   Text,
@@ -59,12 +59,14 @@ const HomeHeader = () => {
             </View>
           )}
 
-          <View style={{ gap: 4 }}>
+          <View style={{}}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={styles.greeting}>Welcome back, </Text>
               <Text style={styles.username}>{profileData.displayName}</Text>
             </View>
-            <Text style={styles.userRole}>{profileData.role}</Text>
+            {profileData.role && (
+              <Text style={styles.userRole}>{profileData.role}</Text>
+            )}
           </View>
         </View>
 
@@ -82,7 +84,7 @@ const HomeHeader = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: horizontalMargin,
-    paddingTop: 10,
+    paddingTop: 5,
     paddingBottom: Platform.OS === "ios" ? 15 : 10,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
