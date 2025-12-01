@@ -44,27 +44,27 @@ const More = () => {
       iconColor: "#374151",
       navigation: "Profile",
     },
-    {
-      id: 2,
-      title: "Survey",
-      icon: "CheckIn_Icon",
-      iconColor: "#374151",
-      navigation: "Survey",
-    },
-    {
-      id: 3,
-      title: "Privacy Policy",
-      icon: "Location_Icon",
-      iconColor: "#374151",
-      navigation: "PrivacyPolicy",
-    },
-    {
-      id: 4,
-      title: "About",
-      icon: "Calendar_Icon",
-      iconColor: "#374151",
-      navigation: "About",
-    },
+    // {
+    //   id: 2,
+    //   title: "Survey",
+    //   icon: "CheckIn_Icon",
+    //   iconColor: "#374151",
+    //   navigation: "Survey",
+    // },
+    // {
+    //   id: 3,
+    //   title: "Privacy Policy",
+    //   icon: "Location_Icon",
+    //   iconColor: "#374151",
+    //   navigation: "PrivacyPolicy",
+    // },
+    // {
+    //   id: 4,
+    //   title: "About",
+    //   icon: "Calendar_Icon",
+    //   iconColor: "#374151",
+    //   navigation: "About",
+    // },
     {
       id: 5,
       title: "Logout",
@@ -93,7 +93,7 @@ const More = () => {
                   {userInfo?.user?.lastName ?? ""}
                 </Text>
                 <Text style={styles.mobileText}>
-                  {userInfo?.user?.role ?? ""}
+                  {userInfo?.user?.email ?? ""}
                 </Text>
               </View>
             </View>

@@ -87,13 +87,15 @@ const Login = () => {
           <View style={styles.logoSection}>
             <View style={styles.logoContainer}>
               <Image
-                source={require("../../Assets/FMF-logo.png")}
+                source={require("../../Assets/logo.png")}
                 style={styles.logo}
                 resizeMode="contain"
               />
             </View>
             <Text style={styles.welcomeText}>Welcome Back</Text>
-            <Text style={styles.subtitleText}>Sign in to your FMF account</Text>
+            <Text style={styles.subtitleText}>
+              Please login to your account to continue
+            </Text>
           </View>
 
           <View style={styles.formSection}>
@@ -137,7 +139,7 @@ const Login = () => {
               />
             </View>
 
-            <Text style={styles.footerText}>FMF Dashboard</Text>
+            <Text style={styles.footerText}>LEAD Dashboard</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
