@@ -4,6 +4,8 @@ import {
   getEventById,
   flights,
   trips,
+  getSubEvents,
+  getSubEventById,
 } from "../../webservice/apiConfig";
 
 import {
@@ -14,6 +16,8 @@ import {
   setSelectedEvent,
   setFlights,
   setTrips,
+  setSubEvents,
+  setSelectedSubEvent,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -81,5 +85,36 @@ export const fetchTrips = (eventId, params) => async (dispatch) => {
     dispatch(setError("Error fetching trips"));
   }
 };
+
+// Fetch sub-events for an event
+export const fetchSubEvents = (eventId, params) => async (dispatch) => {
+  dispatch(setLoading());
+  try {
+    const response = await getSubEvents(eventId, params);
+    dispatch(setSubEvents(response));
+  } catch (error) {
+    console.log("Error in fetchSubEvents:", error);
+    dispatch(setError("Error fetching sub-events"));
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+// Fetch sub-event by ID
+export const fetchSubEventById =
+  (subEventId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      console.log("Fetching sub-event by ID:", subEventId);
+      const response = await getSubEventById(subEventId, params);
+      dispatch(setSelectedSubEvent(response));
+    } catch (error) {
+      dispatch(setError("Error fetching sub-event details"));
+      console.log("Error fetching sub-event details: ", error);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
 export { setSelectedEvent };

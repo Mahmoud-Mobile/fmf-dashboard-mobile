@@ -22,6 +22,7 @@ import Survey from "../screens/Survey";
 import PrivacyPolicy from "../screens/PrivacyPolicy";
 import About from "../screens/About";
 import TripsDetails from "../screens/TripsDetails";
+import SubEventDetails from "../screens/SubEventDetails";
 import { Colors } from "../Global/colors";
 import { Fonts } from "../Global/fonts";
 import NetInfo from "@react-native-community/netinfo";
@@ -221,6 +222,13 @@ const NavStack = () => {
       <Stack.Screen
         name="TripsDetails"
         component={TripsDetails}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="SubEventDetails"
+        component={SubEventDetails}
         options={{
           headerShown: false,
         }}

@@ -32,4 +32,23 @@ const trips = async (eventId, data) => {
   return await Get(`events/${eventId}/transportation/trips`, data);
 };
 
-export { login, guests, getGuestById, events, getEventById, flights, trips };
+// sub-events apis
+const getSubEvents = async (eventId, data) => {
+  return await Get(`events/${eventId}/sub-events`, data);
+};
+
+const getSubEventById = async (subEventId, data) => {
+  return await Get(`events/sub-events/${subEventId}`, data);
+};
+
+export {
+  login,
+  guests,
+  getGuestById,
+  events,
+  getEventById,
+  flights,
+  trips,
+  getSubEvents,
+  getSubEventById,
+};

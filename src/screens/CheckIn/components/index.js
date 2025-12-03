@@ -49,7 +49,7 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
   return (
     <TouchableOpacity
       activeOpacity={1}
-      // onPress={() => onPress?.(item)}
+      onPress={() => onPress?.(item)}
       style={[styles.cardContainer, width && { width }]}
     >
       <View style={styles.flexWrap}>

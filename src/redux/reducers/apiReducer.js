@@ -10,6 +10,8 @@ const apiSlice = createSlice({
     selectedEvent: {},
     flights: [],
     trips: [],
+    subEvents: [],
+    selectedSubEvent: {},
     loading: false,
     error: null,
   },
@@ -49,6 +51,16 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setSubEvents: (state, action) => {
+      state.subEvents = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setSelectedSubEvent: (state, action) => {
+      state.selectedSubEvent = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
     setLoading: (state, action) => {
       state.loading = action.payload !== undefined ? action.payload : true;
     },
@@ -68,6 +80,8 @@ export const {
   setSelectedEvent,
   setFlights,
   setTrips,
+  setSubEvents,
+  setSelectedSubEvent,
   setLoading,
   setError,
 } = apiSlice.actions;

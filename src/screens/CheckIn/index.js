@@ -1,8 +1,7 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { View, FlatList, RefreshControl, Alert, Platform } from "react-native";
 import { Colors } from "../../Global/colors";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
-import navigationService from "../../Global/navRef";
 import SearchActionRow from "../../components/SearchActionRow";
 import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
@@ -19,44 +18,22 @@ import {
   formatDateTime,
   formatStamp,
 } from "../../config/exportToExcel";
-
-const mockEvents = [
-  {
-    id: "1",
-    title: "Event 1",
-    capacity: "200 Seats Capacity",
-    location: "Saudi Arabia",
-    startDate: "2026-01-13 12:30",
-    endDate: "2026-01-13 18:40",
-    isCheckedIn: false,
-    type: "subEvent",
-  },
-  {
-    id: "2",
-    title: "Event 2",
-    capacity: "300 Seats Capacity",
-    location: "Saudi Arabia",
-    startDate: "2026-01-14 12:30",
-    endDate: "2026-01-14 18:40",
-    isCheckedIn: true,
-    type: "resource",
-  },
-];
+import { fetchSubEvents } from "../../redux/actions/api";
 
 const CheckInScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  const [events, setEvents] = useState(mockEvents);
   const [searchText, setSearchText] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState("list");
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("subEvent");
-  const { selectedEvent } = useSelector((state) => state.api);
+  const { selectedEvent, subEvents, loading } = useSelector(
+    (state) => state.api
+  );
 
   const { width: screenWidth } = getDeviceDimensions();
 
@@ -81,8 +58,52 @@ const CheckInScreen = () => {
     { id: "resource", label: "Resource", key: "resource" },
   ];
 
+  const fetchSubEventsData = useCallback(() => {
+    if (selectedEvent?.id) {
+      dispatch(fetchSubEvents(selectedEvent.id));
+    }
+  }, [selectedEvent?.id, dispatch]);
+
+  useEffect(() => {
+    if (selectedEvent?.id) {
+      fetchSubEventsData();
+    }
+  }, [selectedEvent?.id, fetchSubEventsData]);
+
+  useEffect(() => {
+    if (!loading && refreshing) {
+      setRefreshing(false);
+    }
+  }, [loading, refreshing]);
+
+  const eventsList = useMemo(() => {
+    if (!subEvents) {
+      return [];
+    }
+
+    let rawEvents = [];
+    if (subEvents?.subEvents && Array.isArray(subEvents.subEvents)) {
+      rawEvents = subEvents.subEvents;
+    } else if (subEvents?.events && Array.isArray(subEvents.events)) {
+      rawEvents = subEvents.events;
+    } else if (Array.isArray(subEvents)) {
+      rawEvents = subEvents;
+    }
+
+    // Transform API response to match component expectations
+    return rawEvents.map((event) => ({
+      ...event,
+      title: event.name || event.title || "N/A",
+      capacity: event.maxAttendees?.toString() || event.capacity || "N/A",
+      type:
+        event.eventLevel === "SUB"
+          ? "subEvent"
+          : event.eventLevel?.toLowerCase() || event.type || "subEvent",
+    }));
+  }, [subEvents]);
+
   const filteredEvents = useMemo(() => {
-    let filtered = events;
+    let filtered = eventsList;
 
     // Filter by category
     if (selectedCategory) {
@@ -116,54 +137,33 @@ const CheckInScreen = () => {
     }
 
     return filtered;
-  }, [events, searchText, selectedDate, selectedCategory]);
+  }, [eventsList, searchText, selectedDate, selectedCategory]);
 
-  const onRefresh = useCallback(async () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  }, []);
+    fetchSubEventsData();
+  }, [fetchSubEventsData]);
 
   const handleCheckIn = (event) => {
     const alertButtons = [
       {
         text: "Camera Scanner",
         onPress: () => {
-          console.log("Navigating to CameraQRScanner");
-          if (navigationService.navigation) {
-            navigationService.navigation.navigate("CameraQRScanner", {
-              eventId: event?.id,
-            });
-          } else {
-            console.log("Navigation service not available");
-            Alert.alert(
-              "Navigation Error",
-              "Navigation service not available"
-            );
-          }
+          navigation.navigate("CameraQRScanner", {
+            eventId: event?.id,
+          });
         },
       },
     ];
 
-    // Only show Zebra Scanner option on Android
     if (Platform.OS !== "ios") {
       alertButtons.push({
         text: "Zebra Scanner",
         onPress: () => {
-          console.log("Navigating to ZebraQR");
-          if (navigationService.navigation) {
-            navigationService.navigation.navigate("ZebraQR", {
-              eventId: event?.id,
-              manualMode: false,
-            });
-          } else {
-            console.log("Navigation service not available");
-            Alert.alert(
-              "Navigation Error",
-              "Navigation service not available"
-            );
-          }
+          navigation.navigate("ZebraQR", {
+            eventId: event?.id,
+            manualMode: false,
+          });
         },
       });
     }
@@ -172,19 +172,10 @@ const CheckInScreen = () => {
       {
         text: "Check guest code manually",
         onPress: () => {
-          console.log("Navigating to ZebraQR with manual mode");
-          if (navigationService.navigation) {
-            navigationService.navigation.navigate("ZebraQR", {
-              eventId: event?.id,
-              manualMode: true,
-            });
-          } else {
-            console.log("Navigation service not available");
-            Alert.alert(
-              "Navigation Error",
-              "Navigation service not available"
-            );
-          }
+          navigation.navigate("ZebraQR", {
+            eventId: event?.id,
+            manualMode: true,
+          });
         },
       },
       {
@@ -199,21 +190,6 @@ const CheckInScreen = () => {
       alertButtons,
       { cancelable: true }
     );
-  };
-
-  const handlePreview = (event) => {
-    if (event) {
-      if (navigationService.navigation) {
-        navigationService.navigation.navigate("PreviewSeats", {
-          eventTitle: event.title,
-          eventcapacity: event.capacity,
-          location: event.location,
-          date: event.date,
-        });
-      } else {
-        Alert.alert("Navigation Error", "Navigation service not available");
-      }
-    }
   };
 
   const handleSearchClear = () => {
@@ -286,33 +262,27 @@ const CheckInScreen = () => {
 
   const renderEventCard = useCallback(
     ({ item }) => {
-      const handlePreviewPress = (eventIdOrItem) => {
-        const event =
-          typeof eventIdOrItem === "string"
-            ? events.find((e) => e.id === eventIdOrItem) || item
-            : eventIdOrItem || item;
-        handlePreview(event);
-      };
-
-      const handleCheckInPress = (eventIdOrItem) => {
-        const event =
-          typeof eventIdOrItem === "string"
-            ? events.find((e) => e.id === eventIdOrItem) || item
-            : eventIdOrItem || item;
-        handleCheckIn(event);
-      };
-
       return (
         <CustomCheckInCard
           item={item}
-          onPress={handlePreview}
-          onPreview={handlePreviewPress}
-          onCheckIn={handleCheckInPress}
+          onPreview={() => {
+            navigation.navigate("PreviewSeats", {
+              subEventID: item?.id,
+            });
+          }}
+          onCheckIn={(event) => handleCheckIn(event)}
           width={cardWidth}
+          onPress={(event) =>
+            navigation.navigate("SubEventDetails", {
+              subEventID: event?.id,
+              title: event?.title || event?.name,
+              location: event?.location,
+            })
+          }
         />
       );
     },
-    [cardWidth, events, handlePreview, handleCheckIn]
+    [cardWidth, navigation, handleCheckIn]
   );
 
   const listKeyExtractor = useCallback((item) => {
