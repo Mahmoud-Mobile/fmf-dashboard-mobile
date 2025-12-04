@@ -23,7 +23,7 @@ import {
   formatStamp,
 } from "../../config/exportToExcel";
 
-const SubEvent = () => {
+const MainEvent = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state.api);
@@ -160,11 +160,11 @@ const SubEvent = () => {
         };
       });
 
-      const fileName = `subevent_${formatStamp(new Date())}.xlsx`;
+      const fileName = `mainevent_${formatStamp(new Date())}.xlsx`;
       await exportToExcel({
         rows: excelData,
         fileName,
-        sheetName: "SubEvent",
+        sheetName: "MainEvent",
       });
     } catch (error) {
       let errorMessage = "Failed to generate Excel file. Please try again.";
@@ -279,4 +279,4 @@ const SubEvent = () => {
   );
 };
 
-export default SubEvent;
+export default MainEvent;

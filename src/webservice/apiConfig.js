@@ -41,6 +41,15 @@ const getSubEventById = async (subEventId, data) => {
   return await Get(`events/sub-events/${subEventId}`, data);
 };
 
+// resources apis
+const getResources = async (eventId, data) => {
+  return await Get(`events/${eventId}/resources`, data);
+};
+
+const getResourceById = async (resourceId, data) => {
+  return await Get(`events/resources/${resourceId}`, data);
+};
+
 export {
   login,
   guests,
@@ -51,4 +60,6 @@ export {
   trips,
   getSubEvents,
   getSubEventById,
+  getResources,
+  getResourceById,
 };

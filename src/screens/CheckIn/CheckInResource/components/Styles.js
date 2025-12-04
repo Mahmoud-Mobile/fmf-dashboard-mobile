@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
-import { Colors } from "../../../Global/colors";
-import { Fonts } from "../../../Global/fonts";
+import { Colors } from "../../../../Global/colors";
+import { Fonts } from "../../../../Global/fonts";
 
 const styles = StyleSheet.create({
   cardContainer: {
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    width: "90%",
+    // width: "90%",
   },
   detailText: {
     fontSize: 12,

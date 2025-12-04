@@ -1,40 +1,11 @@
 import React from "react";
 import { TouchableOpacity, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import moment from "moment";
 
 import { Colors } from "../../../Global/colors";
 import { ImagesWithProps } from "../../../config/images";
+import { formatDateRange } from "../../../config/dateUtils";
 import styles from "./Styles";
-
-const formatDateRange = (startDate, endDate) => {
-  if (!startDate && !endDate) {
-    return "Date TBD";
-  }
-
-  const start = startDate ? moment(startDate) : null;
-  const end = endDate ? moment(endDate) : null;
-
-  if (start && end) {
-    if (start.isSame(end, "day")) {
-      return start.format("DD MMMM, YYYY");
-    }
-
-    if (start.year() !== end.year()) {
-      return `${start.format("DD MMMM, YYYY")} - ${end.format(
-        "DD MMMM, YYYY"
-      )}`;
-    }
-
-    return `${start.format("DD MMMM")} - ${end.format("DD MMMM, YYYY")}`;
-  }
-
-  if (start) {
-    return start.format("DD MMMM, YYYY");
-  }
-
-  return end.format("DD MMMM, YYYY");
-};
 
 const CustomEventCard = ({ item, onPress, width }) => {
   return (

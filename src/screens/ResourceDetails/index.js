@@ -4,28 +4,28 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchSubEventById } from "../../redux/actions/api";
+import { fetchResourceById } from "../../redux/actions/api";
 import LoadingModal from "../../components/LoadingModal";
 import styles from "./Styles";
-import DataTableCard from "./DataTableCard";
+import DataTableCard from "../SubEventDetails/DataTableCard";
 import { Colors } from "../../Global/colors";
 import { formatDateRange } from "../../config/dateUtils";
 
-const SubEventDetails = ({ route }) => {
-  const { subEventID, title, location } = route.params || {};
+const ResourceDetails = ({ route }) => {
+  const { resourceID, title, location } = route.params || {};
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { selectedSubEvent, loading } = useSelector((state) => state.api);
+  const { selectedResource, loading } = useSelector((state) => state.api);
 
   useEffect(() => {
-    if (subEventID) {
-      dispatch(fetchSubEventById(subEventID));
+    if (resourceID) {
+      dispatch(fetchResourceById(resourceID));
     }
-  }, [subEventID, dispatch]);
+  }, [resourceID, dispatch]);
 
-  const subEvent = selectedSubEvent?.subEvent || {};
-  const statistics = selectedSubEvent?.statistics || {};
-  const participants = selectedSubEvent?.participants || {};
+  const resource = selectedResource?.resource || {};
+  const statistics = selectedResource?.statistics || {};
+  const participants = selectedResource?.participants || {};
   const assignments = participants?.assignments || [];
 
   const getStatusBadgeStyle = (status) => {
@@ -107,8 +107,8 @@ const SubEventDetails = ({ route }) => {
     <View style={styles.container}>
       <CustomHeader
         leftLabel="Back"
-        title={title || subEvent.name || " "}
-        subtitle={location || subEvent.location}
+        title={title || resource.name || " "}
+        subtitle={location || resource.location}
         onLeftButtonPress={() => navigation.goBack()}
       />
       {loading ? (
@@ -123,22 +123,22 @@ const SubEventDetails = ({ route }) => {
             <View style={styles.heroContent}>
               <View style={styles.heroHeader}>
                 <View style={styles.heroTitleContainer}>
-                  <Text style={styles.heroTitle}>{subEvent.name || " "}</Text>
+                  <Text style={styles.heroTitle}>{resource.name || " "}</Text>
                   <View
                     style={[
                       styles.statusBadge,
-                      getStatusBadgeStyle(subEvent.status),
+                      getStatusBadgeStyle(resource.status),
                     ]}
                   >
                     <Text style={styles.statusBadgeText}>
-                      {subEvent.status || " "}
+                      {resource.status || " "}
                     </Text>
                   </View>
                 </View>
               </View>
-              {subEvent.description && (
+              {resource.description && (
                 <Text style={styles.heroDescription}>
-                  {subEvent.description}
+                  {resource.description}
                 </Text>
               )}
             </View>
@@ -147,45 +147,39 @@ const SubEventDetails = ({ route }) => {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <MaterialIcons name="event" size={20} color={Colors.Primary} />
-              <Text style={styles.cardTitle}>Event Details</Text>
+              <Text style={styles.cardTitle}>Resource Details</Text>
             </View>
             <View style={styles.cardBody}>
               <View style={styles.infoGrid}>
                 {renderInfoItem(
                   "calendar-outline",
                   "Date Range",
-                  formatDateRange(subEvent.startDate, subEvent.endDate),
+                  formatDateRange(resource.startDate, resource.endDate),
                   Colors.Primary
                 )}
                 {renderInfoItem(
                   "location-outline",
                   "Location",
-                  subEvent.location,
+                  resource.location,
                   Colors.Error
                 )}
                 {renderInfoItem(
                   "people-outline",
                   "Max Attendees",
-                  subEvent.maxAttendees?.toString(),
+                  resource.maxAttendees?.toString(),
                   Colors.Success
                 )}
                 {renderInfoItem(
-                  "layers-outline",
-                  "Event Type",
-                  subEvent.eventType,
+                  "cube-outline",
+                  "Resource Type",
+                  resource.type || resource.resourceType,
                   Colors.Warning
                 )}
                 {renderInfoItem(
-                  "bar-chart-outline",
-                  "Event Level",
-                  subEvent.eventLevel,
+                  "layers-outline",
+                  "Capacity",
+                  resource.capacity?.toString(),
                   Colors.Primary
-                )}
-                {renderInfoItem(
-                  "cube-outline",
-                  "Total Pools",
-                  subEvent.totalPoolsCount?.toString(),
-                  Colors.Gray
                 )}
               </View>
             </View>
@@ -341,4 +335,5 @@ const SubEventDetails = ({ route }) => {
   );
 };
 
-export default SubEventDetails;
+export default ResourceDetails;
+

@@ -6,6 +6,8 @@ import {
   trips,
   getSubEvents,
   getSubEventById,
+  getResources,
+  getResourceById,
 } from "../../webservice/apiConfig";
 
 import {
@@ -18,6 +20,8 @@ import {
   setTrips,
   setSubEvents,
   setSelectedSubEvent,
+  setResources,
+  setSelectedResource,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -112,6 +116,37 @@ export const fetchSubEventById =
     } catch (error) {
       dispatch(setError("Error fetching sub-event details"));
       console.log("Error fetching sub-event details: ", error);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Fetch resources for an event
+export const fetchResources = (eventId, params) => async (dispatch) => {
+  dispatch(setLoading());
+  try {
+    const response = await getResources(eventId, params);
+    dispatch(setResources(response));
+  } catch (error) {
+    console.log("Error in fetchResources:", error);
+    dispatch(setError("Error fetching resources"));
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+// Fetch resource by ID
+export const fetchResourceById =
+  (resourceId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      console.log("Fetching resource by ID:", resourceId);
+      const response = await getResourceById(resourceId, params);
+      dispatch(setSelectedResource(response));
+    } catch (error) {
+      dispatch(setError("Error fetching resource details"));
+      console.log("Error fetching resource details: ", error);
     } finally {
       dispatch(setLoading(false));
     }

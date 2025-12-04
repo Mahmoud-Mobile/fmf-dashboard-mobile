@@ -1,39 +1,10 @@
 import React from "react";
 import { TouchableOpacity, View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import moment from "moment";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { ImagesWithProps } from "../../../config/images";
+import { ImagesWithProps } from "../../../../config/images";
+import { formatDateRange } from "../../../../config/dateUtils";
 import styles from "./Styles";
-
-const formatDateRange = (startDate, endDate) => {
-  if (!startDate && !endDate) {
-    return "Date TBD";
-  }
-
-  const start = startDate ? moment(startDate) : null;
-  const end = endDate ? moment(endDate) : null;
-
-  if (start && end) {
-    if (start.isSame(end, "day")) {
-      return start.format("DD MMMM, YYYY");
-    }
-
-    if (start.year() !== end.year()) {
-      return `${start.format("DD MMMM, YYYY")} - ${end.format(
-        "DD MMMM, YYYY"
-      )}`;
-    }
-
-    return `${start.format("DD MMMM")} - ${end.format("DD MMMM, YYYY")}`;
-  }
-
-  if (start) {
-    return start.format("DD MMMM, YYYY");
-  }
-
-  return end.format("DD MMMM, YYYY");
-};
 
 const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
   const handlePreviewPress = (e) => {
@@ -78,7 +49,7 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
               style={{ marginRight: 4, marginTop: 2 }}
             />
             <Text style={styles.detailText}>
-              {formatDateRange(item?.startDate, item?.endDate)}
+              {formatDateRange(item?.availableFrom, item?.availableUntil)}
             </Text>
           </View>
           <View style={styles.detailItem}>
