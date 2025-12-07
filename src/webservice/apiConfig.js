@@ -37,8 +37,8 @@ const getSubEvents = async (eventId, data) => {
   return await Get(`events/${eventId}/sub-events`, data);
 };
 
-const getSubEventById = async (subEventId, data) => {
-  return await Get(`events/sub-events/${subEventId}`, data);
+const getSubEventById = async (eventId, subEventId, data) => {
+  return await Get(`events/${eventId}/sub-events/${subEventId}`, data);
 };
 
 // resources apis

@@ -12,16 +12,21 @@ import { Colors } from "../../Global/colors";
 import { formatDateRange } from "../../config/dateUtils";
 
 const SubEventDetails = ({ route }) => {
-  const { subEventID, title, location } = route.params || {};
+  const { subEventID, title, location, eventId } = route.params || {};
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { selectedSubEvent, loading } = useSelector((state) => state.api);
+  const { selectedSubEvent, selectedEvent, loading } = useSelector(
+    (state) => state.api
+  );
+
+  // Get eventId from route params or Redux state
+  const eventID = eventId || selectedEvent?.id;
 
   useEffect(() => {
-    if (subEventID) {
-      dispatch(fetchSubEventById(subEventID));
+    if (subEventID && eventID) {
+      dispatch(fetchSubEventById(eventID, subEventID));
     }
-  }, [subEventID, dispatch]);
+  }, [subEventID, eventID, dispatch]);
 
   const subEvent = selectedSubEvent?.subEvent || {};
   const statistics = selectedSubEvent?.statistics || {};

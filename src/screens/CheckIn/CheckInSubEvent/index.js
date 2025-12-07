@@ -246,6 +246,7 @@ const CheckInSubEvent = ({
           onPress={(event) =>
             navigation.navigate("SubEventDetails", {
               subEventID: event?.id,
+              eventId: selectedEvent?.id,
               title: event?.title || event?.name,
               location: event?.location,
             })
@@ -253,7 +254,7 @@ const CheckInSubEvent = ({
         />
       );
     },
-    [cardWidth, navigation, handleCheckIn]
+    [cardWidth, navigation, handleCheckIn, selectedEvent]
   );
 
   const listKeyExtractor = useCallback((item) => {

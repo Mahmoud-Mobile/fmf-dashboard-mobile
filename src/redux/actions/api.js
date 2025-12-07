@@ -106,12 +106,12 @@ export const fetchSubEvents = (eventId, params) => async (dispatch) => {
 
 // Fetch sub-event by ID
 export const fetchSubEventById =
-  (subEventId, params = {}) =>
+  (eventId, subEventId, params = {}) =>
   async (dispatch) => {
     dispatch(setLoading());
     try {
       console.log("Fetching sub-event by ID:", subEventId);
-      const response = await getSubEventById(subEventId, params);
+      const response = await getSubEventById(eventId, subEventId, params);
       dispatch(setSelectedSubEvent(response));
     } catch (error) {
       dispatch(setError("Error fetching sub-event details"));

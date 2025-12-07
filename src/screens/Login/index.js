@@ -59,7 +59,7 @@ const Login = () => {
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
           index: 0,
-          routes: [{ name: "SubEvent" }],
+          routes: [{ name: "MainEvent" }],
         });
       }
       setLoading(false);

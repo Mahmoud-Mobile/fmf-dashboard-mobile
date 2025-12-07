@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../screens/Login";
-import MainEvent from "../screens/SubEvent";
+import MainEvent from "../screens/MainEvent";
 import MyTabs from "../Navigation/MyTabs";
 import NoInternetScreen from "../screens/NoInternetScreen";
 import FlightDetails from "../screens/FlightDetails";
