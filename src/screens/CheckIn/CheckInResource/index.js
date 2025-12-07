@@ -87,9 +87,9 @@ const CheckInResource = ({
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(
         (event) =>
-          event.title.toLowerCase().includes(searchLower) ||
-          event.capacity.toLowerCase().includes(searchLower) ||
-          (event.location && event.location.toLowerCase().includes(searchLower))
+          event.title?.toLowerCase().includes(searchLower) ||
+          (event.location &&
+            event.location?.toLowerCase().includes(searchLower))
       );
     }
 
