@@ -8,29 +8,16 @@ import navigationService from "../../Global/navRef";
 import QRScanResultModal from "../../components/QRScanResultModal";
 import QRScanErrorModal from "../../components/QRScanErrorModal";
 import { styles } from "./Styles";
-
-// Mock function to fetch user info from QR code
-// Replace this with your actual API call
-const fetchUserInfoFromQR = async (qrData) => {
-  // Simulate API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // In a real app, you would parse the QR data or make an API call
-      // For now, return mock data
-      resolve({
-        name: "John Doe",
-        email: "john.doe@example.com",
-        mobile: "+1 234 567 8900",
-        address: "123 Main Street, City, State 12345",
-        image: null,
-      });
-    }, 1000);
-  });
-};
+import { checkIn } from "../../webservice/apiConfig";
 
 const CameraQRScanner = ({ onScanned }) => {
   const route = useRoute();
   const eventId = route.params?.eventId;
+  const subEventId = route.params?.subEventId;
+  const scanLocation = route.params?.scanLocation;
+
+  // console.log("route params", route.params);
+
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
@@ -46,30 +33,40 @@ const CameraQRScanner = ({ onScanned }) => {
     navigationService.navigation?.goBack();
   };
 
-  const handleScanned = useCallback(async (data) => {
-    console.log("QR Code scanned:", data);
-    setScannedData(data);
-    setIsLoadingUserInfo(true);
-    setErrorMessage(null);
+  const handleScanned = useCallback(
+    async (qrCode) => {
+      console.log("QR Code scanned:", qrCode);
+      setScannedData(qrCode);
+      setIsLoadingUserInfo(true);
+      setErrorMessage(null);
 
-    try {
-      // Fetch user info from QR code
-      const info = await fetchUserInfoFromQR(data);
-      setUserInfo(info);
-      // Open success modal
-      successModalRef.current?.open();
-    } catch (error) {
-      console.error("Error fetching user info:", error);
-      // Still show modal with basic info
-      setUserInfo({ name: "User", email: null, mobile: null, address: null });
-      successModalRef.current?.open();
-    } finally {
-      setIsLoadingUserInfo(false);
-    }
-  }, []);
+      try {
+        const payload = {
+          qrCode: qrCode,
+          scanLocation: scanLocation || "",
+        };
+        const response = await checkIn(eventId, subEventId, payload);
+        console.log("response", response);
+        setUserInfo(response);
+        successModalRef.current?.open();
+      } catch (error) {
+        console.log("Error object:", error);
+        const errorData = error?.response?.data || error?.data || {};
+        const errorMsg =
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to check in. Please try again.";
+        setErrorMessage(errorMsg);
+        errorModalRef.current?.open();
+      } finally {
+        setIsLoadingUserInfo(false);
+      }
+    },
+    [eventId, subEventId, scanLocation]
+  );
 
   const handleScanAnother = useCallback(() => {
-    // Reset lock to allow another scan
     isLockedRef.current = false;
     setUserInfo(null);
     setScannedData(null);
@@ -77,7 +74,6 @@ const CameraQRScanner = ({ onScanned }) => {
   }, []);
 
   const handleTryAgain = useCallback(() => {
-    // Reset lock to allow another scan after error
     isLockedRef.current = false;
     setErrorMessage(null);
   }, []);
@@ -85,7 +81,6 @@ const CameraQRScanner = ({ onScanned }) => {
   const handleShowSeats = useCallback(() => {
     navigationService.navigation?.navigate("ShowSeats", {
       title: "Show Seats",
-      // imageUri: scannedData, // Uncomment if QR code contains image URL
     });
   }, [scannedData]);
 
@@ -99,20 +94,8 @@ const CameraQRScanner = ({ onScanned }) => {
     async ({ data }) => {
       if (isLockedRef.current || !data) return;
 
-      // Lock immediately to prevent infinite loop
       isLockedRef.current = true;
       setIsProcessing(true);
-
-      // Check if event ID is "1" - if so, deny access
-      if (eventId === "1") {
-        setErrorMessage("This QR code does not have access to this event.");
-        setUserInfo(null);
-        setScannedData(null);
-        setIsProcessing(false);
-        // Open error modal
-        errorModalRef.current?.open();
-        return;
-      }
 
       try {
         await handleScanned(String(data));
@@ -120,7 +103,7 @@ const CameraQRScanner = ({ onScanned }) => {
         setIsProcessing(false);
       }
     },
-    [handleScanned, eventId]
+    [handleScanned]
   );
 
   useEffect(() => {

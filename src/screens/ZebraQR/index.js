@@ -17,37 +17,13 @@ import QRScanResultModal from "../../components/QRScanResultModal";
 import QRScanErrorModal from "../../components/QRScanErrorModal";
 import { styles } from "./Styles";
 import { Colors } from "../../Global/colors";
-
-const verifyQrCode = async ({ qr }) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ valid: Math.random() > 0.3 });
-    }, 1000);
-  });
-};
-
-// Mock function to fetch user info from QR code
-// Replace this with your actual API call
-const fetchUserInfoFromQR = async (qrData) => {
-  // Simulate API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // In a real app, you would parse the QR data or make an API call
-      // For now, return mock data
-      resolve({
-        name: "John Doe",
-        email: "john.doe@example.com",
-        mobile: "+1 234 567 8900",
-        address: "123 Main Street, City, State 12345",
-        image: null, // You can add image URL here if available
-      });
-    }, 1000);
-  });
-};
+import { checkIn } from "../../webservice/apiConfig";
 
 const ZebraQR = () => {
   const route = useRoute();
   const eventId = route.params?.eventId;
+  const subEventId = route.params?.subEventId;
+  const scanLocation = route.params?.scanLocation;
   const manualMode = route.params?.manualMode ?? false;
   const inputRef = useRef(null);
   const manualInputRef = useRef(null);
@@ -67,37 +43,46 @@ const ZebraQR = () => {
   const successModalRef = useRef(null);
   const errorModalRef = useRef(null);
 
-  const handleScanned = useCallback(async (data) => {
-    console.log("QR Code scanned:", data);
-    setScannedData(data);
-    setIsLoadingUserInfo(true);
-    setErrorMessage(null);
+  const handleScanned = useCallback(
+    async (qrCode) => {
+      console.log("QR Code scanned:", qrCode);
+      setScannedData(qrCode);
+      setIsLoadingUserInfo(true);
+      setErrorMessage(null);
 
-    try {
-      // Fetch user info from QR code
-      const info = await fetchUserInfoFromQR(data);
-      setUserInfo(info);
-      // Open success modal
-      successModalRef.current?.open();
-    } catch (error) {
-      console.error("Error fetching user info:", error);
-      // Still show modal with basic info
-      setUserInfo({ name: "User", email: null, mobile: null, address: null });
-      successModalRef.current?.open();
-    } finally {
-      setIsLoadingUserInfo(false);
-    }
-  }, []);
+      try {
+        const payload = {
+          qrCode: qrCode,
+          scanLocation: scanLocation || "",
+        };
+        const response = await checkIn(eventId, subEventId, payload);
+        console.log("response", response);
+        setUserInfo(response);
+        successModalRef.current?.open();
+      } catch (error) {
+        console.log("Error object:", error);
+        const errorData = error?.response?.data || error?.data || {};
+        const errorMsg =
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to check in. Please try again.";
+        setErrorMessage(errorMsg);
+        errorModalRef.current?.open();
+      } finally {
+        setIsLoadingUserInfo(false);
+      }
+    },
+    [eventId, subEventId, scanLocation]
+  );
 
   const handleScanAnother = useCallback(() => {
-    // Reset lock to allow another scan
     isLockedRef.current = false;
     setBuffer("");
     setManualInput("");
     setUserInfo(null);
     setScannedData(null);
     setErrorMessage(null);
-    // Re-focus for next scan
     if (manualMode) {
       requestAnimationFrame(() => manualInputRef.current?.focus());
     } else {
@@ -106,12 +91,10 @@ const ZebraQR = () => {
   }, [manualMode]);
 
   const handleTryAgain = useCallback(() => {
-    // Reset lock to allow another scan after error
     isLockedRef.current = false;
     setErrorMessage(null);
     setBuffer("");
     setManualInput("");
-    // Re-focus for next scan
     if (manualMode) {
       requestAnimationFrame(() => manualInputRef.current?.focus());
     } else {
@@ -120,10 +103,8 @@ const ZebraQR = () => {
   }, [manualMode]);
 
   const handleShowSeats = useCallback(() => {
-    // Navigate to ShowSeats screen
     navigationService.navigation?.navigate("ShowSeats", {
       title: "Show Seats",
-      // imageUri: scannedData, // Uncomment if QR code contains image URL
     });
   }, [scannedData]);
 
@@ -143,32 +124,14 @@ const ZebraQR = () => {
       setIsProcessing(true);
 
       try {
-        // Check if event ID is "1" - if so, deny access
-        if (eventId === "1") {
-          setErrorMessage("This QR code does not have access to this event.");
-          setUserInfo(null);
-          setScannedData(null);
-          setIsProcessing(false);
-          // Open error modal
-          errorModalRef.current?.open();
-          return;
-        }
-
-        console.log("verifyQrCode body:", { qr: data });
-        const res = await verifyQrCode({ qr: data });
-        const isValid = Boolean(res?.valid);
-
-        // Show success modal with options
         await handleScanned(data);
       } catch (e) {
-        console.error("Error verifying QR code:", e);
-        // On error, reset lock
+        console.error("Error processing QR code:", e);
         isLockedRef.current = false;
       } finally {
         setIsProcessing(false);
         setBuffer("");
         setManualInput("");
-        // Don't auto-refocus - wait for user choice in modal
       }
     },
     [
@@ -210,7 +173,6 @@ const ZebraQR = () => {
     [handleSubmit, isFocused]
   );
 
-  // Ensure hidden input regains focus when screen becomes active (only for Zebra scanner mode)
   useEffect(() => {
     if (isFocused && !manualMode) {
       lastFocusAtRef.current = Date.now();

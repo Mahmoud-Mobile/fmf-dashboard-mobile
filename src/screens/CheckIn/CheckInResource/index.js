@@ -117,53 +117,67 @@ const CheckInResource = ({
     fetchResourcesData();
   }, [fetchResourcesData]);
 
-  const handleCheckIn = (event) => {
-    const alertButtons = [
-      {
-        text: "Camera Scanner",
-        onPress: () => {
-          navigation.navigate("CameraQRScanner", {
-            eventId: event?.id,
-          });
-        },
-      },
-    ];
+  const handleCheckIn = useCallback(
+    (eventOrId) => {
+      const resource =
+        typeof eventOrId === "string"
+          ? eventsList.find((item) => item.id === eventOrId)
+          : eventOrId;
 
-    if (Platform.OS !== "ios") {
-      alertButtons.push({
-        text: "Zebra Scanner",
-        onPress: () => {
-          navigation.navigate("ZebraQR", {
-            eventId: event?.id,
-            manualMode: false,
-          });
+      const alertButtons = [
+        {
+          text: "Camera Scanner",
+          onPress: () => {
+            navigation.navigate("CameraQRScanner", {
+              eventId: selectedEvent?.id,
+              subEventId: resource?.id,
+              scanLocation: resource?.location,
+            });
+          },
         },
-      });
-    }
+      ];
 
-    alertButtons.push(
-      {
-        text: "Check guest code manually",
-        onPress: () => {
-          navigation.navigate("ZebraQR", {
-            eventId: event?.id,
-            manualMode: true,
-          });
-        },
-      },
-      {
-        text: "Cancel",
-        style: "cancel",
+      if (Platform.OS !== "ios") {
+        alertButtons.push({
+          text: "Zebra Scanner",
+          onPress: () => {
+            navigation.navigate("ZebraQR", {
+              eventId: selectedEvent?.id,
+              subEventId: resource?.id,
+              manualMode: false,
+              scanLocation: resource?.location,
+            });
+          },
+        });
       }
-    );
 
-    Alert.alert(
-      "Choose Scanner Type",
-      "How would you like to scan the QR code?",
-      alertButtons,
-      { cancelable: true }
-    );
-  };
+      alertButtons.push(
+        {
+          text: "Check guest code manually",
+          onPress: () => {
+            navigation.navigate("ZebraQR", {
+              eventId: selectedEvent?.id,
+              subEventId: resource?.id,
+              manualMode: true,
+              scanLocation: resource?.location,
+            });
+          },
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        }
+      );
+
+      Alert.alert(
+        "Choose Scanner Type",
+        "How would you like to scan the QR code?",
+        alertButtons,
+        { cancelable: true }
+      );
+    },
+    [eventsList, selectedEvent?.id, navigation]
+  );
 
   const printToFile = useCallback(async () => {
     try {

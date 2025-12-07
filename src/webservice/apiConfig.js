@@ -50,6 +50,16 @@ const getResourceById = async (resourceId, data) => {
   return await Get(`events/resources/${resourceId}`, data);
 };
 
+// check-in apis
+const checkIn = async (eventId, subEventId, data) => {
+  return await Post(
+    `events/${eventId}/operations/sub-events/${subEventId}/check-in`,
+    data,
+    "POST",
+    true
+  );
+};
+
 export {
   login,
   guests,
@@ -62,4 +72,5 @@ export {
   getSubEventById,
   getResources,
   getResourceById,
+  checkIn,
 };

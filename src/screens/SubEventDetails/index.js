@@ -19,7 +19,6 @@ const SubEventDetails = ({ route }) => {
     (state) => state.api
   );
 
-  // Get eventId from route params or Redux state
   const eventID = eventId || selectedEvent?.id;
 
   useEffect(() => {
@@ -27,7 +26,7 @@ const SubEventDetails = ({ route }) => {
       dispatch(fetchSubEventById(eventID, subEventID));
     }
   }, [subEventID, eventID, dispatch]);
-
+  // console.log(selectedSubEvent);
   const subEvent = selectedSubEvent?.subEvent || {};
   const statistics = selectedSubEvent?.statistics || {};
   const participants = selectedSubEvent?.participants || {};
