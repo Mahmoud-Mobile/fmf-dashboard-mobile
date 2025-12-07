@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   View,
-  Animated,
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
@@ -34,7 +33,6 @@ const ZebraQR = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [scannedData, setScannedData] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [scrollY] = useState(new Animated.Value(0));
   const debounceRef = useRef(null);
   const immediateSubmitRef = useRef(null);
   const lastFocusAtRef = useRef(0);
@@ -102,17 +100,26 @@ const ZebraQR = () => {
     }
   }, [manualMode]);
 
-  const handleShowSeats = useCallback(() => {
-    navigationService.navigation?.navigate("ShowSeats", {
-      title: "Show Seats",
-    });
-  }, [scannedData]);
+  const handleShowSeats = useCallback(
+    (userInfoData) => {
+      const data = userInfoData || userInfo;
+      navigationService.navigation?.navigate("ShowSeats", {
+        participantId: data?.participant?.id,
+      });
+    },
+    [userInfo]
+  );
 
-  const handleShowProfile = useCallback(() => {
-    navigationService.navigation?.navigate("AudienceProfile", {
-      userInfo: userInfo,
-    });
-  }, [userInfo]);
+  const handleShowProfile = useCallback(
+    (userInfoData) => {
+      const data = userInfoData || userInfo;
+      navigationService.navigation?.navigate("AudienceProfile", {
+        userInfo: data,
+        participantId: data?.participant?.id,
+      });
+    },
+    [userInfo]
+  );
 
   const handleSubmit = useCallback(
     async (forced) => {

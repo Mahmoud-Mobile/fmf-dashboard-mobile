@@ -80,14 +80,14 @@ const QRScanResultModal = forwardRef(
     const handleShowSeats = () => {
       bottomSheetRef.current?.close();
       if (onShowSeats) {
-        onShowSeats();
+        onShowSeats(userInfo);
       }
     };
 
     const handleShowProfile = () => {
       bottomSheetRef.current?.close();
       if (onShowProfile) {
-        onShowProfile();
+        onShowProfile(userInfo);
       }
     };
 
@@ -139,9 +139,9 @@ const QRScanResultModal = forwardRef(
             </View>
           ) : (
             <View style={styles.userInfoContainer}>
-              {userInfo?.image ? (
+              {userInfo?.participant?.image ? (
                 <Image
-                  source={{ uri: userInfo.image }}
+                  source={{ uri: userInfo.participant.image }}
                   style={styles.userImage}
                 />
               ) : (
@@ -150,11 +150,48 @@ const QRScanResultModal = forwardRef(
                 </View>
               )}
               <Text style={styles.userName}>
-                {userInfo?.name || "User Name"}
+                {userInfo?.participant?.name || "User Name"}
               </Text>
-              {userInfo?.email && (
-                <Text style={styles.userEmail}>{userInfo.email}</Text>
+
+              {userInfo?.participant?.participantType && (
+                <View style={styles.participantTypeBadge}>
+                  <Text style={styles.participantTypeText}>
+                    {userInfo.participant.participantType}
+                  </Text>
+                </View>
               )}
+
+              {userInfo?.message && (
+                <Text style={styles.messageText}>{userInfo.message}</Text>
+              )}
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <MaterialIcons
+                    name="check-circle"
+                    size={16}
+                    color={Colors.Success}
+                  />
+                  <Text style={styles.infoLabel}>Check-ins:</Text>
+                  <Text style={styles.infoValue}>
+                    {userInfo?.checkInCount ?? 0}
+                  </Text>
+                </View>
+                {userInfo?.isFirstEntry !== undefined && (
+                  <View style={styles.infoItem}>
+                    <MaterialIcons
+                      name={userInfo.isFirstEntry ? "new-releases" : "repeat"}
+                      size={16}
+                      color={
+                        userInfo.isFirstEntry ? Colors.Primary : Colors.gray
+                      }
+                    />
+                    <Text style={styles.infoLabel}>
+                      {userInfo.isFirstEntry ? "First Entry" : "Re-entry"}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
           )}
 

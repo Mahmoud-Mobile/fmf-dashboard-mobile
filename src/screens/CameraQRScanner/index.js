@@ -77,18 +77,26 @@ const CameraQRScanner = ({ onScanned }) => {
     isLockedRef.current = false;
     setErrorMessage(null);
   }, []);
+  const handleShowSeats = useCallback(
+    (userInfoData) => {
+      const data = userInfoData || userInfo;
+      navigationService.navigation?.navigate("ShowSeats", {
+        participantId: data?.participant?.id,
+      });
+    },
+    [userInfo]
+  );
 
-  const handleShowSeats = useCallback(() => {
-    navigationService.navigation?.navigate("ShowSeats", {
-      title: "Show Seats",
-    });
-  }, [scannedData]);
-
-  const handleShowProfile = useCallback(() => {
-    navigationService.navigation?.navigate("AudienceProfile", {
-      userInfo: userInfo,
-    });
-  }, [userInfo]);
+  const handleShowProfile = useCallback(
+    (userInfoData) => {
+      const data = userInfoData || userInfo;
+      navigationService.navigation?.navigate("AudienceProfile", {
+        userInfo: data,
+        participantId: data?.participant?.id,
+      });
+    },
+    [userInfo]
+  );
 
   const handleBarCodeScanned = useCallback(
     async ({ data }) => {
