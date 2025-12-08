@@ -10,7 +10,7 @@ import styles from "./Styles";
 const AudienceProfile = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const userInfo = route.params?.userInfo || {};
+  const userInfo = route.params || {};
 
   return (
     <View style={styles.container}>
@@ -36,7 +36,7 @@ const AudienceProfile = () => {
             </View>
           )}
           <Text style={styles.profileName}>
-            {userInfo?.name || "User Name"}
+            {userInfo?.userInfo?.participant?.name ?? " "}
           </Text>
         </View>
 
@@ -48,7 +48,7 @@ const AudienceProfile = () => {
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Email</Text>
               <Text style={styles.infoValue}>
-                {userInfo?.email || "Not provided"}
+                {userInfo?.email || "Mo@gmail.com"}
               </Text>
             </View>
           </View>
@@ -62,7 +62,7 @@ const AudienceProfile = () => {
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Mobile</Text>
               <Text style={styles.infoValue}>
-                {userInfo?.mobile || "Not provided"}
+                {userInfo?.mobile || "+966 591161089"}
               </Text>
             </View>
           </View>
@@ -80,7 +80,7 @@ const AudienceProfile = () => {
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Address</Text>
               <Text style={styles.infoValue}>
-                {userInfo?.address || "Not provided"}
+                {userInfo?.address || "Riyadh "}
               </Text>
             </View>
           </View>

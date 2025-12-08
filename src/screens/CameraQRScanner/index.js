@@ -80,23 +80,20 @@ const CameraQRScanner = ({ onScanned }) => {
   const handleShowSeats = useCallback(
     (userInfoData) => {
       const data = userInfoData || userInfo;
-      navigationService.navigation?.navigate("ShowSeats", {
+      navigation.navigate("ShowSeats", {
         participantId: data?.participant?.id,
       });
     },
     [userInfo]
   );
 
-  const handleShowProfile = useCallback(
-    (userInfoData) => {
-      const data = userInfoData || userInfo;
-      navigationService.navigation?.navigate("AudienceProfile", {
-        userInfo: data,
-        participantId: data?.participant?.id,
-      });
-    },
-    [userInfo]
-  );
+  const handleShowProfile = useCallback((userInfoData) => {
+    const data = userInfoData || userInfo;
+    navigation.navigate("AudienceProfile", {
+      userInfo: data,
+      participantId: data?.participant?.id,
+    });
+  }, []);
 
   const handleBarCodeScanned = useCallback(
     async ({ data }) => {

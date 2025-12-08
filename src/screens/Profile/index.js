@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../Global/colors";
-import { Fonts } from "../../Global/fonts";
 import { fetchProfile } from "../../redux/actions/api";
 import styles from "./Styles";
 
