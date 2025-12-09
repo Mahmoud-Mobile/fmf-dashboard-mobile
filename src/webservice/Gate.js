@@ -105,6 +105,11 @@ function handleErrors(error) {
       alert(data.message || "Redirected: " + errorMessage);
       break;
     case 404:
+      alert(
+        data.message || "Not Found: The requested resource could not be found."
+      );
+      break;
+    case 500:
       break;
     default:
       alert(`Error ${status}: ${errorMessage}`);

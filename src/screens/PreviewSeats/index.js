@@ -2,14 +2,14 @@ import React from "react";
 import { View, Image } from "react-native";
 
 import CustomHeader from "../../components/CustomHeader";
-import navigationService from "../../Global/navRef";
+import { useNavigation } from "@react-navigation/native";
 import { styles } from "./Styles";
 
 const SeatingPlanPreview = ({ route }) => {
-  // console.log(route.params);
+  const navigation = useNavigation();
 
   const handleBack = () => {
-    navigationService.navigation?.goBack();
+    navigation.goBack();
   };
 
   return (

@@ -4,19 +4,21 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { useIsFocused, useRoute } from "@react-navigation/native";
 import { Colors } from "../../Global/colors";
 import CustomHeader from "../../components/CustomHeader";
-import navigationService from "../../Global/navRef";
 import QRScanResultModal from "../../components/QRScanResultModal";
 import QRScanErrorModal from "../../components/QRScanErrorModal";
 import { styles } from "./Styles";
-import { checkIn } from "../../webservice/apiConfig";
+import { subEvent_Checkin, resource_Checkin } from "../../webservice/apiConfig";
+import { useNavigation } from "@react-navigation/native";
 
 const CameraQRScanner = ({ onScanned }) => {
   const route = useRoute();
+  const navigation = useNavigation();
   const eventId = route.params?.eventId;
   const subEventId = route.params?.subEventId;
+  const resourceId = route.params?.resourceId;
   const scanLocation = route.params?.scanLocation;
 
-  // console.log("route params", route.params);
+  console.log("route params", route.params);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -30,10 +32,10 @@ const CameraQRScanner = ({ onScanned }) => {
   const errorModalRef = useRef(null);
 
   const handleBack = () => {
-    navigationService.navigation?.goBack();
+    navigation.goBack();
   };
 
-  const handleScanned = useCallback(
+  const handleScanned_subEvent = useCallback(
     async (qrCode) => {
       console.log("QR Code scanned:", qrCode);
       setScannedData(qrCode);
@@ -45,7 +47,7 @@ const CameraQRScanner = ({ onScanned }) => {
           qrCode: qrCode,
           scanLocation: scanLocation || "",
         };
-        const response = await checkIn(eventId, subEventId, payload);
+        const response = await subEvent_Checkin(eventId, subEventId, payload);
         console.log("response", response);
         setUserInfo(response);
         successModalRef.current?.open();
@@ -64,6 +66,39 @@ const CameraQRScanner = ({ onScanned }) => {
       }
     },
     [eventId, subEventId, scanLocation]
+  );
+
+  const handleScanned_Resource = useCallback(
+    async (qrCode) => {
+      console.log("QR Code scanned:", qrCode);
+      setScannedData(qrCode);
+      setIsLoadingUserInfo(true);
+      setErrorMessage(null);
+
+      try {
+        const payload = {
+          qrCode: qrCode,
+          scanLocation: scanLocation || "",
+        };
+        const response = await resource_Checkin(eventId, resourceId, payload);
+        console.log("response", response);
+        setUserInfo(response);
+        successModalRef.current?.open();
+      } catch (error) {
+        console.log("Error object:", error);
+        const errorData = error?.response?.data || error?.data || {};
+        const errorMsg =
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to check in. Please try again.";
+        setErrorMessage(errorMsg);
+        errorModalRef.current?.open();
+      } finally {
+        setIsLoadingUserInfo(false);
+      }
+    },
+    [eventId, resourceId, scanLocation]
   );
 
   const handleScanAnother = useCallback(() => {
@@ -103,12 +138,16 @@ const CameraQRScanner = ({ onScanned }) => {
       setIsProcessing(true);
 
       try {
-        await handleScanned(String(data));
+        if (subEventId) {
+          await handleScanned_subEvent(String(data));
+        } else if (resourceId) {
+          await handleScanned_Resource(String(data));
+        }
       } finally {
         setIsProcessing(false);
       }
     },
-    [handleScanned]
+    [subEventId, resourceId, handleScanned_subEvent, handleScanned_Resource]
   );
 
   useEffect(() => {

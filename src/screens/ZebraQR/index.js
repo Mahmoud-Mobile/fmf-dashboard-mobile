@@ -8,20 +8,25 @@ import {
   ScrollView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useIsFocused, useRoute } from "@react-navigation/native";
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
 import CustomPressable from "../../components/CustomPressable";
-import navigationService from "../../Global/navRef";
 import QRScanResultModal from "../../components/QRScanResultModal";
 import QRScanErrorModal from "../../components/QRScanErrorModal";
 import { styles } from "./Styles";
 import { Colors } from "../../Global/colors";
-import { checkIn } from "../../webservice/apiConfig";
+import { subEvent_Checkin, resource_Checkin } from "../../webservice/apiConfig";
 
 const ZebraQR = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const eventId = route.params?.eventId;
   const subEventId = route.params?.subEventId;
+  const resourceId = route.params?.resourceId;
   const scanLocation = route.params?.scanLocation;
   const manualMode = route.params?.manualMode ?? false;
   const inputRef = useRef(null);
@@ -41,7 +46,7 @@ const ZebraQR = () => {
   const successModalRef = useRef(null);
   const errorModalRef = useRef(null);
 
-  const handleScanned = useCallback(
+  const handleScanned_subEvent = useCallback(
     async (qrCode) => {
       console.log("QR Code scanned:", qrCode);
       setScannedData(qrCode);
@@ -53,7 +58,7 @@ const ZebraQR = () => {
           qrCode: qrCode,
           scanLocation: scanLocation || "",
         };
-        const response = await checkIn(eventId, subEventId, payload);
+        const response = await subEvent_Checkin(eventId, subEventId, payload);
         console.log("response", response);
         setUserInfo(response);
         successModalRef.current?.open();
@@ -72,6 +77,39 @@ const ZebraQR = () => {
       }
     },
     [eventId, subEventId, scanLocation]
+  );
+
+  const handleScanned_Resource = useCallback(
+    async (qrCode) => {
+      console.log("QR Code scanned:", qrCode);
+      setScannedData(qrCode);
+      setIsLoadingUserInfo(true);
+      setErrorMessage(null);
+
+      try {
+        const payload = {
+          qrCode: qrCode,
+          scanLocation: scanLocation || "",
+        };
+        const response = await resource_Checkin(eventId, resourceId, payload);
+        console.log("response", response);
+        setUserInfo(response);
+        successModalRef.current?.open();
+      } catch (error) {
+        console.log("Error object:", error);
+        const errorData = error?.response?.data || error?.data || {};
+        const errorMsg =
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to check in. Please try again.";
+        setErrorMessage(errorMsg);
+        errorModalRef.current?.open();
+      } finally {
+        setIsLoadingUserInfo(false);
+      }
+    },
+    [eventId, resourceId, scanLocation]
   );
 
   const handleScanAnother = useCallback(() => {
@@ -103,7 +141,7 @@ const ZebraQR = () => {
   const handleShowSeats = useCallback(
     (userInfoData) => {
       const data = userInfoData || userInfo;
-      navigationService.navigation?.navigate("ShowSeats", {
+      navigation.navigate("ShowSeats", {
         participantId: data?.participant?.id,
       });
     },
@@ -127,7 +165,11 @@ const ZebraQR = () => {
       setIsProcessing(true);
 
       try {
-        await handleScanned(data);
+        if (subEventId) {
+          await handleScanned_subEvent(data);
+        } else if (resourceId) {
+          await handleScanned_Resource(data);
+        }
       } catch (e) {
         console.error("Error processing QR code:", e);
         isLockedRef.current = false;
@@ -143,8 +185,10 @@ const ZebraQR = () => {
       manualMode,
       isProcessing,
       isFocused,
-      handleScanned,
-      eventId,
+      subEventId,
+      resourceId,
+      handleScanned_subEvent,
+      handleScanned_Resource,
     ]
   );
 
@@ -207,7 +251,7 @@ const ZebraQR = () => {
   }, [isFocused, manualMode]);
 
   const handleBack = () => {
-    navigationService.navigation?.goBack();
+    navigation.goBack();
   };
 
   const handleManualInputChange = useCallback((text) => {

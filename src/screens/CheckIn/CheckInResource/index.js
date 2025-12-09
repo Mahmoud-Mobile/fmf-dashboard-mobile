@@ -130,7 +130,7 @@ const CheckInResource = ({
           onPress: () => {
             navigation.navigate("CameraQRScanner", {
               eventId: selectedEvent?.id,
-              subEventId: resource?.id,
+              resourceId: resource?.id,
               scanLocation: resource?.location,
             });
           },
@@ -143,7 +143,7 @@ const CheckInResource = ({
           onPress: () => {
             navigation.navigate("ZebraQR", {
               eventId: selectedEvent?.id,
-              subEventId: resource?.id,
+              resourceId: resource?.id,
               manualMode: false,
               scanLocation: resource?.location,
             });
@@ -157,7 +157,7 @@ const CheckInResource = ({
           onPress: () => {
             navigation.navigate("ZebraQR", {
               eventId: selectedEvent?.id,
-              subEventId: resource?.id,
+              resourceId: resource?.id,
               manualMode: true,
               scanLocation: resource?.location,
             });

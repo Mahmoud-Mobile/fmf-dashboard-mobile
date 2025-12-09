@@ -1,14 +1,15 @@
 import React from "react";
 import { View, Image } from "react-native";
 import CustomHeader from "../../components/CustomHeader";
-import navigationService from "../../Global/navRef";
 import { styles } from "./Styles";
+import { useNavigation } from "@react-navigation/native";
 
 const ShowSeats = ({ route }) => {
-  const participantId = route?.params;
+  const navigation = useNavigation();
+  const participantId = route?.params?.participantId;
   console.log("participantId", participantId);
   const handleBack = () => {
-    navigationService.navigation?.goBack();
+    navigation.goBack();
   };
 
   return (

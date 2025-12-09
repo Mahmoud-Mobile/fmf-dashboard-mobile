@@ -51,9 +51,18 @@ const getResourceById = async (resourceId, data) => {
 };
 
 // check-in apis
-const checkIn = async (eventId, subEventId, data) => {
+const subEvent_Checkin = async (eventId, subEventId, data) => {
   return await Post(
     `events/${eventId}/operations/sub-events/${subEventId}/check-in`,
+    data,
+    "POST",
+    true
+  );
+};
+
+const resource_Checkin = async (eventId, resourceId, data) => {
+  return await Post(
+    `events/${eventId}/operations/resources/${resourceId}/check-in`,
     data,
     "POST",
     true
@@ -72,5 +81,6 @@ export {
   getSubEventById,
   getResources,
   getResourceById,
-  checkIn,
+  subEvent_Checkin,
+  resource_Checkin,
 };
