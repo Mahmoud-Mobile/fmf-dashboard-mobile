@@ -69,6 +69,14 @@ const resource_Checkin = async (eventId, resourceId, data) => {
   );
 };
 
+// seating plans apis
+const getSeatingPlans = async (eventId, subeventId, data) => {
+  return await Get(
+    `events/${eventId}/subevent/${subeventId}/seating/plans`,
+    data
+  );
+};
+
 export {
   login,
   guests,
@@ -83,4 +91,5 @@ export {
   getResourceById,
   subEvent_Checkin,
   resource_Checkin,
+  getSeatingPlans,
 };

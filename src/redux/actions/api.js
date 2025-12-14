@@ -8,6 +8,7 @@ import {
   getSubEventById,
   getResources,
   getResourceById,
+  getSeatingPlans,
 } from "../../webservice/apiConfig";
 
 import {
@@ -22,6 +23,7 @@ import {
   setSelectedSubEvent,
   setResources,
   setSelectedResource,
+  setSeatingPlans,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -147,6 +149,21 @@ export const fetchResourceById =
     } catch (error) {
       dispatch(setError("Error fetching resource details"));
       console.log("Error fetching resource details: ", error);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Fetch seating plans for a sub-event
+export const fetchSeatingPlans =
+  (eventId, subeventId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      const response = await getSeatingPlans(eventId, subeventId, params);
+      dispatch(setSeatingPlans(response));
+    } catch (error) {
+      dispatch(setError("Error fetching seating plans"));
     } finally {
       dispatch(setLoading(false));
     }

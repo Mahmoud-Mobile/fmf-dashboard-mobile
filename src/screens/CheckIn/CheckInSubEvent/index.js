@@ -251,6 +251,7 @@ const CheckInSubEvent = ({
           onPreview={() => {
             navigation.navigate("PreviewSeats", {
               subEventID: item?.id,
+              eventId: selectedEvent?.id,
             });
           }}
           onCheckIn={(event) => handleCheckIn(event)}

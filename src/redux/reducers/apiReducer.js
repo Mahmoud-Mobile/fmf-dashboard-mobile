@@ -14,6 +14,7 @@ const apiSlice = createSlice({
     selectedSubEvent: {},
     resources: [],
     selectedResource: {},
+    seatingPlans: null,
     loading: false,
     error: null,
   },
@@ -73,6 +74,11 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setSeatingPlans: (state, action) => {
+      state.seatingPlans = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
     setLoading: (state, action) => {
       state.loading = action.payload !== undefined ? action.payload : true;
     },
@@ -96,6 +102,7 @@ export const {
   setSelectedSubEvent,
   setResources,
   setSelectedResource,
+  setSeatingPlans,
   setLoading,
   setError,
 } = apiSlice.actions;
