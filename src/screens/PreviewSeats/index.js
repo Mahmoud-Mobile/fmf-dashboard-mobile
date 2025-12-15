@@ -124,7 +124,7 @@ const SeatingPlanPreview = ({ route }) => {
     }
 
     if (!hasSeatingPlan) {
-      return <ErrorState message="No seating plan found" />;
+      return <ErrorState message=" " />;
     }
 
     return (

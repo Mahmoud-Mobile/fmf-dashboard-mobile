@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    // width: "90%",
+    width: "90%",
   },
   detailText: {
     fontSize: 12,
@@ -44,11 +44,11 @@ const styles = StyleSheet.create({
   },
   previewButton: {
     paddingVertical: 8,
-    paddingHorizontal: 20,
+    paddingHorizontal: 14,
     borderRadius: 10,
     backgroundColor: "#EEF0F4",
     alignItems: "center",
-    marginRight: 16,
+    marginRight: 8,
   },
   previewButtonText: {
     color: Colors.PrimaryText,
@@ -57,14 +57,27 @@ const styles = StyleSheet.create({
   },
   checkInButton: {
     paddingVertical: 8,
-    paddingHorizontal: 20,
+    paddingHorizontal: 14,
     borderRadius: 10,
     backgroundColor: Colors.Primary,
     alignItems: "center",
+    marginRight: 8,
   },
   checkInButtonText: {
     color: Colors.White,
-    fontSize: 14,
+    fontSize: 12,
+    fontFamily: Fonts.FONT_MEDIUM,
+  },
+  checkOutButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    backgroundColor: "#FF6B6B",
+    alignItems: "center",
+  },
+  checkOutButtonText: {
+    color: Colors.White,
+    fontSize: 12,
     fontFamily: Fonts.FONT_MEDIUM,
   },
 });

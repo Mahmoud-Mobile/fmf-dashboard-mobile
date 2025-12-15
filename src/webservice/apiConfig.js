@@ -69,6 +69,23 @@ const resource_Checkin = async (eventId, resourceId, data) => {
   );
 };
 
+const subEvent_Checkout = async (eventId, subEventId, data) => {
+  return await Post(
+    `events/${eventId}/operations/sub-events/${subEventId}/check-out`,
+    data,
+    "POST",
+    true
+  );
+};
+
+const resource_Checkout = async (eventId, resourceId, data) => {
+  return await Post(
+    `events/${eventId}/operations/resources/${resourceId}/check-out`,
+    data,
+    "POST",
+    true
+  );
+};
 // manual register api
 const subEvent_ManualRegister = async (eventId, subEventId, data) => {
   return await Post(
@@ -101,6 +118,8 @@ export {
   getResourceById,
   subEvent_Checkin,
   resource_Checkin,
+  subEvent_Checkout,
+  resource_Checkout,
   subEvent_ManualRegister,
   getSeatingPlans,
 };

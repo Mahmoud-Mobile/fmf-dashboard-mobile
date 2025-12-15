@@ -6,7 +6,14 @@ import { ImagesWithProps } from "../../../../config/images";
 import { formatDateRange } from "../../../../config/dateUtils";
 import styles from "./Styles";
 
-const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
+const CustomCheckInCard = ({
+  item,
+  onPress,
+  onPreview,
+  onCheckIn,
+  onCheckOut,
+  width,
+}) => {
   const handlePreviewPress = (e) => {
     e.stopPropagation();
     onPreview?.(item?.id || item);
@@ -15,6 +22,11 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
   const handleCheckInPress = (e) => {
     e.stopPropagation();
     onCheckIn?.(item?.id || item);
+  };
+
+  const handleCheckOutPress = (e) => {
+    e.stopPropagation();
+    onCheckOut?.(item?.id || item);
   };
 
   return (
@@ -62,15 +74,20 @@ const CustomCheckInCard = ({ item, onPress, onPreview, onCheckIn, width }) => {
             <Text style={styles.detailText}>{item?.capacity}</Text>
           </View>
         </View>
-        <View style={[styles.flexRow, { marginTop: 20 }]}>
-          <Pressable style={styles.previewButton} onPress={handlePreviewPress}>
-            <Text style={styles.previewButtonText}>Preview</Text>
-          </Pressable>
+      </View>
 
-          <Pressable style={styles.checkInButton} onPress={handleCheckInPress}>
-            <Text style={styles.checkInButtonText}>Check-In</Text>
-          </Pressable>
-        </View>
+      <View style={[styles.flexRow, { marginTop: 15 }]}>
+        <Pressable style={styles.previewButton} onPress={handlePreviewPress}>
+          <Text style={styles.previewButtonText}>Preview</Text>
+        </Pressable>
+
+        <Pressable style={styles.checkInButton} onPress={handleCheckInPress}>
+          <Text style={styles.checkInButtonText}>Check-In</Text>
+        </Pressable>
+
+        <Pressable style={styles.checkOutButton} onPress={handleCheckOutPress}>
+          <Text style={styles.checkOutButtonText}>Check-Out</Text>
+        </Pressable>
       </View>
     </TouchableOpacity>
   );

@@ -4,10 +4,17 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { useIsFocused, useRoute } from "@react-navigation/native";
 import { Colors } from "../../Global/colors";
 import CustomHeader from "../../components/CustomHeader";
-import QRScanResultModal from "../../components/QRScanResultModal";
-import QRScanErrorModal from "../../components/QRScanErrorModal";
+import QRScanResultModalSubEvent from "../../components/QRScanResultModalSubEvent";
+import QRScanResultModalResource from "../../components/QRScanResultModalResource";
+import QRScanErrorModalSubEvent from "../../components/QRScanErrorModalSubEvent";
+import QRScanErrorModalResource from "../../components/QRScanErrorModalResource";
 import { styles } from "./Styles";
-import { subEvent_Checkin, resource_Checkin } from "../../webservice/apiConfig";
+import {
+  subEvent_Checkin,
+  resource_Checkin,
+  subEvent_Checkout,
+  resource_Checkout,
+} from "../../webservice/apiConfig";
 import { useNavigation } from "@react-navigation/native";
 
 const CameraQRScanner = ({ onScanned }) => {
@@ -17,6 +24,7 @@ const CameraQRScanner = ({ onScanned }) => {
   const subEventId = route.params?.subEventId;
   const resourceId = route.params?.resourceId;
   const scanLocation = route.params?.scanLocation;
+  const mode = route.params?.mode || "checkin"; // "checkin" or "checkout"
 
   console.log("route params", route.params);
 
@@ -47,7 +55,10 @@ const CameraQRScanner = ({ onScanned }) => {
           qrCode: qrCode,
           scanLocation: scanLocation || "",
         };
-        const response = await subEvent_Checkin(eventId, subEventId, payload);
+        const response =
+          mode === "checkout"
+            ? await subEvent_Checkout(eventId, subEventId, payload)
+            : await subEvent_Checkin(eventId, subEventId, payload);
         console.log("response", response);
         setUserInfo(response);
         successModalRef.current?.open();
@@ -58,14 +69,16 @@ const CameraQRScanner = ({ onScanned }) => {
           errorData?.message ||
           error?.message ||
           errorData?.error ||
-          "Failed to check in. Please try again.";
+          `Failed to ${
+            mode === "checkout" ? "check out" : "check in"
+          }. Please try again.`;
         setErrorMessage(errorMsg);
         errorModalRef.current?.open();
       } finally {
         setIsLoadingUserInfo(false);
       }
     },
-    [eventId, subEventId, scanLocation]
+    [eventId, subEventId, scanLocation, mode]
   );
 
   const handleScanned_Resource = useCallback(
@@ -80,7 +93,10 @@ const CameraQRScanner = ({ onScanned }) => {
           qrCode: qrCode,
           scanLocation: scanLocation || "",
         };
-        const response = await resource_Checkin(eventId, resourceId, payload);
+        const response =
+          mode === "checkout"
+            ? await resource_Checkout(eventId, resourceId, payload)
+            : await resource_Checkin(eventId, resourceId, payload);
         console.log("response", response);
         setUserInfo(response);
         successModalRef.current?.open();
@@ -91,14 +107,16 @@ const CameraQRScanner = ({ onScanned }) => {
           errorData?.message ||
           error?.message ||
           errorData?.error ||
-          "Failed to check in. Please try again.";
+          `Failed to ${
+            mode === "checkout" ? "check out" : "check in"
+          }. Please try again.`;
         setErrorMessage(errorMsg);
         errorModalRef.current?.open();
       } finally {
         setIsLoadingUserInfo(false);
       }
     },
-    [eventId, resourceId, scanLocation]
+    [eventId, resourceId, scanLocation, mode]
   );
 
   const handleScanAnother = useCallback(() => {
@@ -196,7 +214,12 @@ const CameraQRScanner = ({ onScanned }) => {
 
   return (
     <View style={styles.container}>
-      <CustomHeader leftLabel="Camera Scanner" onLeftButtonPress={handleBack} />
+      <CustomHeader
+        leftLabel={
+          mode === "checkout" ? "Camera Scanner - Check Out" : "Camera Scanner"
+        }
+        onLeftButtonPress={handleBack}
+      />
 
       <View style={styles.container}>
         {isFocused ? (
@@ -220,22 +243,47 @@ const CameraQRScanner = ({ onScanned }) => {
         </View>
       </View>
 
-      <QRScanResultModal
-        ref={successModalRef}
-        onScanAnother={handleScanAnother}
-        onShowSeats={handleShowSeats}
-        onShowProfile={handleShowProfile}
-        userInfo={userInfo}
-        isLoading={isLoadingUserInfo}
-      />
-
-      <QRScanErrorModal
-        ref={errorModalRef}
-        onTryAgain={handleTryAgain}
-        errorMessage={errorMessage}
-        onManualRegister={handleManualRegister}
-        showManualRegister={!!subEventId && !!scannedData && !!errorMessage}
-      />
+      {subEventId ? (
+        <>
+          <QRScanResultModalSubEvent
+            ref={successModalRef}
+            onScanAnother={handleScanAnother}
+            onShowSeats={handleShowSeats}
+            onShowProfile={handleShowProfile}
+            userInfo={userInfo}
+            isLoading={isLoadingUserInfo}
+          />
+          <QRScanErrorModalSubEvent
+            ref={errorModalRef}
+            onTryAgain={handleTryAgain}
+            errorMessage={errorMessage}
+            onManualRegister={handleManualRegister}
+            showManualRegister={
+              !!subEventId &&
+              !!scannedData &&
+              !!errorMessage &&
+              mode !== "checkout"
+            }
+          />
+        </>
+      ) : resourceId ? (
+        <>
+          <QRScanResultModalResource
+            ref={successModalRef}
+            onScanAnother={handleScanAnother}
+            onShowSeats={handleShowSeats}
+            onShowProfile={handleShowProfile}
+            userInfo={userInfo}
+            isLoading={isLoadingUserInfo}
+          />
+          <QRScanErrorModalResource
+            ref={errorModalRef}
+            onTryAgain={handleTryAgain}
+            errorMessage={errorMessage}
+            showManualRegister={false}
+          />
+        </>
+      ) : null}
     </View>
   );
 };

@@ -132,6 +132,7 @@ const CheckInResource = ({
               eventId: selectedEvent?.id,
               resourceId: resource?.id,
               scanLocation: resource?.location,
+              mode: "checkin",
             });
           },
         },
@@ -146,6 +147,7 @@ const CheckInResource = ({
               resourceId: resource?.id,
               manualMode: false,
               scanLocation: resource?.location,
+              mode: "checkin",
             });
           },
         });
@@ -160,6 +162,72 @@ const CheckInResource = ({
               resourceId: resource?.id,
               manualMode: true,
               scanLocation: resource?.location,
+              mode: "checkin",
+            });
+          },
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        }
+      );
+
+      Alert.alert(
+        "Choose Scanner Type",
+        "How would you like to scan the QR code?",
+        alertButtons,
+        { cancelable: true }
+      );
+    },
+    [eventsList, selectedEvent?.id, navigation]
+  );
+
+  const handleCheckOut = useCallback(
+    (eventOrId) => {
+      const resource =
+        typeof eventOrId === "string"
+          ? eventsList.find((item) => item.id === eventOrId)
+          : eventOrId;
+
+      const alertButtons = [
+        {
+          text: "Camera Scanner",
+          onPress: () => {
+            navigation.navigate("CameraQRScanner", {
+              eventId: selectedEvent?.id,
+              resourceId: resource?.id,
+              scanLocation: resource?.location,
+              mode: "checkout",
+            });
+          },
+        },
+      ];
+
+      if (Platform.OS !== "ios") {
+        alertButtons.push({
+          text: "Zebra Scanner",
+          onPress: () => {
+            navigation.navigate("ZebraQR", {
+              eventId: selectedEvent?.id,
+              resourceId: resource?.id,
+              manualMode: false,
+              scanLocation: resource?.location,
+              mode: "checkout",
+            });
+          },
+        });
+      }
+
+      alertButtons.push(
+        {
+          text: "Check guest code manually",
+          onPress: () => {
+            navigation.navigate("ZebraQR", {
+              eventId: selectedEvent?.id,
+              resourceId: resource?.id,
+              manualMode: true,
+              scanLocation: resource?.location,
+              mode: "checkout",
             });
           },
         },
@@ -251,6 +319,7 @@ const CheckInResource = ({
             });
           }}
           onCheckIn={(event) => handleCheckIn(event)}
+          onCheckOut={(event) => handleCheckOut(event)}
           width={cardWidth}
           onPress={(event) =>
             navigation.navigate("ResourceDetails", {
@@ -262,7 +331,7 @@ const CheckInResource = ({
         />
       );
     },
-    [cardWidth, navigation, handleCheckIn]
+    [cardWidth, navigation, handleCheckIn, handleCheckOut]
   );
 
   const listKeyExtractor = useCallback((item) => {

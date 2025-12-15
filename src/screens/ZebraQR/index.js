@@ -15,11 +15,18 @@ import {
 } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
 import CustomPressable from "../../components/CustomPressable";
-import QRScanResultModal from "../../components/QRScanResultModal";
-import QRScanErrorModal from "../../components/QRScanErrorModal";
+import QRScanResultModalSubEvent from "../../components/QRScanResultModalSubEvent";
+import QRScanResultModalResource from "../../components/QRScanResultModalResource";
+import QRScanErrorModalSubEvent from "../../components/QRScanErrorModalSubEvent";
+import QRScanErrorModalResource from "../../components/QRScanErrorModalResource";
 import { styles } from "./Styles";
 import { Colors } from "../../Global/colors";
-import { subEvent_Checkin, resource_Checkin } from "../../webservice/apiConfig";
+import {
+  subEvent_Checkin,
+  resource_Checkin,
+  subEvent_Checkout,
+  resource_Checkout,
+} from "../../webservice/apiConfig";
 
 const ZebraQR = () => {
   const route = useRoute();
@@ -29,6 +36,7 @@ const ZebraQR = () => {
   const resourceId = route.params?.resourceId;
   const scanLocation = route.params?.scanLocation;
   const manualMode = route.params?.manualMode ?? false;
+  const mode = route.params?.mode || "checkin"; // "checkin" or "checkout"
   const inputRef = useRef(null);
   const manualInputRef = useRef(null);
   const [buffer, setBuffer] = useState("");
@@ -58,7 +66,10 @@ const ZebraQR = () => {
           qrCode: qrCode,
           scanLocation: scanLocation || "",
         };
-        const response = await subEvent_Checkin(eventId, subEventId, payload);
+        const response =
+          mode === "checkout"
+            ? await subEvent_Checkout(eventId, subEventId, payload)
+            : await subEvent_Checkin(eventId, subEventId, payload);
         console.log("response", response);
         setUserInfo(response);
         successModalRef.current?.open();
@@ -69,14 +80,16 @@ const ZebraQR = () => {
           errorData?.message ||
           error?.message ||
           errorData?.error ||
-          "Failed to check in. Please try again.";
+          `Failed to ${
+            mode === "checkout" ? "check out" : "check in"
+          }. Please try again.`;
         setErrorMessage(errorMsg);
         errorModalRef.current?.open();
       } finally {
         setIsLoadingUserInfo(false);
       }
     },
-    [eventId, subEventId, scanLocation]
+    [eventId, subEventId, scanLocation, mode]
   );
 
   const handleScanned_Resource = useCallback(
@@ -91,7 +104,10 @@ const ZebraQR = () => {
           qrCode: qrCode,
           scanLocation: scanLocation || "",
         };
-        const response = await resource_Checkin(eventId, resourceId, payload);
+        const response =
+          mode === "checkout"
+            ? await resource_Checkout(eventId, resourceId, payload)
+            : await resource_Checkin(eventId, resourceId, payload);
         console.log("response", response);
         setUserInfo(response);
         successModalRef.current?.open();
@@ -102,14 +118,16 @@ const ZebraQR = () => {
           errorData?.message ||
           error?.message ||
           errorData?.error ||
-          "Failed to check in. Please try again.";
+          `Failed to ${
+            mode === "checkout" ? "check out" : "check in"
+          }. Please try again.`;
         setErrorMessage(errorMsg);
         errorModalRef.current?.open();
       } finally {
         setIsLoadingUserInfo(false);
       }
     },
-    [eventId, resourceId, scanLocation]
+    [eventId, resourceId, scanLocation, mode]
   );
 
   const handleScanAnother = useCallback(() => {
@@ -276,7 +294,15 @@ const ZebraQR = () => {
   return (
     <View style={styles.container}>
       <CustomHeader
-        leftLabel={manualMode ? "Manual Entry" : "Zebra Scanner"}
+        leftLabel={
+          manualMode
+            ? mode === "checkout"
+              ? "Manual Entry - Check Out"
+              : "Manual Entry"
+            : mode === "checkout"
+            ? "Zebra Scanner - Check Out"
+            : "Zebra Scanner"
+        }
         onLeftButtonPress={handleBack}
       />
 
@@ -298,12 +324,22 @@ const ZebraQR = () => {
                 color={Colors.Primary}
               />
               <Text style={styles.infoTitle}>
-                {manualMode ? "Manual Entry" : "Zebra Scanner Ready"}
+                {manualMode
+                  ? mode === "checkout"
+                    ? "Manual Entry - Check Out"
+                    : "Manual Entry"
+                  : mode === "checkout"
+                  ? "Zebra Scanner Ready - Check Out"
+                  : "Zebra Scanner Ready"}
               </Text>
               <Text style={styles.infoText}>
                 {manualMode
-                  ? "Enter the guest QR code manually in the field below."
-                  : "Use your Zebra scanner to scan QR codes. The scanner will automatically detect and process the codes."}
+                  ? `Enter the guest QR code manually in the field below to ${
+                      mode === "checkout" ? "check out" : "check in"
+                    }.`
+                  : `Use your Zebra scanner to scan QR codes for ${
+                      mode === "checkout" ? "check out" : "check in"
+                    }. The scanner will automatically detect and process the codes.`}
               </Text>
               {isProcessing && (
                 <View style={styles.processingContainer}>
@@ -326,7 +362,11 @@ const ZebraQR = () => {
                   editable={!isProcessing}
                   autoCorrect={false}
                   autoCapitalize="none"
-                  placeholder="Enter QR code here"
+                  placeholder={
+                    mode === "checkout"
+                      ? "Enter QR code to check out"
+                      : "Enter QR code here"
+                  }
                   placeholderTextColor="#828282"
                   returnKeyType="done"
                 />
@@ -355,8 +395,14 @@ const ZebraQR = () => {
                 caretHidden
                 contextMenuHidden
                 placeholder={Platform.select({
-                  ios: "Scan here",
-                  android: "Scan here",
+                  ios:
+                    mode === "checkout"
+                      ? "Scan here to check out"
+                      : "Scan here",
+                  android:
+                    mode === "checkout"
+                      ? "Scan here to check out"
+                      : "Scan here",
                 })}
               />
             ) : null}
@@ -364,22 +410,47 @@ const ZebraQR = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <QRScanResultModal
-        ref={successModalRef}
-        onScanAnother={handleScanAnother}
-        onShowSeats={handleShowSeats}
-        onShowProfile={handleShowProfile}
-        userInfo={userInfo}
-        isLoading={isLoadingUserInfo}
-      />
-
-      <QRScanErrorModal
-        ref={errorModalRef}
-        onTryAgain={handleTryAgain}
-        errorMessage={errorMessage}
-        onManualRegister={handleManualRegister}
-        showManualRegister={!!subEventId && !!scannedData && !!errorMessage}
-      />
+      {subEventId ? (
+        <>
+          <QRScanResultModalSubEvent
+            ref={successModalRef}
+            onScanAnother={handleScanAnother}
+            onShowSeats={handleShowSeats}
+            onShowProfile={handleShowProfile}
+            userInfo={userInfo}
+            isLoading={isLoadingUserInfo}
+          />
+          <QRScanErrorModalSubEvent
+            ref={errorModalRef}
+            onTryAgain={handleTryAgain}
+            errorMessage={errorMessage}
+            onManualRegister={handleManualRegister}
+            showManualRegister={
+              !!subEventId &&
+              !!scannedData &&
+              !!errorMessage &&
+              mode !== "checkout"
+            }
+          />
+        </>
+      ) : resourceId ? (
+        <>
+          <QRScanResultModalResource
+            ref={successModalRef}
+            onScanAnother={handleScanAnother}
+            onShowSeats={handleShowSeats}
+            onShowProfile={handleShowProfile}
+            userInfo={userInfo}
+            isLoading={isLoadingUserInfo}
+          />
+          <QRScanErrorModalResource
+            ref={errorModalRef}
+            onTryAgain={handleTryAgain}
+            errorMessage={errorMessage}
+            showManualRegister={false}
+          />
+        </>
+      ) : null}
     </View>
   );
 };

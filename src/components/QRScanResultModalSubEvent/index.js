@@ -19,7 +19,7 @@ import { Colors } from "../../Global/colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "./Styles";
 
-const QRScanResultModal = forwardRef(
+const QRScanResultModalSubEvent = forwardRef(
   (
     { onScanAnother, onShowSeats, onShowProfile, userInfo, isLoading = false },
     ref
@@ -32,7 +32,10 @@ const QRScanResultModal = forwardRef(
           try {
             bottomSheetRef.current.snapToIndex(0);
           } catch (error) {
-            console.log("Error opening QR scan result modal:", error);
+            console.log(
+              "Error opening QR scan result modal (subevent):",
+              error
+            );
           }
         }
       },
@@ -41,7 +44,10 @@ const QRScanResultModal = forwardRef(
           try {
             bottomSheetRef.current.close();
           } catch (error) {
-            console.log("Error closing QR scan result modal:", error);
+            console.log(
+              "Error closing QR scan result modal (subevent):",
+              error
+            );
           }
         }
       },
@@ -254,6 +260,6 @@ const QRScanResultModal = forwardRef(
   }
 );
 
-QRScanResultModal.displayName = "QRScanResultModal";
+QRScanResultModalSubEvent.displayName = "QRScanResultModalSubEvent";
 
-export default QRScanResultModal;
+export default QRScanResultModalSubEvent;
