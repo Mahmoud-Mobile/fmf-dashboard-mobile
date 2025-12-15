@@ -138,6 +138,17 @@ const ZebraQR = () => {
     }
   }, [manualMode]);
 
+  const handleManualRegister = useCallback(() => {
+    if (subEventId && scannedData) {
+      navigation.navigate("PreviewSeats", {
+        eventId: eventId,
+        subEventID: subEventId,
+        qrCode: scannedData,
+        manualRegisterMode: true,
+      });
+    }
+  }, [navigation, eventId, subEventId, scannedData]);
+
   const handleShowSeats = useCallback(
     (userInfoData) => {
       const data = userInfoData || userInfo;
@@ -366,6 +377,8 @@ const ZebraQR = () => {
         ref={errorModalRef}
         onTryAgain={handleTryAgain}
         errorMessage={errorMessage}
+        onManualRegister={handleManualRegister}
+        showManualRegister={!!subEventId && !!scannedData && !!errorMessage}
       />
     </View>
   );

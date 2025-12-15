@@ -3,7 +3,13 @@ import { View, TouchableOpacity, Alert, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../../Global/colors";
 
-const SeatingElement = ({ element, seat, scale }) => {
+const SeatingElement = ({
+  element,
+  seat,
+  scale,
+  onSeatPress,
+  isManualRegisterMode = false,
+}) => {
   const { type, x, y, width, height, rotation = 0, id } = element;
 
   // Validate position and size data
@@ -36,36 +42,18 @@ const SeatingElement = ({ element, seat, scale }) => {
   };
 
   const handlePress = () => {
-    let seatId = "";
-    let title = "";
-
-    if (type === "table") {
-      title = "Table Information";
-      seatId = `Table ID: ${id}`;
-      if (element.properties?.label) {
-        seatId += `\nLabel: ${element.properties.label}`;
-      }
-    } else if (type === "chair") {
-      title = "Seat Information";
-      if (seat?.seatIdentifier) {
-        seatId = `Seat ID: ${seat.seatIdentifier}`;
-      } else if (seat?.id) {
-        seatId = `Seat ID: ${seat.id}`;
-      } else {
-        seatId = `Element ID: ${id}`;
-      }
-      if (seat?.status) {
-        seatId += `\nStatus: ${seat.status}`;
-      }
-    } else if (type === "stage") {
-      title = "Stage Information";
-      seatId = `Stage ID: ${id}`;
-      if (element.properties?.label) {
-        seatId += `\nLabel: ${element.properties.label}`;
-      }
+    // Only allow interaction in manual register mode
+    if (!isManualRegisterMode) {
+      return;
     }
 
-    Alert.alert(title, seatId, [{ text: "OK" }]);
+    // If onSeatPress is provided and it's a chair, use it for manual registration
+    if (onSeatPress && type === "chair") {
+      // Prioritize seat.id (UUID) for API, fallback to seatIdentifier or element id
+      const seatId = seat?.id || seat?.seatIdentifier || id;
+      onSeatPress(seatId, seat);
+      return;
+    }
   };
 
   // if (type === "table") {
@@ -89,6 +77,16 @@ const SeatingElement = ({ element, seat, scale }) => {
     const seatStatus = seat?.status || "AVAILABLE";
     const seatColor = getSeatColor(seatStatus);
 
+    // In preview mode, seats are not clickable
+    if (!isManualRegisterMode) {
+      return (
+        <View key={id} style={elementStyle}>
+          <MaterialIcons name="event-seat" size={iconSize} color={seatColor} />
+        </View>
+      );
+    }
+
+    // In manual register mode, seats are clickable
     return (
       <TouchableOpacity
         key={id}
@@ -104,20 +102,18 @@ const SeatingElement = ({ element, seat, scale }) => {
   if (type === "stage") {
     const stageLabel = element.properties?.label || "Stage";
     return (
-      <TouchableOpacity
+      <View
         key={id}
         style={[
           elementStyle,
           {
             backgroundColor: Colors.Primary,
             borderRadius: 4,
-            borderWidth: 2,
+            borderWidth: 1,
             borderColor: Colors.DarkGray,
             opacity: 0.9,
           },
         ]}
-        onPress={handlePress}
-        activeOpacity={0.7}
       >
         <Text
           style={{
@@ -130,7 +126,7 @@ const SeatingElement = ({ element, seat, scale }) => {
         >
           {stageLabel}
         </Text>
-      </TouchableOpacity>
+      </View>
     );
   }
 

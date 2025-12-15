@@ -96,6 +96,9 @@ const styles = StyleSheet.create({
   tryAgainButton: {
     backgroundColor: Colors.gray,
   },
+  manualRegisterButton: {
+    backgroundColor: Colors.Primary,
+  },
   buttonText: {
     fontSize: 14,
     fontFamily: Fonts.FONT_Semi,
@@ -104,4 +107,3 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
-

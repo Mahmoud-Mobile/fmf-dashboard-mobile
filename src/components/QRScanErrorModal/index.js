@@ -18,6 +18,8 @@ const QRScanErrorModal = forwardRef(
     {
       onTryAgain,
       errorMessage = "This QR code does not have access to this event.",
+      onManualRegister,
+      showManualRegister = false,
     },
     ref
   ) => {
@@ -79,6 +81,13 @@ const QRScanErrorModal = forwardRef(
       // onTryAgain will be called via handleSheetChanges when modal closes
     };
 
+    const handleManualRegister = () => {
+      bottomSheetRef.current?.close();
+      if (onManualRegister) {
+        onManualRegister();
+      }
+    };
+
     return (
       <BottomSheet
         ref={bottomSheetRef}
@@ -121,6 +130,22 @@ const QRScanErrorModal = forwardRef(
           </View>
 
           <View style={styles.buttonsContainer}>
+            {showManualRegister && onManualRegister && (
+              <TouchableOpacity
+                style={[styles.button, styles.manualRegisterButton]}
+                onPress={handleManualRegister}
+                activeOpacity={0.7}
+              >
+                <MaterialIcons
+                  name="event-seat"
+                  size={18}
+                  color={Colors.White}
+                />
+                <Text style={styles.buttonText}>
+                  Manual Register to Sub-Event
+                </Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={[styles.button, styles.tryAgainButton]}
               onPress={handleTryAgain}

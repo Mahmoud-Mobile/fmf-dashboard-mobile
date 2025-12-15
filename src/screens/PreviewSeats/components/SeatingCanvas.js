@@ -12,6 +12,8 @@ const SeatingCanvas = ({
   canvasWidth,
   canvasHeight,
   scale,
+  onSeatPress,
+  isManualRegisterMode = false,
 }) => {
   const scaledWidth = canvasWidth * scale;
   const scaledHeight = canvasHeight * scale;
@@ -64,6 +66,8 @@ const SeatingCanvas = ({
                 element={element}
                 seat={seatsMap[element.id]}
                 scale={scale}
+                onSeatPress={onSeatPress}
+                isManualRegisterMode={isManualRegisterMode}
               />
             ))}
           </View>

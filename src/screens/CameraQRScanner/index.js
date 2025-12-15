@@ -112,6 +112,17 @@ const CameraQRScanner = ({ onScanned }) => {
     isLockedRef.current = false;
     setErrorMessage(null);
   }, []);
+
+  const handleManualRegister = useCallback(() => {
+    if (subEventId && scannedData) {
+      navigation.navigate("PreviewSeats", {
+        eventId: eventId,
+        subEventID: subEventId,
+        qrCode: scannedData,
+        manualRegisterMode: true,
+      });
+    }
+  }, [navigation, eventId, subEventId, scannedData]);
   const handleShowSeats = useCallback(
     (userInfoData) => {
       const data = userInfoData || userInfo;
@@ -222,6 +233,8 @@ const CameraQRScanner = ({ onScanned }) => {
         ref={errorModalRef}
         onTryAgain={handleTryAgain}
         errorMessage={errorMessage}
+        onManualRegister={handleManualRegister}
+        showManualRegister={!!subEventId && !!scannedData && !!errorMessage}
       />
     </View>
   );

@@ -69,6 +69,16 @@ const resource_Checkin = async (eventId, resourceId, data) => {
   );
 };
 
+// manual register api
+const subEvent_ManualRegister = async (eventId, subEventId, data) => {
+  return await Post(
+    `events/${eventId}/operations/sub-events/${subEventId}/manual-register`,
+    data,
+    "POST",
+    true
+  );
+};
+
 // seating plans apis
 const getSeatingPlans = async (eventId, subeventId, data) => {
   return await Get(
@@ -91,5 +101,6 @@ export {
   getResourceById,
   subEvent_Checkin,
   resource_Checkin,
+  subEvent_ManualRegister,
   getSeatingPlans,
 };
