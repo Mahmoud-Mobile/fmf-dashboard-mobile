@@ -20,7 +20,7 @@ export const calcHeight = (target) => {
 };
 
 export const commonCardStyle = {
-  borderRadius: 25,
+  borderRadius: 12,
   shadowColor: "rgba(141, 141, 141, 0.08)",
   borderColor: "#F9F9F9",
   backgroundColor: "#FFF",

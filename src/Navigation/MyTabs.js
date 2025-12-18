@@ -8,71 +8,17 @@ import Animated, {
 } from "react-native-reanimated";
 import { useIsFocused, useRoute } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import { Storage } from "expo-storage";
 import { setSelectedEvent } from "../redux/actions/api";
-import Dashboard from "../screens/Dashboard";
-import Flights from "../screens/Flights";
-import CheckIn from "../screens/CheckIn";
-import Trips from "../screens/Trips";
-import More from "../screens/More";
-import Hotels from "../screens/Hotels";
-import DesignatedCars from "../screens/DesignatedCars";
 import { ImagesWithProps } from "../config/images";
 import { Fonts } from "../Global/fonts";
 import { Colors } from "../Global/colors";
+import {
+  getTabsForEnvironment,
+  getDefaultTabVisibility,
+} from "../config/tabConfig";
 
 const Tab = createBottomTabNavigator();
-
-const TabArr = [
-  {
-    route: "Dashboard",
-    component: Dashboard,
-    icon: "Home_Tab",
-    headerShown: false,
-    titleText: "Dashboard",
-  },
-  {
-    route: "Flights",
-    component: Flights,
-    icon: "Flights_Icon",
-    headerShown: false,
-    titleText: "Flights",
-  },
-  {
-    route: "CheckIn",
-    component: CheckIn,
-    icon: "CheckIn_Icon",
-    headerShown: false,
-    titleText: "Check In",
-  },
-  {
-    route: "Trips",
-    component: Trips,
-    icon: "DesignatedCar_Icon",
-    headerShown: false,
-    titleText: "Trips",
-  },
-  {
-    route: "DesignatedCars",
-    component: DesignatedCars,
-    icon: "DesignatedCar_Icon",
-    headerShown: false,
-    titleText: "D. Cars",
-  },
-  {
-    route: "Hotels",
-    component: Hotels,
-    icon: "Hotels_Icon",
-    headerShown: false,
-    titleText: "Hotels",
-  },
-  {
-    route: "More",
-    component: More,
-    icon: "More_Tab",
-    headerShown: false,
-    titleText: "More",
-  },
-];
 
 const TabButton = ({ item, onPress, routeName }) => {
   const isFocused = useIsFocused();
@@ -127,8 +73,29 @@ const MyTabs = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const tabVisibility = useSelector((state) => state.ui?.tabVisibility) || {};
+  const [currentEnvironment, setCurrentEnvironment] = React.useState("fmf");
+  const [TabArr, setTabArr] = React.useState(() =>
+    getTabsForEnvironment("fmf")
+  );
 
-  // Get the selected event from route params and store it in Redux
+  React.useEffect(() => {
+    const loadEnvironment = async () => {
+      try {
+        const selectedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        const env = selectedCategory || "fmf";
+        setCurrentEnvironment(env);
+        setTabArr(getTabsForEnvironment(env));
+      } catch (error) {
+        console.error("Error loading environment:", error);
+        setCurrentEnvironment("fmf");
+        setTabArr(getTabsForEnvironment("fmf"));
+      }
+    };
+    loadEnvironment();
+  }, []);
+
   React.useEffect(() => {
     if (route.params?.selectedEvent) {
       dispatch(setSelectedEvent(route.params.selectedEvent));
@@ -136,54 +103,45 @@ const MyTabs = () => {
   }, [route.params?.selectedEvent, dispatch]);
 
   const resolvedTabVisibility = React.useMemo(() => {
-    // Default visible tabs on first app open (no persisted state yet)
-    const DEFAULT_TAB_VISIBILITY = {
-      Dashboard: true,
-      More: true,
-      Flights: true,
-      CheckIn: true,
-      Trips: true,
-      DesignatedCars: false,
-      Hotels: false,
-    };
+    const defaultVisibility = getDefaultTabVisibility(currentEnvironment);
+
     return TabArr.reduce((acc, tab) => {
       const stored = tabVisibility?.[tab.route];
       acc[tab.route] =
-        stored === undefined
-          ? DEFAULT_TAB_VISIBILITY[tab.route] ?? true
-          : stored;
+        stored === undefined ? defaultVisibility[tab.route] ?? true : stored;
       return acc;
     }, {});
-  }, [tabVisibility]);
+  }, [tabVisibility, TabArr, currentEnvironment]);
 
-  // Always force Dashboard and More to be visible
   const visibleRoutes = React.useMemo(() => {
-    const forcedVisible = {
-      ...resolvedTabVisibility,
-      Dashboard: true,
-      More: true,
-    };
+    const forcedVisible = { ...resolvedTabVisibility };
 
-    // Priority order to include when limiting to 5
-    const priorityOrder = [
-      "Dashboard",
-      "More",
-      "Flights",
-      "CheckIn",
-      "Trips",
-      "DesignatedCars",
-      "Hotels",
-    ];
+    TabArr.forEach((tab) => {
+      if (tab.alwaysVisible) {
+        forcedVisible[tab.route] = true;
+      }
+    });
+
+    const sortedTabs = [...TabArr]
+      .filter((tab) => forcedVisible[tab.route])
+      .sort((a, b) => (a.priority || 999) - (b.priority || 999));
 
     const selected = [];
-    for (const routeName of priorityOrder) {
-      if (forcedVisible[routeName]) {
-        selected.push(routeName);
+    for (const tab of sortedTabs) {
+      if (forcedVisible[tab.route]) {
+        selected.push(tab.route);
       }
       if (selected.length >= 5) break;
     }
     return new Set(selected);
-  }, [resolvedTabVisibility]);
+  }, [resolvedTabVisibility, TabArr]);
+
+  const visibleTabs = TabArr.filter((t) => visibleRoutes.has(t.route));
+
+  // Don't render navigator if there are no visible tabs
+  if (visibleTabs.length === 0) {
+    return null;
+  }
 
   return (
     <Tab.Navigator
@@ -193,7 +151,7 @@ const MyTabs = () => {
         headerBackLeft: true,
       }}
     >
-      {TabArr.filter((t) => visibleRoutes.has(t.route)).map((item) => (
+      {visibleTabs.map((item) => (
         <Tab.Screen
           key={item.route}
           name={item.route}

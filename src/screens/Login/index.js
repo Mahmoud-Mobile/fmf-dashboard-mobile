@@ -12,6 +12,7 @@ import styles from "./Styles";
 import { useNavigation } from "@react-navigation/native";
 import CustomInput from "../../components/CustomInput";
 import CustomPressable from "../../components/CustomPressable";
+import EnvironmentSelector from "./components/EnvironmentSelector";
 import { setEmail, setPassword } from "../../redux/actions/authActions";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/actions/authActions";
@@ -25,7 +26,9 @@ const Login = () => {
 
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [categoryError, setCategoryError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const validateInputs = () => {
     let isValid = true;
@@ -40,6 +43,12 @@ const Login = () => {
       isValid = false;
     } else {
       setPasswordError(false);
+    }
+    if (!selectedCategory) {
+      setCategoryError(true);
+      isValid = false;
+    } else {
+      setCategoryError(false);
     }
     return isValid;
   };
@@ -73,6 +82,10 @@ const Login = () => {
     dispatch(setPassword("password123"));
   }, []);
 
+  const handleCategoryChange = (categoryValue) => {
+    setSelectedCategory(categoryValue);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
@@ -100,6 +113,12 @@ const Login = () => {
 
           <View style={styles.formSection}>
             <Text style={styles.titleText}>Sign In</Text>
+
+            <EnvironmentSelector
+              onCategoryChange={handleCategoryChange}
+              error={categoryError}
+              onErrorChange={setCategoryError}
+            />
 
             <View style={styles.inputContainer}>
               <CustomInput

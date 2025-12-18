@@ -1,24 +1,38 @@
 import { Storage } from "expo-storage";
 const ENV = {
   prod: {
-    apiUrl: "https://fmf-api.lead-360.co/api/v1/",
+    fmf: {
+      apiUrl: "https://fmf-api.lead-360.co/api/v1/",
+    },
+    offerHome: {
+      apiUrl: "https://api.lead-360.co/api/v1/",
+    },
   },
   dev: {
-    apiUrl: "https://fmf-api.lead-360.co/api/v1/",
+    fmf: {
+      apiUrl: "https://fmf-api.lead-360.co/api/v1/",
+    },
+    offerHome: {
+      apiUrl: "https://api.lead-360.co/api/v1/",
+    },
   },
 };
 
 const getEnvVars = async (key = false) => {
   const actEnv = await Storage.getItem({ key: "active-env" });
+  const selectedCategory = await Storage.getItem({ key: "selected-category" });
+
+  // Default to "fmf" if no category is selected
+  const category = selectedCategory || "fmf";
 
   let envVar;
 
   if (actEnv === "development") {
-    envVar = ENV.dev;
+    envVar = ENV.dev[category] || ENV.dev.fmf;
   } else if (__DEV__) {
-    envVar = ENV.dev;
+    envVar = ENV.dev[category] || ENV.dev.fmf;
   } else {
-    envVar = ENV.prod;
+    envVar = ENV.prod[category] || ENV.prod.fmf;
   }
 
   if (key) {
