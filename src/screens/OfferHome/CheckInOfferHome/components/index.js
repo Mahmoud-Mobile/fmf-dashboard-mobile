@@ -1,8 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, Dimensions } from "react-native";
 import { styles } from "./Styles";
 import { Colors } from "../../../../Global/colors";
 import { Ionicons } from "@expo/vector-icons";
+
+const { width: screenWidth } = Dimensions.get("window");
+const isSmallScreen = screenWidth < 375;
+
 const CustomItem = ({
   item,
   vendorData,
@@ -35,59 +39,110 @@ const CustomItem = ({
 
   if (showVendorOnly) {
     return (
-      <View style={styles.vendorHeader}>
-        <View style={styles.vendorLeft}>
+      <View
+        style={[styles.vendorHeader, isSmallScreen && styles.vendorHeaderSmall]}
+      >
+        <View
+          style={[styles.vendorLeft, isSmallScreen && styles.vendorLeftSmall]}
+        >
           {renderAvatar()}
           <View style={styles.vendorInfo}>
-            <Text style={styles.vendorName} numberOfLines={1}>
+            <Text
+              style={[
+                styles.vendorName,
+                isSmallScreen && styles.vendorNameSmall,
+              ]}
+              numberOfLines={1}
+            >
               {vendorName}
             </Text>
             <View style={styles.boothContainer}>
               <Ionicons
                 name="location-outline"
-                size={14}
+                size={isSmallScreen ? 12 : 14}
                 color={Colors.SecondaryText}
               />
-              <Text style={styles.boothText} numberOfLines={1}>
+              <Text
+                style={[
+                  styles.boothText,
+                  isSmallScreen && styles.boothTextSmall,
+                ]}
+                numberOfLines={1}
+              >
                 {booth}
               </Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.vendorCenter}>
+        <View
+          style={[
+            styles.vendorCenter,
+            isSmallScreen && styles.vendorCenterSmall,
+          ]}
+        >
           <View style={styles.statItem}>
             <Ionicons
               name="eye-outline"
-              size={16}
+              size={isSmallScreen ? 14 : 16}
               color={Colors.SecondaryText}
             />
-            <Text style={styles.statText}>{visits} Visits</Text>
+            <Text
+              style={[styles.statText, isSmallScreen && styles.statTextSmall]}
+            >
+              {isSmallScreen ? visits : `${visits} Visits`}
+            </Text>
           </View>
           <View style={styles.statItem}>
             <Ionicons
               name="cart-outline"
-              size={16}
+              size={isSmallScreen ? 14 : 16}
               color={Colors.SecondaryText}
             />
-            <Text style={styles.statText}>{purchases} Purchases</Text>
+            <Text
+              style={[styles.statText, isSmallScreen && styles.statTextSmall]}
+            >
+              {isSmallScreen ? purchases : `${purchases} Purchases`}
+            </Text>
           </View>
         </View>
 
-        <View style={styles.vendorRight}>
+        <View
+          style={[styles.vendorRight, isSmallScreen && styles.vendorRightSmall]}
+        >
           <TouchableOpacity
-            style={styles.visitButton}
+            style={[
+              styles.visitButton,
+              isSmallScreen && styles.visitButtonSmall,
+            ]}
             onPress={onVisitPress}
             activeOpacity={0.7}
           >
-            <Text style={styles.visitButtonText}>Visit</Text>
+            <Text
+              style={[
+                styles.visitButtonText,
+                isSmallScreen && styles.visitButtonTextSmall,
+              ]}
+            >
+              Visit
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.purchaseButton}
+            style={[
+              styles.purchaseButton,
+              isSmallScreen && styles.purchaseButtonSmall,
+            ]}
             onPress={() => onPurchasePress && onPurchasePress()}
             activeOpacity={0.7}
           >
-            <Text style={styles.purchaseButtonText}>Purchase</Text>
+            <Text
+              style={[
+                styles.purchaseButtonText,
+                isSmallScreen && styles.purchaseButtonTextSmall,
+              ]}
+            >
+              Purchase
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -98,27 +153,72 @@ const CustomItem = ({
 
   return (
     <View style={styles.productCard}>
-      <View style={styles.productContent}>
-        <View style={styles.productLeft}>
-          <Text style={styles.productName} numberOfLines={2}>
+      <View
+        style={[
+          styles.productContent,
+          isSmallScreen && styles.productContentSmall,
+        ]}
+      >
+        <View
+          style={[styles.productLeft, isSmallScreen && styles.productLeftSmall]}
+        >
+          <Text
+            style={[
+              styles.productName,
+              isSmallScreen && styles.productNameSmall,
+            ]}
+            numberOfLines={2}
+          >
             {item.name}
           </Text>
-          <Text style={styles.productDiscount}>Discount: {item.discount}%</Text>
+          <Text
+            style={[
+              styles.productDiscount,
+              isSmallScreen && styles.productDiscountSmall,
+            ]}
+          >
+            Discount: {item.discount}%
+          </Text>
         </View>
 
-        <View style={styles.productMiddle}>
-          <Text style={styles.originalPrice} numberOfLines={1}>
+        <View
+          style={[
+            styles.productMiddle,
+            isSmallScreen && styles.productMiddleSmall,
+          ]}
+        >
+          <Text
+            style={[
+              styles.originalPrice,
+              isSmallScreen && styles.originalPriceSmall,
+            ]}
+            numberOfLines={1}
+          >
             Original Price: SAR{" "}
             <Text style={styles.strikethrough}>{item.originalPrice}</Text>
           </Text>
-          <Text style={styles.finalPrice} numberOfLines={1}>
+          <Text
+            style={[styles.finalPrice, isSmallScreen && styles.finalPriceSmall]}
+            numberOfLines={1}
+          >
             Final Price: SAR {item.finalPrice}
           </Text>
         </View>
 
-        <View style={styles.productRight}>
-          <Text style={styles.recordedPurchase} numberOfLines={1}>
-            Recorded Purchase {item.recordedPurchaseTime}
+        <View
+          style={[
+            styles.productRight,
+            isSmallScreen && styles.productRightSmall,
+          ]}
+        >
+          <Text
+            style={[
+              styles.recordedPurchase,
+              isSmallScreen && styles.recordedPurchaseSmall,
+            ]}
+            numberOfLines={1}
+          >
+            {item.recordedPurchaseTime}
           </Text>
         </View>
       </View>

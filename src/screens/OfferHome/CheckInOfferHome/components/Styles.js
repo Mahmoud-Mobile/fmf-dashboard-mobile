@@ -10,32 +10,57 @@ export const styles = StyleSheet.create({
   },
   vendorHeader: {
     flexDirection: "row",
-    flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  vendorHeaderSmall: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
   },
   vendorLeft: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    minWidth: "45%",
+    minWidth: 150,
+    flexShrink: 1,
+  },
+  vendorLeftSmall: {
+    flex: 1,
+    minWidth: "100%",
     marginBottom: 8,
   },
   vendorCenter: {
-    alignItems: "flex-start",
-    marginHorizontal: 8,
-    flexWrap: "wrap",
     flexDirection: "row",
-    gap: 12,
+    alignItems: "center",
+    gap: 16,
+    flexShrink: 0,
+  },
+  vendorCenterSmall: {
+    width: "100%",
     marginBottom: 8,
+    flexWrap: "wrap",
+  },
+  vendorStatsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    marginBottom: 8,
+    width: "100%",
   },
   vendorRight: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 8,
     alignItems: "center",
+    flexShrink: 0,
+  },
+  vendorRightSmall: {
     width: "100%",
-    marginTop: 4,
+    justifyContent: "flex-start",
+    marginTop: 0,
+    flexWrap: "wrap",
   },
   vendorAvatar: {
     width: 34,
@@ -65,15 +90,22 @@ export const styles = StyleSheet.create({
     color: Colors.PrimaryText,
     marginBottom: 4,
   },
+  vendorNameSmall: {
+    fontSize: 14,
+  },
   boothContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   boothText: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     marginLeft: 4,
+    flexShrink: 1,
+  },
+  boothTextSmall: {
+    fontSize: 10,
   },
   statItem: {
     flexDirection: "row",
@@ -81,92 +113,135 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statText: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     marginLeft: 4,
   },
+  statTextSmall: {
+    fontSize: 10,
+  },
   visitButton: {
-    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
     backgroundColor: Colors.LightGray,
-    borderWidth: 0,
-    flex: 1,
-    minWidth: "45%",
+    width: 100,
     alignItems: "center",
+    justifyContent: "center",
+  },
+  visitButtonSmall: {
+    paddingVertical: 6,
   },
   visitButtonText: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
   },
+  visitButtonTextSmall: {
+    fontSize: 10,
+  },
   purchaseButton: {
-    paddingHorizontal: 16,
+    width: 100,
     paddingVertical: 8,
     borderRadius: 8,
     backgroundColor: Colors.Primary,
-    flex: 1,
-    minWidth: "45%",
     alignItems: "center",
+    justifyContent: "center",
+  },
+  purchaseButtonSmall: {
+    paddingVertical: 6,
   },
   purchaseButtonText: {
     fontSize: 12,
     color: Colors.White,
     fontFamily: Fonts.FONT_REGULAR,
   },
+  purchaseButtonTextSmall: {
+    fontSize: 11,
+  },
   productContent: {
     flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
+  productContentSmall: {
+    flexDirection: "column",
+    gap: 8,
+  },
   productLeft: {
     flex: 1,
-    minWidth: "45%",
     marginRight: 8,
-    marginBottom: 8,
+    minWidth: 0,
+  },
+  productLeftSmall: {
+    flex: 0,
+    marginRight: 0,
+    width: "100%",
   },
   productName: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     marginBottom: 4,
   },
-  productDiscount: {
+  productNameSmall: {
     fontSize: 12,
+  },
+  productDiscount: {
+    fontSize: 10,
     color: Colors.SecondaryText,
     fontFamily: Fonts.FONT_REGULAR,
   },
+  productDiscountSmall: {
+    fontSize: 10,
+  },
   productMiddle: {
     flex: 1,
-    minWidth: "45%",
     marginRight: 8,
     alignItems: "flex-start",
-    marginBottom: 8,
+  },
+  productMiddleSmall: {
+    flex: 0,
+    marginRight: 0,
+    width: "100%",
   },
   originalPrice: {
-    fontSize: 12,
+    fontSize: 10,
     color: Colors.SecondaryText,
     marginBottom: 4,
+  },
+  originalPriceSmall: {
+    fontSize: 10,
   },
   strikethrough: {
     textDecorationLine: "line-through",
   },
   finalPrice: {
-    fontSize: 14,
+    fontSize: 10,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
   },
+  finalPriceSmall: {
+    fontSize: 10,
+  },
   productRight: {
+    // flex: 1,
+    // alignItems: "flex-end",
+  },
+  productRightSmall: {
     width: "100%",
-    marginTop: 4,
+    alignItems: "flex-start",
   },
   recordedPurchase: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     textAlign: "right",
     marginTop: 4,
+  },
+  recordedPurchaseSmall: {
+    fontSize: 10,
+    textAlign: "left",
+    marginTop: 0,
   },
 });
