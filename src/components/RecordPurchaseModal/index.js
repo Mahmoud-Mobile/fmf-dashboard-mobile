@@ -38,59 +38,157 @@ const RecordPurchaseModal = forwardRef(
     ref
   ) => {
     const bottomSheetRef = useRef(null);
-    const [productNameValue, setProductNameValue] = useState(productName);
-    const [quantity, setQuantity] = useState("2");
+    const [productNameValue, setProductNameValue] = useState("");
+    const [quantity, setQuantity] = useState("");
     const [originalPrice, setOriginalPrice] = useState(
-      initialOriginalPrice || "5000"
+      initialOriginalPrice || ""
     );
-    const [discount, setDiscount] = useState(initialDiscount || "20");
+    const [discount, setDiscount] = useState(initialDiscount || "");
     const [notes, setNotes] = useState("");
+    const [finalPrice, setFinalPrice] = useState("");
+    const lastEditedRef = useRef(null); // 'discount', 'finalPrice', or null
 
-    // Calculate final price from original price and discount
-    const calculateFinalPrice = () => {
+    const calculateFinalPriceFromDiscount = () => {
       const original = parseFloat(originalPrice) || 0;
       const discountPercent = parseFloat(discount) || 0;
       const discountAmount = (original * discountPercent) / 100;
       return original - discountAmount;
     };
 
-    const finalPrice = calculateFinalPrice();
-    const original = parseFloat(originalPrice) || 0;
-    const savedAmount = original - finalPrice;
+    const calculateDiscountFromFinalPrice = () => {
+      const original = parseFloat(originalPrice) || 0;
+      const final = parseFloat(finalPrice) || 0;
+      if (original > 0) {
+        return ((original - final) / original) * 100;
+      }
+      return 0;
+    };
 
-    // Calculate discount from original and final price if finalPrice is provided but discount is not
+    // Determine which value to use based on last edited field
+    const getFinalPrice = () => {
+      if (lastEditedRef.current === "finalPrice" && finalPrice !== "") {
+        return parseFloat(finalPrice) || 0;
+      }
+      return calculateFinalPriceFromDiscount();
+    };
+
+    const getDiscount = () => {
+      if (lastEditedRef.current === "finalPrice" && finalPrice !== "") {
+        const calculatedDiscount = calculateDiscountFromFinalPrice();
+        return calculatedDiscount.toFixed(2);
+      }
+      return discount;
+    };
+
+    const currentFinalPrice = getFinalPrice();
+    const currentDiscountValue = parseFloat(getDiscount()) || 0;
+    const original = parseFloat(originalPrice) || 0;
+    const qty = parseInt(quantity) || 1;
+    const savedAmount = (original - currentFinalPrice) * qty;
+
+    // Auto-update discount when final price is manually edited
     useEffect(() => {
-      if (initialOriginalPrice && initialFinalPrice && !initialDiscount) {
-        const original = parseFloat(initialOriginalPrice) || 0;
-        const final = parseFloat(initialFinalPrice) || 0;
-        if (original > 0) {
-          const calculatedDiscount = ((original - final) / original) * 100;
-          setDiscount(calculatedDiscount.toFixed(0));
+      if (
+        lastEditedRef.current === "finalPrice" &&
+        finalPrice !== "" &&
+        originalPrice !== "" &&
+        originalPrice !== " "
+      ) {
+        const original = parseFloat(originalPrice) || 0;
+        const final = parseFloat(finalPrice) || 0;
+        if (original > 0 && final >= 0 && final <= original) {
+          const calculatedDiscount = calculateDiscountFromFinalPrice();
+          const newDiscount = calculatedDiscount.toFixed(2);
+          const currentDiscountValue = parseFloat(discount) || 0;
+          // Only update if different to avoid infinite loop
+          if (Math.abs(currentDiscountValue - calculatedDiscount) > 0.01) {
+            setDiscount(newDiscount);
+          }
         }
       }
-    }, [initialOriginalPrice, initialFinalPrice, initialDiscount]);
+    }, [finalPrice]);
 
-    // Update state when props change
+    // Auto-update final price when discount is manually edited
     useEffect(() => {
-      setProductNameValue(productName || "");
-      if (initialOriginalPrice) {
-        setOriginalPrice(initialOriginalPrice);
+      if (
+        lastEditedRef.current === "discount" &&
+        discount !== "" &&
+        originalPrice !== "" &&
+        originalPrice !== " "
+      ) {
+        const calculatedFinal = calculateFinalPriceFromDiscount();
+        const newFinalPrice = calculatedFinal.toFixed(2);
+        const currentFinalValue = parseFloat(finalPrice) || 0;
+        // Only update if different to avoid infinite loop
+        if (
+          finalPrice === "" ||
+          Math.abs(currentFinalValue - calculatedFinal) > 0.01
+        ) {
+          setFinalPrice(newFinalPrice);
+        }
       }
-      if (initialDiscount) {
-        setDiscount(initialDiscount);
+    }, [discount]);
+
+    // Update when original price changes
+    useEffect(() => {
+      if (originalPrice !== "" && originalPrice !== " ") {
+        if (
+          lastEditedRef.current === "discount" ||
+          lastEditedRef.current === null
+        ) {
+          // Recalculate final price from discount
+          const calculatedFinal = calculateFinalPriceFromDiscount();
+          setFinalPrice(calculatedFinal.toFixed(2));
+        } else if (
+          lastEditedRef.current === "finalPrice" &&
+          finalPrice !== ""
+        ) {
+          // Recalculate discount from final price
+          const original = parseFloat(originalPrice) || 0;
+          const final = parseFloat(finalPrice) || 0;
+          if (original > 0) {
+            const calculatedDiscount = calculateDiscountFromFinalPrice();
+            setDiscount(calculatedDiscount.toFixed(2));
+          }
+        }
       }
-    }, [productName, initialOriginalPrice, initialDiscount]);
+    }, [originalPrice]);
 
     useImperativeHandle(ref, () => ({
       open: () => {
         if (bottomSheetRef.current) {
           try {
             bottomSheetRef.current.snapToIndex(0);
+
+            // Initialize all inputs as empty, or use provided initial values
             setProductNameValue(productName || "");
-            setQuantity("2");
-            setOriginalPrice(initialOriginalPrice || "5000");
-            setDiscount(initialDiscount || "20");
+            setQuantity("");
+            setOriginalPrice(initialOriginalPrice || "");
+            setDiscount(initialDiscount || "");
+            setFinalPrice(initialFinalPrice || "");
             setNotes("");
+            lastEditedRef.current = null;
+
+            // If initial values are provided, set up the calculations
+            if (initialOriginalPrice && initialFinalPrice) {
+              // If both original and final price are provided, calculate discount
+              const original = parseFloat(initialOriginalPrice) || 0;
+              const final = parseFloat(initialFinalPrice) || 0;
+              if (original > 0) {
+                const calculatedDiscount =
+                  ((original - final) / original) * 100;
+                setDiscount(calculatedDiscount.toFixed(2));
+                lastEditedRef.current = "finalPrice";
+              }
+            } else if (initialOriginalPrice && initialDiscount) {
+              // If original price and discount are provided, calculate final price
+              const original = parseFloat(initialOriginalPrice) || 0;
+              const discountPercent = parseFloat(initialDiscount) || 0;
+              const discountAmount = (original * discountPercent) / 100;
+              const calculatedPrice = (original - discountAmount).toFixed(2);
+              setFinalPrice(calculatedPrice);
+              lastEditedRef.current = "discount";
+            }
           } catch (error) {
             console.log("Error opening record purchase modal:", error);
           }
@@ -140,8 +238,8 @@ const RecordPurchaseModal = forwardRef(
         productName: productNameValue,
         quantity: parseInt(quantity) || 0,
         originalPrice: parseFloat(originalPrice) || 0,
-        discount: parseFloat(discount) || 0,
-        finalPrice: finalPrice,
+        discount: currentDiscountValue,
+        finalPrice: currentFinalPrice,
         notes: notes.trim(),
       };
 
@@ -200,7 +298,6 @@ const RecordPurchaseModal = forwardRef(
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              {/* Product Name / ID */}
               <View style={styles.inputContainer}>
                 <Text style={styles.labelText}>Product Name / ID</Text>
                 <BottomSheetTextInput
@@ -213,7 +310,6 @@ const RecordPurchaseModal = forwardRef(
                 />
               </View>
 
-              {/* Purchase Quantity */}
               <View style={styles.inputContainer}>
                 <Text style={styles.labelText}>purchase Quantity</Text>
                 <BottomSheetTextInput
@@ -227,7 +323,6 @@ const RecordPurchaseModal = forwardRef(
                 />
               </View>
 
-              {/* Original Price */}
               <View style={styles.inputContainer}>
                 <Text style={styles.labelText}>Original Price (SAR)</Text>
                 <BottomSheetTextInput
@@ -241,13 +336,15 @@ const RecordPurchaseModal = forwardRef(
                 />
               </View>
 
-              {/* Discount */}
               <View style={styles.inputContainer}>
                 <Text style={styles.labelText}>Discount (%)</Text>
                 <BottomSheetTextInput
                   style={styles.textInput}
                   value={discount}
-                  onChangeText={setDiscount}
+                  onChangeText={(text) => {
+                    setDiscount(text);
+                    lastEditedRef.current = "discount";
+                  }}
                   onFocus={handleTextInputFocus}
                   keyboardType="numeric"
                   placeholder="Enter discount percentage"
@@ -255,18 +352,28 @@ const RecordPurchaseModal = forwardRef(
                 />
               </View>
 
-              {/* Final Price */}
               <View style={styles.inputContainer}>
                 <Text style={styles.labelText}>Final Price (SAR)</Text>
                 <BottomSheetTextInput
-                  style={[styles.textInput, styles.readOnlyInput]}
-                  value={finalPrice.toFixed(2)}
-                  editable={false}
+                  style={styles.textInput}
+                  value={
+                    finalPrice !== ""
+                      ? finalPrice
+                      : originalPrice !== "" && discount !== ""
+                      ? currentFinalPrice.toFixed(2)
+                      : ""
+                  }
+                  onChangeText={(text) => {
+                    setFinalPrice(text);
+                    lastEditedRef.current = "finalPrice";
+                  }}
+                  onFocus={handleTextInputFocus}
+                  keyboardType="numeric"
+                  placeholder="Enter final price"
                   placeholderTextColor={Colors.SecondaryText}
                 />
               </View>
 
-              {/* Purchase Notes */}
               <View style={styles.inputContainer}>
                 <Text style={styles.labelText}>Purchase Notes (Optional)</Text>
                 <BottomSheetTextInput
@@ -287,18 +394,18 @@ const RecordPurchaseModal = forwardRef(
                 <View style={styles.summaryRow}>
                   <Text style={styles.summaryLabel}>Original Price:</Text>
                   <Text style={styles.summaryValue}>
-                    SAR {formatCurrency(parseFloat(originalPrice) || 0)}
+                    SAR {formatCurrency(original * qty)}
                   </Text>
                 </View>
                 <View style={styles.summaryRow}>
                   <Text style={styles.summaryLabel}>Final Price:</Text>
                   <Text style={styles.summaryValueBold}>
-                    SAR {formatCurrency(finalPrice)}
+                    SAR {formatCurrency(currentFinalPrice * qty)}
                   </Text>
                 </View>
                 <Text style={styles.savedText}>
-                  You saved SAR {formatCurrency(savedAmount)} ({discount || 0}%
-                  off)
+                  You saved SAR {formatCurrency(savedAmount)} (
+                  {currentDiscountValue.toFixed(2)}% off)
                 </Text>
               </View>
             </ScrollView>

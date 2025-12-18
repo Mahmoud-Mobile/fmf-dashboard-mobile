@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
   },
   vendorHeader: {
     flexDirection: "row",
+    flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -17,15 +18,24 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
+    minWidth: "45%",
+    marginBottom: 8,
   },
   vendorCenter: {
     alignItems: "flex-start",
-    marginHorizontal: 16,
+    marginHorizontal: 8,
+    flexWrap: "wrap",
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 8,
   },
   vendorRight: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     alignItems: "center",
+    width: "100%",
+    marginTop: 4,
   },
   vendorAvatar: {
     width: 34,
@@ -77,11 +87,14 @@ export const styles = StyleSheet.create({
     marginLeft: 4,
   },
   visitButton: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
     backgroundColor: Colors.LightGray,
     borderWidth: 0,
+    flex: 1,
+    minWidth: "45%",
+    alignItems: "center",
   },
   visitButtonText: {
     fontSize: 12,
@@ -93,6 +106,9 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     backgroundColor: Colors.Primary,
+    flex: 1,
+    minWidth: "45%",
+    alignItems: "center",
   },
   purchaseButtonText: {
     fontSize: 12,
@@ -101,12 +117,15 @@ export const styles = StyleSheet.create({
   },
   productContent: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
   productLeft: {
     flex: 1,
+    minWidth: "45%",
     marginRight: 8,
+    marginBottom: 8,
   },
   productName: {
     fontSize: 16,
@@ -121,8 +140,10 @@ export const styles = StyleSheet.create({
   },
   productMiddle: {
     flex: 1,
+    minWidth: "45%",
     marginRight: 8,
     alignItems: "flex-start",
+    marginBottom: 8,
   },
   originalPrice: {
     fontSize: 12,
@@ -138,8 +159,8 @@ export const styles = StyleSheet.create({
     color: Colors.PrimaryText,
   },
   productRight: {
-    // flex: 1,
-    // alignItems: "flex-end",
+    width: "100%",
+    marginTop: 4,
   },
   recordedPurchase: {
     fontSize: 11,

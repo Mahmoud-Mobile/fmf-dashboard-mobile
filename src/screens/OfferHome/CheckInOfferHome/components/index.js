@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { styles } from "./Styles";
 import { Colors } from "../../../../Global/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -40,14 +39,18 @@ const CustomItem = ({
         <View style={styles.vendorLeft}>
           {renderAvatar()}
           <View style={styles.vendorInfo}>
-            <Text style={styles.vendorName}>{vendorName}</Text>
+            <Text style={styles.vendorName} numberOfLines={1}>
+              {vendorName}
+            </Text>
             <View style={styles.boothContainer}>
               <Ionicons
                 name="location-outline"
                 size={14}
                 color={Colors.SecondaryText}
               />
-              <Text style={styles.boothText}>{booth}</Text>
+              <Text style={styles.boothText} numberOfLines={1}>
+                {booth}
+              </Text>
             </View>
           </View>
         </View>
@@ -97,22 +100,24 @@ const CustomItem = ({
     <View style={styles.productCard}>
       <View style={styles.productContent}>
         <View style={styles.productLeft}>
-          <Text style={styles.productName}>{item.name}</Text>
+          <Text style={styles.productName} numberOfLines={2}>
+            {item.name}
+          </Text>
           <Text style={styles.productDiscount}>Discount: {item.discount}%</Text>
         </View>
 
         <View style={styles.productMiddle}>
-          <Text style={styles.originalPrice}>
+          <Text style={styles.originalPrice} numberOfLines={1}>
             Original Price: SAR{" "}
             <Text style={styles.strikethrough}>{item.originalPrice}</Text>
           </Text>
-          <Text style={styles.finalPrice}>
+          <Text style={styles.finalPrice} numberOfLines={1}>
             Final Price: SAR {item.finalPrice}
           </Text>
         </View>
 
         <View style={styles.productRight}>
-          <Text style={styles.recordedPurchase}>
+          <Text style={styles.recordedPurchase} numberOfLines={1}>
             Recorded Purchase {item.recordedPurchaseTime}
           </Text>
         </View>
