@@ -104,6 +104,15 @@ const getSeatingPlans = async (eventId, subeventId, data) => {
   );
 };
 
+const checkin_OfferHome = async (eventId, vendorId, data) => {
+  return await Post(
+    `events/${eventId}/operations/vendors/${vendorId}/check-in`,
+    data,
+    "POST",
+    true
+  );
+};
+
 export {
   login,
   guests,
@@ -122,4 +131,5 @@ export {
   resource_Checkout,
   subEvent_ManualRegister,
   getSeatingPlans,
+  checkin_OfferHome,
 };

@@ -39,10 +39,9 @@ const CheckInOfferHome = () => {
         {
           text: "Camera Scanner",
           onPress: () => {
-            navigation.navigate("CameraQRScanner", {
+            navigation.navigate("CameraQRScannerOfferHome", {
               eventId: selectedEvent?.id,
               vendorId: vendor?.id,
-              mode: "checkin",
             });
           },
         },
@@ -52,11 +51,10 @@ const CheckInOfferHome = () => {
         alertButtons.push({
           text: "Zebra Scanner",
           onPress: () => {
-            navigation.navigate("ZebraQR", {
+            navigation.navigate("ZebraQROfferHome", {
               eventId: selectedEvent?.id,
               vendorId: vendor?.id,
               manualMode: false,
-              mode: "checkin",
             });
           },
         });
@@ -66,11 +64,10 @@ const CheckInOfferHome = () => {
         {
           text: "Check guest code manually",
           onPress: () => {
-            navigation.navigate("ZebraQR", {
+            navigation.navigate("ZebraQROfferHome", {
               eventId: selectedEvent?.id,
               vendorId: vendor?.id,
               manualMode: true,
-              mode: "checkin",
             });
           },
         },

@@ -12,6 +12,7 @@ import DesignatedCar_Icon from "../SVG/DesignatedCar_Icon";
 import User_Icon from "../SVG/User_Icon";
 import Hotels_Icon from "../SVG/Hotels_Icon";
 import FMF_Icon from "../SVG/FMF_Icon";
+import Notification_Icon from "../SVG/Notification_Icon";
 const images = {
   Home_Tab: <Home_Tab />,
   More_Tab: <More_Tab />,
@@ -26,6 +27,7 @@ const images = {
   User_Icon: <User_Icon />,
   Hotels_Icon: <Hotels_Icon />,
   FMF_Icon: <FMF_Icon />,
+  Notification_Icon: <Notification_Icon />,
 };
 export const ImagesWithProps = ({
   props,
@@ -61,6 +63,8 @@ export const ImagesWithProps = ({
     <Hotels_Icon color={color} size={size} />
   ) : source == "FMF_Icon" ? (
     <FMF_Icon color={color} size={size} />
+  ) : source == "Notification_Icon" ? (
+    <Notification_Icon color={color} size={size} />
   ) : null;
 
 export default images;

@@ -6,7 +6,7 @@ import More from "../screens/More";
 import Hotels from "../screens/Hotels";
 import DesignatedCars from "../screens/DesignatedCars";
 import CheckInOfferHome from "../screens/OfferHome/CheckInOfferHome";
-import DashboardOfferHome from "../screens/OfferHome/Dashboard";
+import NotificationScreen from "../screens/NotificationScreen";
 
 export const ENVIRONMENT_TABS = {
   fmf: [
@@ -77,21 +77,20 @@ export const ENVIRONMENT_TABS = {
   ],
   offerHome: [
     {
-      route: "DashboardOfferHome",
-      component: DashboardOfferHome,
-      icon: "Home_Tab",
-      headerShown: false,
-      titleText: "Dashboard",
-      priority: 1,
-      defaultVisible: true,
-      alwaysVisible: true,
-    },
-    {
       route: "CheckInOfferHome",
       component: CheckInOfferHome,
       icon: "CheckIn_Icon",
       headerShown: false,
       titleText: "Check-in",
+      priority: 1,
+      defaultVisible: true,
+    },
+    {
+      route: "NotificationScreen",
+      component: NotificationScreen,
+      icon: "Notification_Icon",
+      headerShown: false,
+      titleText: "Notifications",
       priority: 2,
       defaultVisible: true,
     },
