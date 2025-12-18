@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useRef } from "react";
-import { View, FlatList } from "react-native";
+import React, { useState, useMemo, useRef, useCallback } from "react";
+import { View, FlatList, Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import CustomEventHeader from "../../../components/CustomEventHeader";
@@ -33,7 +33,62 @@ const CheckInOfferHome = () => {
     setSearchText("");
   };
 
-  const handleVisitPress = () => {};
+  const handleVisitPress = useCallback(
+    (vendor) => {
+      const alertButtons = [
+        {
+          text: "Camera Scanner",
+          onPress: () => {
+            navigation.navigate("CameraQRScanner", {
+              eventId: selectedEvent?.id,
+              vendorId: vendor?.id,
+              mode: "checkin",
+            });
+          },
+        },
+      ];
+
+      if (Platform.OS !== "ios") {
+        alertButtons.push({
+          text: "Zebra Scanner",
+          onPress: () => {
+            navigation.navigate("ZebraQR", {
+              eventId: selectedEvent?.id,
+              vendorId: vendor?.id,
+              manualMode: false,
+              mode: "checkin",
+            });
+          },
+        });
+      }
+
+      alertButtons.push(
+        {
+          text: "Check guest code manually",
+          onPress: () => {
+            navigation.navigate("ZebraQR", {
+              eventId: selectedEvent?.id,
+              vendorId: vendor?.id,
+              manualMode: true,
+              mode: "checkin",
+            });
+          },
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        }
+      );
+
+      Alert.alert(
+        "Choose Scanner Type",
+        "How would you like to scan the QR code?",
+        alertButtons,
+        { cancelable: true }
+      );
+    },
+    [selectedEvent?.id, navigation]
+  );
 
   const handlePurchasePress = (item) => {
     setSelectedProduct(item);
@@ -42,12 +97,9 @@ const CheckInOfferHome = () => {
 
   const handleRecordPurchase = (purchaseData) => {
     console.log("Purchase recorded:", purchaseData);
-    // TODO: Implement API call to record purchase
   };
 
-  const handleCancelPurchase = () => {
-    // Handle cancel if needed
-  };
+  const handleCancelPurchase = () => {};
 
   const renderVendorCard = ({ item: vendor }) => {
     const renderProductItem = ({ item, index }) => (
@@ -55,7 +107,7 @@ const CheckInOfferHome = () => {
         item={item}
         vendorData={vendor}
         index={index}
-        onVisitPress={handleVisitPress}
+        onVisitPress={() => handleVisitPress(vendor)}
         onPurchasePress={() => handlePurchasePress(item)}
       />
     );
@@ -66,7 +118,7 @@ const CheckInOfferHome = () => {
           item={null}
           vendorData={vendor}
           index={0}
-          onVisitPress={handleVisitPress}
+          onVisitPress={() => handleVisitPress(vendor)}
           onPurchasePress={() =>
             handlePurchasePress(vendor.products?.[0] || null)
           }

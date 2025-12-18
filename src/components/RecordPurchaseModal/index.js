@@ -17,11 +17,10 @@ import {
 } from "react-native";
 import BottomSheet, {
   BottomSheetBackdrop,
-  BottomSheetView,
+  BottomSheetScrollView,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
 import { Colors } from "../../Global/colors";
-import { Fonts } from "../../Global/fonts";
 import { MaterialIcons } from "@expo/vector-icons";
 import { styles } from "./Styles";
 
@@ -219,7 +218,7 @@ const RecordPurchaseModal = forwardRef(
           disappearsOnIndex={-1}
           appearsOnIndex={0}
           opacity={0.5}
-          pressBehavior="none"
+          pressBehavior="close"
         />
       ),
       []
@@ -272,7 +271,7 @@ const RecordPurchaseModal = forwardRef(
         keyboardBehavior="interactive"
         keyboardBlurBehavior="restore"
       >
-        <BottomSheetView style={styles.modalContentContainer}>
+        <BottomSheetScrollView style={styles.modalContentContainer}>
           <View style={styles.modalHeaderContainer}>
             <Text style={styles.modalTitle}>Record Purchase</Text>
             <TouchableOpacity
@@ -389,7 +388,6 @@ const RecordPurchaseModal = forwardRef(
                 />
               </View>
 
-              {/* Purchase Summary */}
               <View style={styles.summaryContainer}>
                 <View style={styles.summaryRow}>
                   <Text style={styles.summaryLabel}>Original Price:</Text>
@@ -411,7 +409,6 @@ const RecordPurchaseModal = forwardRef(
             </ScrollView>
           </KeyboardAvoidingView>
 
-          {/* Action Buttons */}
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={[styles.modalButton, styles.modalCancelButton]}
@@ -428,7 +425,7 @@ const RecordPurchaseModal = forwardRef(
               <Text style={styles.modalRecordButtonText}>Record Purchase</Text>
             </TouchableOpacity>
           </View>
-        </BottomSheetView>
+        </BottomSheetScrollView>
       </BottomSheet>
     );
   }

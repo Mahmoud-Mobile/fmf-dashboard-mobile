@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
   },
   modalHeaderContainer: {
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 14,
     marginTop: 8,
     position: "relative",
   },
