@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.Background,
   },
-  scrollView: {
+  content: {
     flex: 1,
   },
   scrollContent: {
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: horizontalMargin,
     paddingTop: 32,
-    paddingBottom: 24,
+    paddingBottom: 32,
   },
   iconContainer: {
     width: 64,
@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
     color: Colors.PrimaryText,
     marginBottom: 8,
     textAlign: "center",
-    lineHeight: 36,
   },
   subtitle: {
     fontSize: 16,
@@ -44,42 +43,39 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
   },
-  descriptionContainer: {
-    paddingHorizontal: horizontalMargin,
-    marginBottom: 24,
-  },
-  description: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.SecondaryText,
-    lineHeight: 24,
-  },
-  featuresSection: {
-    paddingHorizontal: horizontalMargin,
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.PrimaryText,
-    marginBottom: 16,
-  },
-  featureCard: {
+  card: {
     backgroundColor: Colors.White,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    flexDirection: "row",
+    borderRadius: 16,
+    marginHorizontal: horizontalMargin,
+    marginBottom: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    overflow: "hidden",
   },
-  featureIconContainer: {
+  questionContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    minHeight: 72,
+  },
+  questionContainerExpanded: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderColor,
+  },
+  questionContent: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingRight: 12,
+  },
+  iconWrapper: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -88,36 +84,44 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
-  featureContent: {
-    flex: 1,
-  },
-  featureTitle: {
+  question: {
     fontSize: 17,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
-    marginBottom: 4,
-  },
-  featureDescription: {
-    fontSize: 14,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.SecondaryText,
-    lineHeight: 20,
-  },
-  infoSection: {
-    paddingHorizontal: horizontalMargin,
-    marginBottom: 24,
-  },
-  infoTitle: {
-    fontSize: 20,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.PrimaryText,
-    marginBottom: 12,
-  },
-  infoText: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.SecondaryText,
+    flex: 1,
     lineHeight: 24,
+  },
+  chevronContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: `${Colors.Primary}08`,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chevronContainerExpanded: {
+    backgroundColor: `${Colors.Primary}15`,
+  },
+  answerContainer: {
+    padding: 20,
+    paddingTop: 16,
+  },
+  answerLine: {
+    width: 3,
+    height: "100%",
+    backgroundColor: Colors.Primary,
+    position: "absolute",
+    left: 20,
+    top: 16,
+    bottom: 16,
+    borderRadius: 2,
+  },
+  answer: {
+    fontSize: 15,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.SecondaryText,
+    lineHeight: 22,
+    paddingLeft: 16,
   },
 });
 

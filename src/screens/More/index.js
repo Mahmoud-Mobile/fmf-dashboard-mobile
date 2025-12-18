@@ -44,27 +44,36 @@ const More = () => {
       iconColor: "#374151",
       navigation: "Profile",
     },
-    // {
-    //   id: 2,
-    //   title: "Survey",
-    //   icon: "CheckIn_Icon",
-    //   iconColor: "#374151",
-    //   navigation: "Survey",
-    // },
-    // {
-    //   id: 3,
-    //   title: "Privacy Policy",
-    //   icon: "Location_Icon",
-    //   iconColor: "#374151",
-    //   navigation: "PrivacyPolicy",
-    // },
-    // {
-    //   id: 4,
-    //   title: "About",
-    //   icon: "Calendar_Icon",
-    //   iconColor: "#374151",
-    //   navigation: "About",
-    // },
+
+    {
+      id: 3,
+      title: "Privacy Policy",
+      icon: "Location_Icon",
+      iconColor: "#374151",
+      navigation: "PrivacyPolicy",
+    },
+    {
+      id: 4,
+      title: "About",
+      icon: "Calendar_Icon",
+      iconColor: "#374151",
+      navigation: "About",
+    },
+
+    {
+      id: 3,
+      title: "FAQ",
+      icon: "FAQ_Icon",
+      iconColor: "#374151",
+      navigation: "FAQ",
+    },
+    {
+      id: 4,
+      title: "Contact Us",
+      icon: "Contact_Icon",
+      iconColor: "#374151",
+      navigation: "ContactUs",
+    },
     {
       id: 5,
       title: "Logout",

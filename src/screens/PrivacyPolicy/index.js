@@ -14,228 +14,129 @@ const PrivacyPolicy = () => {
         onLeftButtonPress={() => navigation.goBack()}
       />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>FMF Client Mobile App – Privacy Policy</Text>
+        <Text style={styles.title}>
+          Event Operations Management App – Privacy Policy
+        </Text>
 
         <Text style={styles.lastUpdated}>Last Updated: 20 November 2025</Text>
 
         <Text style={styles.description}>
-          This Privacy Policy describes how the FMF Client Mobile App ("we",
-          "us", "our") collects, uses, and protects your personal information.
-          By using the App, you agree to the practices outlined in this policy.
+          This Privacy Policy describes how this Event Operations Management App
+          ("we", "us", "our") handles information. This is an admin-only
+          application for managing event operations. By using the App, you agree
+          to the practices outlined in this policy.
         </Text>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>1. Information We Collect</Text>
+          <Text style={styles.sectionTitle}>1. Account Access</Text>
           <Text style={styles.sectionText}>
-            We may collect the following categories of information:
-          </Text>
-
-          <Text style={styles.subsectionTitle}>1.1 Personal Information</Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Full name</Text>
-            <Text style={styles.bulletPoint}>• Email address</Text>
-            <Text style={styles.bulletPoint}>• Mobile number</Text>
-            <Text style={styles.bulletPoint}>• Nationality</Text>
-            <Text style={styles.bulletPoint}>
-              • Organization name and job title
-            </Text>
-            <Text style={styles.bulletPoint}>
-              • Identification details (e.g., passport/ID number for access
-              verification)
-            </Text>
-          </View>
-
-          <Text style={styles.subsectionTitle}>1.2 Event Information</Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Registration details</Text>
-            <Text style={styles.bulletPoint}>
-              • RSVP and attendance information
-            </Text>
-            <Text style={styles.bulletPoint}>• Session selections</Text>
-            <Text style={styles.bulletPoint}>• Badge data and QR codes</Text>
-            <Text style={styles.bulletPoint}>
-              • Activity log from event scanning points
-            </Text>
-          </View>
-
-          <Text style={styles.subsectionTitle}>
-            1.3 Device & Technical Data
-          </Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>
-              • Device type, operating system, and version
-            </Text>
-            <Text style={styles.bulletPoint}>• IP address</Text>
-            <Text style={styles.bulletPoint}>• Mobile identifiers</Text>
-            <Text style={styles.bulletPoint}>
-              • App performance and crash logs
-            </Text>
-            <Text style={styles.bulletPoint}>• Usage analytics</Text>
-          </View>
-
-          <Text style={styles.subsectionTitle}>
-            1.4 Precise Location Information
+            This application is designed for administrators only. Account
+            creation is not available through this mobile app. All admin
+            accounts are created and managed through the web dashboard.
+            Administrators can only log in using credentials that have been set
+            up via the web dashboard.
           </Text>
           <Text style={styles.sectionText}>
-            If you allow location permissions, the App may collect precise
-            (GPS-level) location to:
-          </Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Enable event navigation</Text>
-            <Text style={styles.bulletPoint}>
-              • Show nearby services (e.g., entrances, facilities,
-              transportation points)
-            </Text>
-            <Text style={styles.bulletPoint}>
-              • Facilitate transportation features (e.g., taxi/Uber
-              integrations)
-            </Text>
-            <Text style={styles.bulletPoint}>
-              • Enhance security and ensure authorized access to restricted
-              areas
-            </Text>
-          </View>
-          <Text style={styles.sectionText}>
-            You can disable location access from your device settings at any
-            time. Disabling location may affect certain features of the App.
-          </Text>
-
-          <Text style={styles.subsectionTitle}>
-            1.5 In-App Chat & Communication
-          </Text>
-          <Text style={styles.sectionText}>
-            If the App provides chat features, we may collect:
-          </Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Messages sent or received</Text>
-            <Text style={styles.bulletPoint}>
-              • Attachments or shared files
-            </Text>
-            <Text style={styles.bulletPoint}>• Chat timestamps</Text>
-            <Text style={styles.bulletPoint}>
-              • Messages sent to the helpdesk
-            </Text>
-          </View>
-          <Text style={styles.sectionText}>
-            We do not read or monitor private chats, unless required for:
-          </Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Technical troubleshooting</Text>
-            <Text style={styles.bulletPoint}>
-              • Investigating misuse or violations
-            </Text>
-            <Text style={styles.bulletPoint}>• Legal compliance</Text>
-          </View>
-          <Text style={styles.sectionText}>
-            Chat data may be encrypted depending on the system setup.
+            Event access and permissions are managed through the web dashboard.
+            Each event's access is configured and assigned through the web
+            interface, and administrators can then access those events through
+            this mobile app after logging in.
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            2. How We Use Your Information
+          <Text style={styles.sectionTitle}>2. Information Collection</Text>
+          <Text style={styles.sectionText}>
+            This app does not collect personal information from users. The app
+            is used solely for administrative purposes to manage event
+            operations including:
           </Text>
-          <Text style={styles.sectionText}>We use your information to:</Text>
           <View style={styles.bulletContainer}>
             <Text style={styles.bulletPoint}>
-              • Process and manage event registrations
+              • Viewing and managing flight information
             </Text>
             <Text style={styles.bulletPoint}>
-              • Generate your digital badge and QR code
+              • Managing hotel bookings and occupancy
             </Text>
             <Text style={styles.bulletPoint}>
-              • Provide real-time event information and updates
+              • Coordinating trips and transportation
             </Text>
             <Text style={styles.bulletPoint}>
-              • Enable navigation using precise location
+              • Processing check-ins via QR code scanning
             </Text>
             <Text style={styles.bulletPoint}>
-              • Facilitate in-app chat features
+              • Viewing dashboard analytics and reports
             </Text>
             <Text style={styles.bulletPoint}>
-              • Send notifications via mobile alerts, email, SMS, and WhatsApp
-            </Text>
-            <Text style={styles.bulletPoint}>
-              • Manage logistics (transport, hotel, access-level permissions)
-            </Text>
-            <Text style={styles.bulletPoint}>
-              • Improve app performance, stability, and user experience
-            </Text>
-            <Text style={styles.bulletPoint}>
-              • Ensure security and detect unauthorized access
+              • Managing designated cars and resources
             </Text>
           </View>
+          <Text style={styles.sectionText}>
+            All event data and guest information is managed through the web
+            dashboard. This mobile app serves as a tool for administrators to
+            access and manage that data, but does not collect additional
+            personal information.
+          </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>3. Sharing of Information</Text>
+          <Text style={styles.sectionTitle}>3. Login Credentials</Text>
           <Text style={styles.sectionText}>
-            We may share your information only when necessary:
+            Admin login credentials are stored securely on your device for
+            authentication purposes only. These credentials are used solely to
+            verify your identity and grant access to the administrative
+            functions. Credentials are encrypted and stored according to
+            industry-standard security practices.
           </Text>
-
-          <Text style={styles.subsectionTitle}>
-            3.1 With Event Organizers and Authorized Partners
-          </Text>
-          <Text style={styles.sectionText}>For:</Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Registration management</Text>
-            <Text style={styles.bulletPoint}>• Logistics and operations</Text>
-            <Text style={styles.bulletPoint}>
-              • Security and access control
-            </Text>
-            <Text style={styles.bulletPoint}>• Technical hosting</Text>
-            <Text style={styles.bulletPoint}>
-              • Transportation coordination
-            </Text>
-            <Text style={styles.bulletPoint}>• Communication services</Text>
-          </View>
-
-          <Text style={styles.subsectionTitle}>
-            3.2 With Communication Providers
-          </Text>
-          <Text style={styles.sectionText}>To deliver:</Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Email notifications</Text>
-            <Text style={styles.bulletPoint}>• WhatsApp messages</Text>
-            <Text style={styles.bulletPoint}>• SMS alerts</Text>
-          </View>
-
-          <Text style={styles.subsectionTitle}>3.3 In-App Chat Systems</Text>
-          <Text style={styles.sectionText}>
-            Messages may be processed by secure third-party communication
-            providers under confidentiality agreements.
-          </Text>
-
-          <Text style={styles.subsectionTitle}>
-            3.4 Legal and Regulatory Requirements
-          </Text>
-          <Text style={styles.sectionText}>
-            We may disclose information to comply with:
-          </Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Laws</Text>
-            <Text style={styles.bulletPoint}>• Court orders</Text>
-            <Text style={styles.bulletPoint}>
-              • Government or regulatory requests
-            </Text>
-          </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>4. Data Security</Text>
+          <Text style={styles.sectionTitle}>4. Data Access</Text>
           <Text style={styles.sectionText}>
-            We implement industry-standard security practices such as:
+            This app accesses event data that is stored and managed on secure
+            servers. The app displays and allows management of:
           </Text>
           <View style={styles.bulletContainer}>
             <Text style={styles.bulletPoint}>
-              • Encryption of data in transit
+              • Event information configured in the web dashboard
             </Text>
             <Text style={styles.bulletPoint}>
-              • Secure hosting environments
+              • Guest data for check-in and management purposes
             </Text>
-            <Text style={styles.bulletPoint}>• Strict access controls</Text>
             <Text style={styles.bulletPoint}>
-              • Continuous monitoring and periodic audits
+              • Flight, hotel, and trip logistics data
+            </Text>
+            <Text style={styles.bulletPoint}>
+              • Real-time analytics and reporting data
+            </Text>
+          </View>
+          <Text style={styles.sectionText}>
+            All data displayed in this app originates from the web dashboard
+            system. The app does not store or collect this data independently.
+          </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>5. Data Security</Text>
+          <Text style={styles.sectionText}>
+            We implement industry-standard security practices to protect
+            administrative access and data:
+          </Text>
+          <View style={styles.bulletContainer}>
+            <Text style={styles.bulletPoint}>
+              • Encryption of data in transit between the app and servers
+            </Text>
+            <Text style={styles.bulletPoint}>
+              • Secure authentication and authorization
+            </Text>
+            <Text style={styles.bulletPoint}>
+              • Secure storage of login credentials on device
+            </Text>
+            <Text style={styles.bulletPoint}>
+              • Strict access controls based on admin permissions
+            </Text>
+            <Text style={styles.bulletPoint}>
+              • Continuous monitoring and security audits
             </Text>
           </View>
           <Text style={styles.sectionText}>
@@ -244,98 +145,54 @@ const PrivacyPolicy = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>5. Data Retention</Text>
+          <Text style={styles.sectionTitle}>6. Event Data Management</Text>
           <Text style={styles.sectionText}>
-            We retain personal data only as long as necessary to:
+            All event data, including guest information, flight details, hotel
+            bookings, and trip information, is managed through the web
+            dashboard. This mobile app provides a mobile interface to access and
+            manage that data, but does not independently store or retain event
+            data. Data retention policies are managed through the web dashboard
+            system.
+          </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>7. Third-Party Services</Text>
+          <Text style={styles.sectionText}>
+            The App may integrate with third-party services for functionality
+            such as:
           </Text>
           <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Deliver event services</Text>
-            <Text style={styles.bulletPoint}>• Meet legal requirements</Text>
-            <Text style={styles.bulletPoint}>• Resolve disputes</Text>
+            <Text style={styles.bulletPoint}>• QR code scanning libraries</Text>
+            <Text style={styles.bulletPoint}>
+              • Communication services (if chat features are used)
+            </Text>
+            <Text style={styles.bulletPoint}>
+              • Analytics and performance monitoring tools
+            </Text>
           </View>
           <Text style={styles.sectionText}>
-            Chat data retention varies based on technical configuration.
-            Location data is not stored permanently unless required for service
-            delivery. Data is securely deleted or anonymized after the retention
-            period.
+            Their privacy practices are separate and independent. We recommend
+            reviewing their privacy policies if you have concerns.
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>6. Your Rights</Text>
-          <Text style={styles.sectionText}>
-            Depending on applicable laws, you may request to:
-          </Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Access your personal data</Text>
-            <Text style={styles.bulletPoint}>
-              • Correct or update inaccurate information
-            </Text>
-            <Text style={styles.bulletPoint}>
-              • Request deletion (where allowed)
-            </Text>
-            <Text style={styles.bulletPoint}>
-              • Withdraw consent for optional features (such as location access)
-            </Text>
-            <Text style={styles.bulletPoint}>• Obtain a copy of your data</Text>
-          </View>
-          <Text style={styles.sectionText}>
-            Contact us using the details below to exercise your rights.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>7. Children's Privacy</Text>
-          <Text style={styles.sectionText}>
-            The App is not intended for children under 16. We do not knowingly
-            collect data from children without parental consent.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>8. Third-Party Services</Text>
-          <Text style={styles.sectionText}>
-            The App may provide links or integrations with:
-          </Text>
-          <View style={styles.bulletContainer}>
-            <Text style={styles.bulletPoint}>• Map/navigation platforms</Text>
-            <Text style={styles.bulletPoint}>• Transportation services</Text>
-            <Text style={styles.bulletPoint}>
-              • Email/SMS/WhatsApp communication providers
-            </Text>
-            <Text style={styles.bulletPoint}>• Chat frameworks</Text>
-          </View>
-          <Text style={styles.sectionText}>
-            Their privacy practices are separate and independent.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>9. International Transfers</Text>
-          <Text style={styles.sectionText}>
-            Your data may be transferred to and processed in other countries. We
-            ensure such transfers comply with relevant data protection laws.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>10. Changes to This Policy</Text>
+          <Text style={styles.sectionTitle}>8. Changes to This Policy</Text>
           <Text style={styles.sectionText}>
             We may update this Privacy Policy as needed. Continued use of the
-            App after updates indicates acceptance of the revised policy.
+            App after updates indicates acceptance of the revised policy. We
+            recommend reviewing this policy periodically.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>11. Contact Us</Text>
           <Text style={styles.sectionText}>
-            For any questions or requests regarding this Privacy Policy:
+            For any questions or requests regarding this Privacy Policy, please
+            contact us through the Contact Us section in the app or reach out to
+            our support team using the contact information provided in the app.
           </Text>
-          <Text style={styles.contactInfo}>FMF Support Team</Text>
-          <Text style={styles.contactInfo}>
-            Email: support@futuremineralsforum.com.sa
-          </Text>
-          <Text style={styles.contactInfo}>Phone: +966 560 807 342</Text>
         </View>
       </ScrollView>
     </View>

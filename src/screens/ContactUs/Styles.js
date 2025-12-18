@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.Background,
   },
-  scrollView: {
+  content: {
     flex: 1,
   },
   scrollContent: {
@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
     color: Colors.PrimaryText,
     marginBottom: 8,
     textAlign: "center",
-    lineHeight: 36,
   },
   subtitle: {
     fontSize: 16,
@@ -44,61 +43,48 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
   },
-  descriptionContainer: {
+  contactSection: {
     paddingHorizontal: horizontalMargin,
     marginBottom: 24,
   },
-  description: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.SecondaryText,
-    lineHeight: 24,
-  },
-  featuresSection: {
-    paddingHorizontal: horizontalMargin,
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.PrimaryText,
-    marginBottom: 16,
-  },
-  featureCard: {
+  contactCard: {
     backgroundColor: Colors.White,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    flexDirection: "row",
+    borderRadius: 16,
+    marginBottom: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  featureIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  contactCardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+  },
+  iconWrapper: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: `${Colors.Primary}10`,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 16,
   },
-  featureContent: {
+  contactInfo: {
     flex: 1,
   },
-  featureTitle: {
-    fontSize: 17,
+  contactTitle: {
+    fontSize: 16,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 4,
   },
-  featureDescription: {
-    fontSize: 14,
+  contactValue: {
+    fontSize: 15,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     lineHeight: 20,
@@ -118,6 +104,20 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     lineHeight: 24,
+    marginBottom: 12,
+  },
+  hoursContainer: {
+    backgroundColor: Colors.White,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 8,
+  },
+  hoursText: {
+    fontSize: 15,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.PrimaryText,
+    lineHeight: 22,
+    marginBottom: 4,
   },
 });
 

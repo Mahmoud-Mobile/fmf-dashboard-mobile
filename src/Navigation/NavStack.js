@@ -23,6 +23,8 @@ import AudienceProfile from "../screens/AudienceProfile";
 import Survey from "../screens/Survey";
 import PrivacyPolicy from "../screens/PrivacyPolicy";
 import About from "../screens/About";
+import FAQ from "../screens/FAQ";
+import ContactUs from "../screens/ContactUs";
 import TripsDetails from "../screens/TripsDetails";
 import SubEventDetails from "../screens/SubEventDetails";
 import ResourceDetails from "../screens/ResourceDetails";
@@ -232,6 +234,20 @@ const NavStack = () => {
       <Stack.Screen
         name="About"
         component={About}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="FAQ"
+        component={FAQ}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ContactUs"
+        component={ContactUs}
         options={{
           headerShown: false,
         }}

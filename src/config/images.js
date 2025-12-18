@@ -13,6 +13,8 @@ import User_Icon from "../SVG/User_Icon";
 import Hotels_Icon from "../SVG/Hotels_Icon";
 import FMF_Icon from "../SVG/FMF_Icon";
 import Notification_Icon from "../SVG/Notification_Icon";
+import FAQ_Icon from "../SVG/FAQ_Icon";
+import Contact_Icon from "../SVG/Contact_Icon";
 const images = {
   Home_Tab: <Home_Tab />,
   More_Tab: <More_Tab />,
@@ -28,6 +30,8 @@ const images = {
   Hotels_Icon: <Hotels_Icon />,
   FMF_Icon: <FMF_Icon />,
   Notification_Icon: <Notification_Icon />,
+  FAQ_Icon: <FAQ_Icon />,
+  Contact_Icon: <Contact_Icon />,
 };
 export const ImagesWithProps = ({
   props,
@@ -65,6 +69,10 @@ export const ImagesWithProps = ({
     <FMF_Icon color={color} size={size} />
   ) : source == "Notification_Icon" ? (
     <Notification_Icon color={color} size={size} />
+  ) : source == "FAQ_Icon" ? (
+    <FAQ_Icon color={color} size={size} />
+  ) : source == "Contact_Icon" ? (
+    <Contact_Icon color={color} size={size} />
   ) : null;
 
 export default images;
