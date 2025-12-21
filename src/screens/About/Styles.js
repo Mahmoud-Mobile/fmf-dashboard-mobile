@@ -30,15 +30,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 18,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 8,
     textAlign: "center",
-    lineHeight: 36,
+    lineHeight: 24,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     textAlign: "center",
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 16,
@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featureTitle: {
-    fontSize: 17,
+    fontSize: 14,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 4,
   },
   featureDescription: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     lineHeight: 20,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   infoTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 12,

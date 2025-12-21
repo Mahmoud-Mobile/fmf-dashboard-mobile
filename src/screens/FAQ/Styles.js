@@ -30,14 +30,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 18,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     textAlign: "center",
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    paddingRight: 12,
+    paddingRight: 8,
   },
   iconWrapper: {
     width: 40,
@@ -82,14 +82,13 @@ const styles = StyleSheet.create({
     backgroundColor: `${Colors.Primary}10`,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 8,
   },
   question: {
-    fontSize: 17,
-    fontFamily: Fonts.FONT_BOLD,
+    fontSize: 14,
+    fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.PrimaryText,
     flex: 1,
-    lineHeight: 24,
   },
   chevronContainer: {
     width: 36,
@@ -117,7 +116,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   answer: {
-    fontSize: 15,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     lineHeight: 22,

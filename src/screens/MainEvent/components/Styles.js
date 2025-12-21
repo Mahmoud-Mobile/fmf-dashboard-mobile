@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   eventTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     marginLeft: 8,
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   detailText: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
   },

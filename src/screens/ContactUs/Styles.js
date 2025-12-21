@@ -30,14 +30,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 18,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     textAlign: "center",
@@ -78,13 +78,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contactTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 4,
   },
   contactValue: {
-    fontSize: 15,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     lineHeight: 20,
@@ -94,13 +94,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   infoTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 12,
   },
   infoText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     lineHeight: 24,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   hoursText: {
-    fontSize: 15,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     lineHeight: 22,
