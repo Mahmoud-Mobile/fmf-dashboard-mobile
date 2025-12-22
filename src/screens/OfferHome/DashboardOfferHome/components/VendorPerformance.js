@@ -6,10 +6,10 @@ import {
   Image,
   ScrollView,
   Dimensions,
+  StyleSheet,
 } from "react-native";
 import { Colors } from "../../../../Global/colors";
 import { Fonts } from "../../../../Global/fonts";
-import { StyleSheet } from "react-native";
 import { horizontalMargin } from "../../../../config/metrics";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -21,57 +21,70 @@ const VendorPerformance = () => {
 
   const vendors = [
     {
-      name: "Daze",
+      name: "Product 1",
       visits: 360,
       purchases: 220,
       sales: "SAR 210K",
       conversion: "41%",
       status: "High",
-      statusColor: Colors.Success,
-      avatar: "https://picsum.photos/200/300",
     },
     {
-      name: "Daze",
+      name: "Product 2",
       visits: 160,
       purchases: 110,
       sales: "SAR 160K",
       conversion: "36%",
       status: "Medium",
-      statusColor: Colors.Warning,
-      avatar: "https://picsum.photos/200/300",
     },
     {
-      name: "Daze",
+      name: "Product 3",
       visits: 100,
       purchases: 90,
       sales: "SAR 100K",
       conversion: "25%",
       status: "Low",
-      statusColor: Colors.Error,
-      avatar: "https://picsum.photos/200/300",
-    },
-    {
-      name: "Daze",
-      visits: 460,
-      purchases: 360,
-      sales: "SAR 380K",
-      conversion: "46%",
-      status: "Active",
-      statusColor: Colors.Success,
     },
   ];
 
   const getStatusColor = (status) => {
-    if (status === "High" || status === "Active") return Colors.Success;
-    if (status === "Medium") return Colors.Warning;
-    return Colors.Error;
+    if (status === "High") {
+      return {
+        backgroundColor: "#F0FDF4",
+        color: "#008236",
+        borderColor: "rgba(0, 130, 54, 0.20)",
+      };
+    }
+    if (status === "Medium") {
+      return {
+        backgroundColor: "rgba(255, 172, 74, 0.10)",
+        color: "#FF9517",
+        borderColor: "rgba(255, 172, 74, 0.20)",
+      };
+    }
+    if (status === "Low") {
+      return {
+        backgroundColor: "rgba(255, 0, 0, 0.10)",
+        color: "#FF0000",
+        borderColor: "rgba(255, 0, 0, 0.20)",
+      };
+    }
+    return {
+      backgroundColor: "",
+      color: Colors.White,
+      borderColor: "",
+    };
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Vendor Performance</Text>
 
-      <View style={styles.filtersContainer}>
+      {/* Filters */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filtersContainer}
+      >
         {filters.map((filter) => (
           <TouchableOpacity
             key={filter}
@@ -91,60 +104,55 @@ const VendorPerformance = () => {
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
-      <View style={styles.tableContainer}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <View style={styles.tableContent}>
-            <View style={styles.tableHeader}>
-              <View style={[styles.headerColumn, styles.vendorNameColumn]}>
-                <View style={styles.headerIconContainer}>
-                  <Image
-                    source={{ uri: "https://picsum.photos/200/300" }}
-                    style={styles.headerImage}
-                  />
-                  <Text style={styles.headerText}>Vendor Name</Text>
-                </View>
-              </View>
-              <View style={[styles.headerColumn, styles.visitsColumn]}>
-                <Text style={styles.headerText}>Visits</Text>
-              </View>
-              <View style={[styles.headerColumn, styles.purchasesColumn]}>
-                <Text style={styles.headerText}>Purchases</Text>
-              </View>
-              <View style={[styles.headerColumn, styles.salesColumn]}>
-                <Text style={styles.headerText}>Sales</Text>
-              </View>
-              <View style={[styles.headerColumn, styles.conversionColumn]}>
-                <Text style={styles.headerText}>Conv.</Text>
-              </View>
-              <View style={[styles.headerColumn, styles.statusColumn]}>
-                <Text style={styles.headerText}>Status</Text>
-              </View>
+      {/* Table */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tableContentContainer}
+      >
+        <View style={styles.tableContent}>
+          {/* HEADER */}
+          <View style={styles.tableHeader}>
+            <View style={[styles.headerColumn, styles.vendorNameColumn]}>
+              <Image
+                source={{ uri: "https://picsum.photos/200/300" }}
+                style={styles.headerImage}
+                resizeMode="cover"
+              />
+              <Text style={styles.headerText}>Daze</Text>
             </View>
+            <View style={[styles.headerColumn, styles.visitsColumn]}>
+              <Text style={styles.headerText}>Visits</Text>
+            </View>
+            <View style={[styles.headerColumn, styles.purchasesColumn]}>
+              <Text style={styles.headerText}>Purchases</Text>
+            </View>
+            <View style={[styles.headerColumn, styles.salesColumn]}>
+              <Text style={styles.headerText}>Sales</Text>
+            </View>
+            <View style={[styles.headerColumn, styles.conversionColumn]}>
+              <Text style={styles.headerText}>Conv.</Text>
+            </View>
+            <View style={[styles.headerColumn, styles.statusColumn]}>
+              <Text style={styles.headerText}>Status</Text>
+            </View>
+          </View>
 
-            {vendors.map((vendor, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.tableRow,
-                  index === vendors.length - 1 && styles.lastRow,
-                ]}
-              >
+          {/* ROWS */}
+          {vendors.map((vendor, index) => {
+            const statusColors = getStatusColor(vendor.status);
+            return (
+              <View key={index} style={styles.tableRow}>
                 <View style={[styles.dataColumn, styles.vendorNameColumn]}>
-                  <View style={styles.vendorNameContainer}>
-                    <View style={styles.vendorAvatar}>
-                      <Text style={styles.vendorAvatarText}>
-                        {vendor.name.charAt(0).toUpperCase()}
-                        {vendor.name.charAt(1).toUpperCase()}
-                      </Text>
-                    </View>
-                    <Text style={styles.vendorName}>{vendor.name}</Text>
+                  <View style={styles.vendorAvatar}>
+                    <Text style={styles.vendorAvatarText}>
+                      {vendor.name.charAt(0).toUpperCase()}
+                      {vendor.name.charAt(1).toUpperCase()}
+                    </Text>
                   </View>
+                  <Text style={styles.dataText}>{vendor.name}</Text>
                 </View>
                 <View style={[styles.dataColumn, styles.visitsColumn]}>
                   <Text style={styles.dataText}>{vendor.visits}</Text>
@@ -162,25 +170,32 @@ const VendorPerformance = () => {
                   <View
                     style={[
                       styles.statusBadge,
-                      { backgroundColor: getStatusColor(vendor.status) },
+                      {
+                        backgroundColor: statusColors.backgroundColor,
+                        borderColor: statusColors.borderColor,
+                        borderWidth: 0.5,
+                      },
                     ]}
                   >
-                    <Text style={styles.statusText}>{vendor.status}</Text>
+                    <Text
+                      style={[styles.statusText, { color: statusColors.color }]}
+                    >
+                      {vendor.status}
+                    </Text>
                   </View>
                 </View>
               </View>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+            );
+          })}
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 30,
-  },
+  container: { marginBottom: 30 },
+
   sectionTitle: {
     fontSize: 18,
     fontFamily: Fonts.FONT_BOLD,
@@ -188,104 +203,51 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: horizontalMargin,
   },
+
   filtersContainer: {
-    flexDirection: "row",
     paddingHorizontal: horizontalMargin,
     marginBottom: 15,
-    gap: 8,
   },
+
   filterButton: {
-    paddingHorizontal: horizontalMargin,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
     backgroundColor: Colors.LightGray,
+    marginRight: 8,
   },
-  filterButtonActive: {
-    backgroundColor: Colors.Primary,
-  },
+
+  filterButtonActive: { backgroundColor: Colors.Primary },
+
   filterButtonText: {
     fontSize: 12,
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.DarkGray,
   },
-  filterButtonTextActive: {
-    color: Colors.White,
-  },
-  tableContainer: {
-    backgroundColor: Colors.White,
-    borderRadius: 12,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  tableContent: {
-    minWidth: SCREEN_WIDTH,
-  },
+
+  filterButtonTextActive: { color: Colors.White },
+
+  tableContent: { minWidth: SCREEN_WIDTH },
+
+  tableContentContainer: { backgroundColor: "white" },
+
   tableHeader: {
     flexDirection: "row",
     backgroundColor: "#F3F3F5",
     paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEF0F4",
-    minWidth: SCREEN_WIDTH,
-    alignItems: "center",
+    paddingHorizontal: horizontalMargin,
   },
+
   headerColumn: {
     alignItems: "flex-start",
-    justifyContent: "center",
-    paddingRight: 12,
-    flexShrink: 0,
-    paddingLeft: 0,
+    justifyContent: "flex-start",
   },
-  vendorNameColumn: {
-    flexBasis: SCREEN_WIDTH * 0.25,
-    flexGrow: 1,
-    flexShrink: 0,
-    minWidth: 120,
-  },
-  visitsColumn: {
-    flexBasis: SCREEN_WIDTH * 0.15,
-    flexGrow: 1,
-    flexShrink: 0,
-    minWidth: 80,
-  },
-  purchasesColumn: {
-    flexBasis: SCREEN_WIDTH * 0.15,
-    flexGrow: 1,
-    flexShrink: 0,
-    minWidth: 90,
-  },
-  salesColumn: {
-    flexBasis: SCREEN_WIDTH * 0.2,
-    flexGrow: 1,
-    flexShrink: 0,
-    minWidth: 100,
-  },
-  conversionColumn: {
-    flexBasis: SCREEN_WIDTH * 0.1,
-    flexGrow: 1,
-    flexShrink: 0,
-    minWidth: 70,
-  },
-  statusColumn: {
-    flexBasis: SCREEN_WIDTH * 0.15,
-    flexGrow: 1,
-    flexShrink: 0,
-    minWidth: 80,
-  },
-  headerIconContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+
+  headerText: {
+    fontSize: 13,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.PrimaryText,
+    textAlign: "left",
   },
   headerImage: {
     width: 28,
@@ -293,36 +255,28 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     marginRight: 8,
   },
-  headerText: {
-    fontSize: 14,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.PrimaryText,
-    textAlign: "left",
-  },
   tableRow: {
     flexDirection: "row",
     paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: horizontalMargin,
     borderBottomWidth: 1,
     borderBottomColor: Colors.LightGray,
-    alignItems: "center",
-    minHeight: 50,
-    minWidth: SCREEN_WIDTH,
   },
-  lastRow: {
-    borderBottomWidth: 0,
-  },
+
   dataColumn: {
     alignItems: "flex-start",
-    justifyContent: "center",
-    paddingRight: 12,
-    flexShrink: 0,
-    paddingLeft: 0,
+    justifyContent: "flex-start",
   },
-  vendorNameContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+
+  dataText: {
+    fontSize: 12,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.SecondaryText,
+    textAlign: "left",
+    maxWidth: 100,
   },
+
+  vendorNameColumn: { width: 150, flexDirection: "row", alignItems: "center" },
   vendorAvatar: {
     width: 28,
     height: 28,
@@ -338,22 +292,20 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.SecondaryText,
   },
-  vendorName: {
-    fontSize: 13,
-    fontFamily: Fonts.FONT_MEDIUM,
-    color: Colors.PrimaryText,
-  },
-  dataText: {
-    fontSize: 12,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.SecondaryText,
-    textAlign: "left",
-  },
+  visitsColumn: { width: 90 },
+  purchasesColumn: { width: 90 },
+  salesColumn: { width: 100 },
+  conversionColumn: { width: 100 },
+  statusColumn: { width: 100 },
+
   statusBadge: {
-    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
+    width: 70,
+    alignItems: "center",
+    justifyContent: "center",
   },
+
   statusText: {
     fontSize: 11,
     fontFamily: Fonts.FONT_MEDIUM,

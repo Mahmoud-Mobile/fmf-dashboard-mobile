@@ -1,10 +1,10 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../../Global/colors";
 import { Fonts } from "../../../../Global/fonts";
 import { StyleSheet } from "react-native";
-import { horizontalMargin } from "../../../../config/metrics";
+import { horizontalMargin, calcWidth } from "../../../../config/metrics";
 
 const OverviewCards = () => {
   const cards = [
@@ -40,7 +40,12 @@ const OverviewCards = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Overview</Text>
-      <View style={styles.cardsContainer}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.cardsContainer}
+        style={styles.scrollView}
+      >
         {cards.map((card, index) => (
           <View key={index} style={styles.card}>
             <View style={styles.cardHeader}>
@@ -68,7 +73,7 @@ const OverviewCards = () => {
             </View>
           </View>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -85,13 +90,16 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: horizontalMargin,
   },
+  scrollView: {
+    paddingLeft: horizontalMargin,
+  },
   cardsContainer: {
     flexDirection: "row",
-    paddingHorizontal: horizontalMargin,
+    paddingRight: horizontalMargin,
     gap: 12,
   },
   card: {
-    flex: 1,
+    width: 250,
     backgroundColor: Colors.White,
     borderRadius: 12,
     padding: 12,
@@ -103,6 +111,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+    marginBottom: 10,
   },
   cardHeader: {
     flexDirection: "row",
@@ -111,7 +120,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     flex: 1,
@@ -125,7 +134,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cardValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 12,
@@ -144,12 +153,12 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   breakdownLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
   },
   breakdownValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
   },
