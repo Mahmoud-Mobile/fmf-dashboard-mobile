@@ -7,7 +7,6 @@ import Hotels from "../screens/Hotels";
 import DesignatedCars from "../screens/DesignatedCars";
 import VendorOfferHome from "../screens/OfferHome/VendorOfferHome";
 import DashboardOfferHome from "../screens/OfferHome/DashboardOfferHome";
-import CheckInResource_OH from "../screens/OfferHome/CheckInResource_OH";
 export const ENVIRONMENT_TABS = {
   fmf: [
     {
