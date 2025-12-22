@@ -152,6 +152,8 @@ const Flights = () => {
       const params = {
         status: "SCHEDULED",
         participantsType: selectedCategory,
+        page: 1,
+        limit: 500,
       };
       dispatch(fetchFlights(selectedEvent.id, params));
     }

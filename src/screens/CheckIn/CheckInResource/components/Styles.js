@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   eventTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     marginLeft: 4,

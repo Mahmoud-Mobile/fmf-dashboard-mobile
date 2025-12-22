@@ -15,6 +15,7 @@ import FMF_Icon from "../SVG/FMF_Icon";
 import Notification_Icon from "../SVG/Notification_Icon";
 import FAQ_Icon from "../SVG/FAQ_Icon";
 import Contact_Icon from "../SVG/Contact_Icon";
+import Vendor_Icon from "../SVG/Vendor_Icon";
 const images = {
   Home_Tab: <Home_Tab />,
   More_Tab: <More_Tab />,
@@ -32,6 +33,7 @@ const images = {
   Notification_Icon: <Notification_Icon />,
   FAQ_Icon: <FAQ_Icon />,
   Contact_Icon: <Contact_Icon />,
+  Vendor_Icon: <Vendor_Icon />,
 };
 export const ImagesWithProps = ({
   props,
@@ -73,6 +75,8 @@ export const ImagesWithProps = ({
     <FAQ_Icon color={color} size={size} />
   ) : source == "Contact_Icon" ? (
     <Contact_Icon color={color} size={size} />
+  ) : source == "Vendor_Icon" ? (
+    <Vendor_Icon color={color} size={size} />
   ) : null;
 
 export default images;

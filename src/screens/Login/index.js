@@ -77,15 +77,15 @@ const Login = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (selectedCategory === "fmf") {
-  //     dispatch(setEmail("fmf@lead-360.co"));
-  //     dispatch(setPassword("password123"));
-  //   } else if (selectedCategory === "offerHome") {
-  //     dispatch(setEmail("demo@lead-360.co"));
-  //     dispatch(setPassword("password123"));
-  //   }
-  // }, [selectedCategory]);
+  useEffect(() => {
+    if (selectedCategory === "fmf") {
+      dispatch(setEmail("fmf@lead-360.co"));
+      dispatch(setPassword("password123"));
+    } else if (selectedCategory === "offerHome") {
+      dispatch(setEmail("demo@lead-360.co"));
+      dispatch(setPassword("password123"));
+    }
+  }, [selectedCategory]);
 
   const handleCategoryChange = (categoryValue) => {
     setSelectedCategory(categoryValue);

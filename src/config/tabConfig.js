@@ -5,8 +5,8 @@ import Trips from "../screens/Trips";
 import More from "../screens/More";
 import Hotels from "../screens/Hotels";
 import DesignatedCars from "../screens/DesignatedCars";
-import CheckInOfferHome from "../screens/OfferHome/CheckInOfferHome";
-import NotificationScreen from "../screens/NotificationScreen";
+import VendorOfferHome from "../screens/OfferHome/VendorOfferHome";
+import DashboardOfferHome from "../screens/OfferHome/DashboardOfferHome";
 
 export const ENVIRONMENT_TABS = {
   fmf: [
@@ -77,23 +77,24 @@ export const ENVIRONMENT_TABS = {
   ],
   offerHome: [
     {
-      route: "CheckInOfferHome",
-      component: CheckInOfferHome,
-      icon: "CheckIn_Icon",
+      route: "DashboardOfferHome",
+      component: DashboardOfferHome,
+      icon: "Home_Tab",
       headerShown: false,
-      titleText: "Check-in",
+      titleText: "Dashboard",
       priority: 1,
       defaultVisible: true,
     },
     {
-      route: "NotificationScreen",
-      component: NotificationScreen,
-      icon: "Notification_Icon",
+      route: "VendorOfferHome",
+      component: VendorOfferHome,
+      icon: "Vendor_Icon",
       headerShown: false,
-      titleText: "Notifications",
+      titleText: "Vendor",
       priority: 2,
       defaultVisible: true,
     },
+
     {
       route: "More",
       component: More,

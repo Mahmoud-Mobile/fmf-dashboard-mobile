@@ -50,13 +50,13 @@ const CheckInSubEvent = ({
 
   const fetchSubEventsData = useCallback(() => {
     if (selectedEvent?.id) {
-      dispatch(fetchSubEvents(selectedEvent.id));
+      dispatch(fetchSubEvents(selectedEvent.id, { page: 1, limit: 500 }));
     }
   }, [selectedEvent?.id, dispatch]);
 
   useEffect(() => {
     if (selectedEvent?.id) {
-      fetchSubEventsData();
+      fetchSubEventsData({ page: 1, limit: 500 });
     }
   }, [selectedEvent?.id, fetchSubEventsData]);
 

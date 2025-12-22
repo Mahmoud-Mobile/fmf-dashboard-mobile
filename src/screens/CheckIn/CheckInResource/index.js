@@ -51,7 +51,13 @@ const CheckInResource = ({
 
   const fetchResourcesData = useCallback(() => {
     if (selectedEvent?.id) {
-      dispatch(fetchResources(selectedEvent.id, { type: "AREA" }));
+      dispatch(
+        fetchResources(selectedEvent.id, {
+          type: "AREA",
+          page: 1,
+          limit: 500,
+        })
+      );
     }
   }, [selectedEvent?.id, dispatch]);
 

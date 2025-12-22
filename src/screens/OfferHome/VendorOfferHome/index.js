@@ -9,7 +9,7 @@ import { vendorData as vendorsData } from "./components/vendorData";
 import RecordPurchaseModal from "../../../components/RecordPurchaseModal";
 import { styles } from "./Styles";
 
-const CheckInOfferHome = () => {
+const VendorOfferHome = () => {
   const navigation = useNavigation();
   const { selectedEvent } = useSelector((state) => state.api);
   const [searchText, setSearchText] = useState("");
@@ -170,4 +170,4 @@ const CheckInOfferHome = () => {
   );
 };
 
-export default CheckInOfferHome;
+export default VendorOfferHome;

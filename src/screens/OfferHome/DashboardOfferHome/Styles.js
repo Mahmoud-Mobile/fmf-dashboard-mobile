@@ -6,4 +6,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.Background,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
 });
