@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
+import { Storage } from "expo-storage";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import CustomCategories from "../../components/CustomCategories";
 import SearchActionRow from "../../components/SearchActionRow";
@@ -12,6 +13,7 @@ import CheckInResource from "./CheckInResource";
 
 const CheckInScreen = () => {
   const navigation = useNavigation();
+  const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
   const [selectedCategory, setSelectedCategory] = useState("subEvent");
   const [searchText, setSearchText] = useState("");
   const [viewMode, setViewMode] = useState("list");
@@ -21,10 +23,39 @@ const CheckInScreen = () => {
   const printFunctionRef = useRef(null);
   const { selectedEvent } = useSelector((state) => state.api);
 
-  const categories = [
-    { id: "subEvent", label: "Sub Event", key: "subEvent" },
-    { id: "resource", label: "Resource", key: "resource" },
-  ];
+  useEffect(() => {
+    const loadEnvironment = async () => {
+      try {
+        const storedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        const env = storedCategory || "fmf";
+        setCurrentEnvironment(env);
+        // If offerHome environment, set default category to resource
+        if (env === "offerHome") {
+          setSelectedCategory("resource");
+        }
+      } catch (error) {
+        setCurrentEnvironment("fmf");
+      }
+    };
+    loadEnvironment();
+  }, []);
+
+  // Ensure selectedCategory is always "resource" when in offerHome environment
+  useEffect(() => {
+    if (currentEnvironment === "offerHome" && selectedCategory === "subEvent") {
+      setSelectedCategory("resource");
+    }
+  }, [currentEnvironment, selectedCategory]);
+
+  const categories =
+    currentEnvironment === "offerHome"
+      ? [{ id: "resource", label: "Resource", key: "resource" }]
+      : [
+          { id: "subEvent", label: "Sub Event", key: "subEvent" },
+          { id: "resource", label: "Resource", key: "resource" },
+        ];
 
   const handleSearchClear = useCallback(() => {
     setSearchText("");
@@ -76,11 +107,13 @@ const CheckInScreen = () => {
         onClearDate={() => setSelectedDate(null)}
       />
 
-      <CustomCategories
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onCategorySelect={setSelectedCategory}
-      />
+      {currentEnvironment !== "offerHome" && (
+        <CustomCategories
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+        />
+      )}
 
       {selectedCategory === "subEvent" ? (
         <CheckInSubEvent

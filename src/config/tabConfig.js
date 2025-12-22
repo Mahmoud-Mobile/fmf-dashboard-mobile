@@ -7,7 +7,7 @@ import Hotels from "../screens/Hotels";
 import DesignatedCars from "../screens/DesignatedCars";
 import VendorOfferHome from "../screens/OfferHome/VendorOfferHome";
 import DashboardOfferHome from "../screens/OfferHome/DashboardOfferHome";
-
+import CheckInResource_OH from "../screens/OfferHome/CheckInResource_OH";
 export const ENVIRONMENT_TABS = {
   fmf: [
     {
@@ -86,12 +86,21 @@ export const ENVIRONMENT_TABS = {
       defaultVisible: true,
     },
     {
+      route: "CheckIn",
+      component: CheckIn,
+      icon: "CheckIn_Icon",
+      headerShown: false,
+      titleText: "Check In",
+      priority: 2,
+      defaultVisible: true,
+    },
+    {
       route: "VendorOfferHome",
       component: VendorOfferHome,
       icon: "Vendor_Icon",
       headerShown: false,
       titleText: "Vendor",
-      priority: 2,
+      priority: 3,
       defaultVisible: true,
     },
 
@@ -101,7 +110,7 @@ export const ENVIRONMENT_TABS = {
       icon: "More_Tab",
       headerShown: false,
       titleText: "More",
-      priority: 3,
+      priority: 4,
       defaultVisible: true,
       alwaysVisible: true,
     },
