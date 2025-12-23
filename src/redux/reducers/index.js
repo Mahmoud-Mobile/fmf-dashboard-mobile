@@ -8,7 +8,7 @@ import uiReducer from "./uiReducer";
 const authPersistConfig = {
   key: "auth",
   storage: AsyncStorage,
-  whitelist: ["user", "isLoggedIn"],
+  whitelist: ["user", "isLoggedIn", "rolePermission"],
 };
 
 const uiPersistConfig = {

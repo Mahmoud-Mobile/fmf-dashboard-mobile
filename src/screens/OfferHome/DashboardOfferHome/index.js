@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, ScrollView, Text } from "react-native";
+import { View, ScrollView } from "react-native";
 import { styles } from "./Styles";
 import CustomEventHeader from "../../../components/CustomEventHeader";
 import { useNavigation } from "@react-navigation/native";
@@ -11,15 +11,7 @@ import VendorDashboard from "./components/VendorDashboard";
 const DashboardOfferHome = () => {
   const navigation = useNavigation();
   const { selectedEvent } = useSelector((state) => state.api);
-  const loginResponse = useSelector((state) => state.auth.user);
-
-  const userRole = loginResponse?.user?.role;
-
-  useEffect(() => {
-    if (loginResponse) {
-      console.log("Login response:", loginResponse?.user);
-    }
-  }, [loginResponse]);
+  const rolePermission = useSelector((state) => state.auth.user?.user);
 
   return (
     <View style={styles.container}>
@@ -33,10 +25,10 @@ const DashboardOfferHome = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {userRole !== "admin" && <AdminDashboard />}
-        {userRole === "organizer" && <OrganizerDashboard />}
+        {rolePermission == "admin" && <AdminDashboard />}
+        {rolePermission == "organizer" && <OrganizerDashboard />}
 
-        {userRole === "vendor" && <VendorDashboard />}
+        {rolePermission !== "vendor" && <VendorDashboard />}
       </ScrollView>
     </View>
   );
