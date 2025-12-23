@@ -9,6 +9,7 @@ import {
 import { Colors } from "../../../Global/colors";
 import { Fonts } from "../../../Global/fonts";
 import { useNavigation } from "@react-navigation/native";
+import { commonCardStyle } from "../../../config/metrics";
 const FlightToday = () => {
   const navigation = useNavigation();
   const flightData = [
@@ -206,20 +207,13 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   flightCard: {
+    ...commonCardStyle,
     backgroundColor: Colors.White,
     borderRadius: 20,
     padding: 22,
     width: 280,
     borderWidth: 1,
     borderColor: Colors.borderColor,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 1,
-    elevation: 4,
     marginVertical: 2,
   },
   flightHeader: {

@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../../Global/colors";
 import { Fonts } from "../../Global/fonts";
-import { horizontalMargin } from "../../config/metrics";
+import { horizontalMargin, commonCardStyle } from "../../config/metrics";
 
 const styles = StyleSheet.create({
   container: {
@@ -65,19 +65,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   featureCard: {
+    ...commonCardStyle,
     backgroundColor: Colors.White,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     flexDirection: "row",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
   },
   featureIconContainer: {
     width: 40,

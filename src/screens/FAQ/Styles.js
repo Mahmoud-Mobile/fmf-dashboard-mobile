@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../../Global/colors";
 import { Fonts } from "../../Global/fonts";
-import { horizontalMargin } from "../../config/metrics";
+import { horizontalMargin, commonCardStyle } from "../../config/metrics";
 
 const styles = StyleSheet.create({
   container: {
@@ -44,18 +44,11 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   card: {
+    ...commonCardStyle,
     backgroundColor: Colors.White,
     borderRadius: 16,
     marginHorizontal: horizontalMargin,
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
     overflow: "hidden",
   },
   questionContainer: {

@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../../Global/colors";
 import { Fonts } from "../../Global/fonts";
+import { commonCardStyle } from "../../config/metrics";
 
 const styles = StyleSheet.create({
   container: {
@@ -21,6 +22,7 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   logoContainer: {
+    ...commonCardStyle,
     width: 100,
     height: 100,
     backgroundColor: "#F8F9FA",
@@ -28,14 +30,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 30,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   logo: {
     width: 60,

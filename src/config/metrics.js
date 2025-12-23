@@ -20,18 +20,18 @@ export const calcHeight = (target) => {
 };
 
 export const commonCardStyle = {
-  borderRadius: 12,
-  shadowColor: "rgba(141, 141, 141, 0.08)",
+  borderRadius: 17.612,
+  shadowColor: "rgba(222, 222, 222, 0.10)",
   borderColor: "#F9F9F9",
   backgroundColor: "#FFF",
   shadowOffset: {
     width: 0,
-    height: 10,
+    height: 5.871,
   },
   shadowOpacity: 1,
-  shadowRadius: 20,
+  shadowRadius: 13.209,
   elevation: 5,
-  borderWidth: 1,
+  // borderWidth: 1,
 };
 export const titleText = {
   fontSize: 16,

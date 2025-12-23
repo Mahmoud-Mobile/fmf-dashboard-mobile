@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../../Global/colors";
 import { Fonts } from "../../Global/fonts";
+import { commonCardStyle } from "../../config/metrics";
 
 const styles = StyleSheet.create({
   container: {
@@ -46,18 +47,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   infoCard: {
+    ...commonCardStyle,
     backgroundColor: Colors.White,
     marginHorizontal: 16,
     borderRadius: 16,
     padding: 20,
-    shadowColor: Colors.Black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   infoRow: {
     flexDirection: "row",

@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Fonts } from "../../Global/fonts";
 import { Colors } from "../../Global/colors";
+import { commonCardStyle } from "../../config/metrics";
 
 const styles = StyleSheet.create({
   container: {
@@ -15,17 +16,10 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   heroCard: {
+    ...commonCardStyle,
     backgroundColor: Colors.White,
     borderRadius: 8,
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
     overflow: "hidden",
   },
   heroContent: {
@@ -80,17 +74,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEE2E2",
   },
   card: {
+    ...commonCardStyle,
     backgroundColor: Colors.White,
     borderRadius: 8,
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
     overflow: "hidden",
   },
   cardHeader: {

@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Fonts } from "../../Global/fonts";
 import { Colors } from "../../Global/colors";
+import { commonCardStyle } from "../../config/metrics";
 
 const styles = StyleSheet.create({
   container: {
@@ -13,16 +14,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
+    ...commonCardStyle,
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
     marginBottom: 16,
   },
   cardContent: {

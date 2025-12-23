@@ -1,20 +1,14 @@
 import { StyleSheet } from "react-native";
 import { Fonts } from "../../../Global/fonts";
 import { Colors } from "../../../Global/colors";
+import { commonCardStyle } from "../../../config/metrics";
 
 const styles = StyleSheet.create({
   container: {
+    ...commonCardStyle,
     backgroundColor: "#fff",
     borderRadius: 12,
     marginVertical: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
     overflow: "hidden",
     padding: 16,
     marginRight: 8,
