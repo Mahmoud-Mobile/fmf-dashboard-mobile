@@ -5,176 +5,251 @@ import { Fonts } from "../../Global/fonts";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.White,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderColor,
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.Secondary,
-  },
-  closeButton: {
-    padding: 8,
-  },
-  eventInfo: {
-    padding: 16,
-    backgroundColor: Colors.White,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderColor,
-  },
-  eventHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  eventTitleSection: {
+  scrollContainer: {
     flex: 1,
   },
-  eventTitle: {
-    fontSize: 20,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.Secondary,
-    marginBottom: 4,
-  },
-  eventSubtitle: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.gray,
-  },
-  eventDetailsSection: {
-    alignItems: "flex-end",
-  },
-  eventDate: {
-    fontSize: 14,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.Secondary,
-    marginBottom: 4,
-  },
-  eventLocation: {
-    fontSize: 14,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.Secondary,
-  },
-  content: {
+  scrollView: {
     flex: 1,
-    padding: 16,
   },
-  legend: {
-    marginBottom: 24,
-    alignItems: "center",
+  horizontalScrollContent: {
+    minWidth: "100%",
   },
-  legendGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 20,
-    paddingHorizontal: 20,
+  verticalScrollContent: {
+    minHeight: "100%",
   },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
+  canvas: {
+    position: "relative",
+    backgroundColor: "#f5f5f5",
   },
-  legendCircle: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    marginRight: 8,
+  centerContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  legendText: {
-    fontSize: 12,
+  loadingText: {
+    marginTop: 10,
+    color: Colors.gray,
     fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.gray,
+    fontSize: 14,
   },
-  legendGridCounts: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    gap: 12,
-    paddingHorizontal: 20,
-  },
-  occupiedX: {
-    color: Colors.gray,
-    fontSize: 12,
-    fontFamily: Fonts.FONT_BOLD,
-  },
-  seatingPlan: {
-    marginBottom: 24,
-  },
-  seatingTitle: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.Secondary,
-    marginBottom: 16,
+  errorText: {
+    color: Colors.Error,
+    fontFamily: Fonts.FONT_REGULAR,
+    fontSize: 14,
     textAlign: "center",
-  },
-  mainSeatingArea: {
-    backgroundColor: Colors.borderColor,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  frontRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 16,
-    gap: 8,
-  },
-  seatingRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 8,
-    gap: 4,
-  },
-  seat: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  occupiedSeat: {
-    backgroundColor: Colors.gray,
-  },
-  tableArea: {
-    flexDirection: "row",
-    justifyContent: "space-around",
     paddingHorizontal: 20,
   },
-  tableGroup: {
-    alignItems: "center",
+  image: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
   },
-  table: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.gray,
+  manualRegisterBanner: {
+    flexDirection: "row",
+    padding: 16,
+    backgroundColor: Colors.Primary,
+    alignItems: "center",
+    shadowColor: Colors.Black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    top: -9,
+  },
+  manualRegisterIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 8,
+    marginRight: 12,
   },
-  tableText: {
+  manualRegisterContent: {
+    flex: 1,
+  },
+  manualRegisterTitle: {
     color: Colors.White,
     fontSize: 16,
     fontFamily: Fonts.FONT_BOLD,
+    marginBottom: 6,
   },
-  tableChairs: {
+  manualRegisterQRContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    width: 80,
-    gap: 4,
+    alignItems: "center",
+    marginBottom: 4,
   },
-  tableChair: {
-    margin: 2,
+  manualRegisterLabel: {
+    color: Colors.White,
+    fontSize: 12,
+    fontFamily: Fonts.FONT_REGULAR,
+    opacity: 0.9,
+    marginRight: 8,
+  },
+  manualRegisterQRBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.White,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 6,
+  },
+  manualRegisterQRText: {
+    color: Colors.Primary,
+    fontSize: 12,
+    fontFamily: Fonts.FONT_Semi,
+  },
+  manualRegisterSubtext: {
+    color: Colors.White,
+    fontSize: 12,
+    fontFamily: Fonts.FONT_REGULAR,
+    opacity: 0.8,
+    marginTop: 2,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  loadingModal: {
+    backgroundColor: Colors.White,
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  loadingModalText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  // Manual Register Modal Styles
+  bottomSheetBackground: {
+    backgroundColor: Colors.White,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    shadowColor: Colors.Black,
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 16,
+  },
+  handleIndicator: {
+    backgroundColor: Colors.LightGray,
+    width: 60,
+    height: 4,
+    marginTop: 8,
+  },
+  modalContentContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  modalHeaderContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+    position: "relative",
+  },
+  modalCloseButton: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+    borderRadius: 16,
+    backgroundColor: Colors.LightGray,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.FONT_BOLD,
+    color: Colors.PrimaryText,
+    marginTop: 8,
+  },
+  modalScrollView: {
+    flex: 1,
+  },
+  modalScrollContent: {
+    paddingBottom: 20,
+  },
+  modalInfoContainer: {
+    marginBottom: 20,
+  },
+  modalInfoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.LightGray,
+  },
+  modalLabel: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_Semi,
+    color: Colors.PrimaryText,
+  },
+  modalValue: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.SecondaryText,
+    flex: 1,
+    textAlign: "right",
+    marginLeft: 16,
+  },
+  modalNotesContainer: {
+    marginBottom: 20,
+  },
+  modalNotesInput: {
+    borderWidth: 1,
+    borderColor: Colors.LightGray,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.PrimaryText,
+    minHeight: 100,
+    marginTop: 8,
+    textAlignVertical: "top",
+  },
+  modalButtonsContainer: {
+    flexDirection: "row",
+    gap: 12,
+    paddingTop: 16,
+    paddingBottom: 20,
+    borderTopWidth: 1,
+    borderTopColor: Colors.LightGray,
+  },
+  modalButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+  },
+  modalCancelButton: {
+    backgroundColor: Colors.gray,
+  },
+  modalRegisterButton: {
+    backgroundColor: Colors.Primary,
+  },
+  modalButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_Semi,
+    color: Colors.White,
   },
 });

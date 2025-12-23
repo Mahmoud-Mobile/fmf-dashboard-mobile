@@ -44,13 +44,7 @@ const More = () => {
       iconColor: "#374151",
       navigation: "Profile",
     },
-    {
-      id: 2,
-      title: "Survey",
-      icon: "CheckIn_Icon",
-      iconColor: "#374151",
-      navigation: "Survey",
-    },
+
     {
       id: 3,
       title: "Privacy Policy",
@@ -65,9 +59,24 @@ const More = () => {
       iconColor: "#374151",
       navigation: "About",
     },
+
+    {
+      id: 3,
+      title: "FAQ",
+      icon: "FAQ_Icon",
+      iconColor: "#374151",
+      navigation: "FAQ",
+    },
+    {
+      id: 4,
+      title: "Contact Us",
+      icon: "Contact_Icon",
+      iconColor: "#374151",
+      navigation: "ContactUs",
+    },
     {
       id: 5,
-      title: "logout",
+      title: "Logout",
       icon: "Logout_Icon",
       iconColor: "#EF4444",
       navigation: null,
@@ -81,7 +90,7 @@ const More = () => {
       ) : (
         <>
           <LinearGradient
-            colors={["#880CB9", "#368BBA"]}
+            colors={["#2965B8", "#2965B8"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.backgroundImage}
@@ -93,7 +102,7 @@ const More = () => {
                   {userInfo?.user?.lastName ?? ""}
                 </Text>
                 <Text style={styles.mobileText}>
-                  {userInfo?.user?.role ?? ""}
+                  {userInfo?.user?.email ?? ""}
                 </Text>
               </View>
             </View>

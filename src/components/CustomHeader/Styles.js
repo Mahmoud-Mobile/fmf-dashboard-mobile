@@ -1,42 +1,41 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { Fonts } from "../../Global/fonts";
+import { Colors } from "../../Global/colors";
+import { horizontalMargin } from "../../config/metrics";
 
 const styles = StyleSheet.create({
-  container: {
+  safeAreaContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 27,
-    borderBottomWidth: 1,
-    paddingBottom: 18,
+    paddingHorizontal: horizontalMargin,
+    paddingTop: 5,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    backgroundColor: Colors.Primary,
+    paddingBottom: Platform.OS === "ios" ? 15 : 10,
   },
-  centerView: {
-    paddingHorizontal: 27,
-    borderBottomWidth: 1,
-    paddingBottom: 18,
+  leftAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
-  title: {
-    color: "#020201",
-    fontSize: 15,
+  centerOverlay: {},
+  titleText: {
+    fontSize: 18,
     textAlign: "center",
     fontFamily: Fonts.FONT_MEDIUM,
-    paddingVertical: 10,
   },
-
+  subtitleText: {
+    fontSize: 14,
+    textAlign: "center",
+    fontFamily: Fonts.FONT_LIGHT,
+    marginTop: 4,
+  },
   button: {
     width: 40,
     paddingVertical: 10,
     height: 40,
-  },
-  leftButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#F1F1F1",
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 10,
-    transform: [{ scaleX: 1 }], // Fixed to LTR only
   },
 });
 export default styles;

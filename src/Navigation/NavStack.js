@@ -2,21 +2,32 @@ import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../screens/Login";
-import Dashboard from "../screens/Dashboard";
+import MainEvent from "../screens/MainEvent";
 import MyTabs from "../Navigation/MyTabs";
 import NoInternetScreen from "../screens/NoInternetScreen";
 import FlightDetails from "../screens/FlightDetails";
 import PreviewSeats from "../screens/PreviewSeats";
+import ShowSeats from "../screens/ShowSeats";
 import CameraQRScanner from "../screens/CameraQRScanner";
 import ZebraQR from "../screens/ZebraQR";
+import CameraQRScannerOfferHome from "../screens/OfferHome/CameraQRScanner";
+import ZebraQROfferHome from "../screens/OfferHome/ZebraQR";
 import Chat from "../screens/Chat";
 import DesignatedCars from "../screens/DesignatedCars";
+import DesignatedCarDetails from "../screens/DesignatedCarDetails";
 import Hotels from "../screens/Hotels";
+import HotelDetails from "../screens/HotelDetails";
 import NotificationScreen from "../screens/NotificationScreen";
 import Profile from "../screens/Profile";
+import AudienceProfile from "../screens/AudienceProfile";
 import Survey from "../screens/Survey";
 import PrivacyPolicy from "../screens/PrivacyPolicy";
 import About from "../screens/About";
+import FAQ from "../screens/FAQ";
+import ContactUs from "../screens/ContactUs";
+import TripsDetails from "../screens/TripsDetails";
+import SubEventDetails from "../screens/SubEventDetails";
+import ResourceDetails from "../screens/ResourceDetails";
 import { Colors } from "../Global/colors";
 import { Fonts } from "../Global/fonts";
 import NetInfo from "@react-native-community/netinfo";
@@ -69,12 +80,12 @@ const NavStack = () => {
 
   return (
     <Stack.Navigator
-      initialRouteName={isLoggedIn ? "Dashboard" : "Login"} // Use the login state to set the initial route
+      initialRouteName={isLoggedIn ? "MainEvent" : "Login"} // Use the login state to set the initial route
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen
-        name="Dashboard"
-        component={Dashboard}
+        name="MainEvent"
+        component={MainEvent}
         options={{ headerShown: false, animationEnabled: false }}
       />
       <Stack.Screen
@@ -116,6 +127,13 @@ const NavStack = () => {
         }}
       />
       <Stack.Screen
+        name="ShowSeats"
+        component={ShowSeats}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="CameraQRScanner"
         component={CameraQRScanner}
         options={{
@@ -125,6 +143,20 @@ const NavStack = () => {
       <Stack.Screen
         name="ZebraQR"
         component={ZebraQR}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="CameraQRScannerOfferHome"
+        component={CameraQRScannerOfferHome}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ZebraQROfferHome"
+        component={ZebraQROfferHome}
         options={{
           headerShown: false,
         }}
@@ -144,8 +176,22 @@ const NavStack = () => {
         }}
       />
       <Stack.Screen
+        name="DesignatedCarDetails"
+        component={DesignatedCarDetails}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="Hotels"
         component={Hotels}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="HotelDetails"
+        component={HotelDetails}
         options={{
           headerShown: false,
         }}
@@ -160,6 +206,13 @@ const NavStack = () => {
       <Stack.Screen
         name="Profile"
         component={Profile}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="AudienceProfile"
+        component={AudienceProfile}
         options={{
           headerShown: false,
         }}
@@ -181,6 +234,41 @@ const NavStack = () => {
       <Stack.Screen
         name="About"
         component={About}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="FAQ"
+        component={FAQ}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ContactUs"
+        component={ContactUs}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="TripsDetails"
+        component={TripsDetails}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="SubEventDetails"
+        component={SubEventDetails}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ResourceDetails"
+        component={ResourceDetails}
         options={{
           headerShown: false,
         }}

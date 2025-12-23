@@ -4,42 +4,39 @@ import CustomHeader from "../../components/CustomHeader";
 import { styles } from "./Styles";
 import { NotificationItem } from "./components";
 import { componentStyles } from "./components/Styles";
-import { SafeAreaView } from "react-native-safe-area-context";
-
 import { useNavigation } from "@react-navigation/native";
 
 const NotificationScreen = () => {
   const [data, setData] = useState([]);
   const navigation = useNavigation();
   useEffect(() => {
-    // Mock data - replace with actual API call
     const mockData = [
       {
         id: "1",
-        title: "New Event Update",
-        desc: "There's a new update for the upcoming event. Please check the details.",
-        time: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+        title: "New Update Available",
+        desc: "There's a new update available. Please check the details.",
+        time: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
       },
       {
         id: "2",
-        title: "Flight Status Changed",
-        desc: "Your flight status has been updated. Please review the new information.",
-        time: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+        title: "Status Changed",
+        desc: "Your status has been updated. Please review the new information.",
+        time: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
       },
       {
         id: "3",
-        title: "Check-in Reminder",
-        desc: "Don't forget to check in for your upcoming event. Check-in opens in 2 hours.",
-        time: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+        title: "Reminder",
+        desc: "Don't forget about your upcoming event. It starts in 2 hours.",
+        time: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
       },
     ];
     setData(mockData);
   }, []);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <View style={styles.container}>
       <CustomHeader
-        title="Notifications"
+        leftLabel="Notifications"
         onLeftButtonPress={() => navigation.goBack()}
       />
       <FlatList
@@ -59,7 +56,7 @@ const NotificationScreen = () => {
         )}
         ListFooterComponent={() => <View style={{ height: 50 }} />}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

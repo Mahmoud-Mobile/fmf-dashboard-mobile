@@ -4,6 +4,7 @@ import {
   LOGOUT,
   SET_EMAIL,
   SET_PASSWORD,
+  SET_ROLE_PERMISSION,
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
   error: null,
   email: "",
   password: "",
+  rolePermission: null,
 };
 
 export default function authReducer(state = initialState, action) {
@@ -34,11 +36,14 @@ export default function authReducer(state = initialState, action) {
         isLoggedIn: false,
         user: null,
         error: null,
+        rolePermission: null,
       };
     case SET_EMAIL:
       return { ...state, email: action.payload };
     case SET_PASSWORD:
       return { ...state, password: action.payload };
+    case SET_ROLE_PERMISSION:
+      return { ...state, rolePermission: action.payload };
     default:
       return state;
   }

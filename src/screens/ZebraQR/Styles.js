@@ -5,24 +5,6 @@ import { Fonts } from "../../Global/fonts";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.White,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderColor,
-  },
-  backButton: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.Secondary,
   },
   placeholder: {
     width: 40,
@@ -68,5 +50,34 @@ export const styles = StyleSheet.create({
     opacity: 0,
     height: 0,
     width: 0,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+  },
+  manualInputContainer: {
+    width: "100%",
+    marginTop: 32,
+    paddingHorizontal: 20,
+  },
+  manualInput: {
+    width: "100%",
+    height: 56,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.Secondary,
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.LightGray,
+    textAlign: "left",
+    marginBottom: 16,
+  },
+  submitButton: {
+    width: "100%",
+    marginTop: 8,
   },
 });

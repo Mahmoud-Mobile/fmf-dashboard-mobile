@@ -1,0 +1,392 @@
+{
+  "returnGuestsData": [
+    {
+      "id": "1",
+      "flightNo": "EK001",
+      "name": "Ahmed Al-Rashid",
+      "date": "2024-01-15",
+      "time": "14:30"
+    },
+    {
+      "id": "2",
+      "flightNo": "EK002",
+      "name": "Sarah Johnson",
+      "date": "2024-01-15",
+      "time": "15:45"
+    },
+    {
+      "id": "3",
+      "flightNo": "EK003",
+      "name": "Mohammed Hassan",
+      "date": "2024-01-16",
+      "time": "16:20"
+    },
+    {
+      "id": "4",
+      "flightNo": "EK004",
+      "name": "Fatima Al-Zahra",
+      "date": "2024-01-16",
+      "time": "17:10"
+    }
+  ],
+  "arrivalGuestsData": [
+    {
+      "id": "1",
+      "flightNo": "QR101",
+      "name": "Omar Abdullah",
+      "date": "2024-01-15",
+      "time": "09:30"
+    },
+    {
+      "id": "2",
+      "flightNo": "SV102",
+      "name": "Layla Al-Mansouri",
+      "date": "2024-01-15",
+      "time": "10:15"
+    },
+    {
+      "id": "3",
+      "flightNo": "MS103",
+      "name": "Yusuf Ahmed",
+      "date": "2024-01-15",
+      "time": "11:00"
+    },
+    {
+      "id": "4",
+      "flightNo": "KU104",
+      "name": "Aisha Mohammed",
+      "date": "2024-01-15",
+      "time": "12:30"
+    }
+  ],
+  "flightsData": [
+    {
+      "id": "1",
+      "flightNo": "EK205",
+      "airline": "Emirates",
+      "destination": "Dubai",
+      "date": "2024-01-15",
+      "time": "08:00"
+    },
+    {
+      "id": "2",
+      "flightNo": "QR306",
+      "airline": "Qatar Airways",
+      "destination": "Doha",
+      "date": "2024-01-15",
+      "time": "10:30"
+    },
+    {
+      "id": "3",
+      "flightNo": "SV407",
+      "airline": "Saudia",
+      "destination": "Riyadh",
+      "date": "2024-01-16",
+      "time": "14:15"
+    },
+    {
+      "id": "4",
+      "flightNo": "MS508",
+      "airline": "EgyptAir",
+      "destination": "Cairo",
+      "date": "2024-01-16",
+      "time": "16:45"
+    }
+  ],
+  "hotelOccupancyData": [
+    {
+      "id": "1",
+      "hotelName": "Grand Plaza Hotel",
+      "count": "85 from 100"
+    },
+    {
+      "id": "2",
+      "hotelName": "Sea View Resort",
+      "count": "72 from 100"
+    },
+    {
+      "id": "3",
+      "hotelName": "City Center Inn",
+      "count": "55 from 100"
+    },
+    {
+      "id": "4",
+      "hotelName": "Luxury Suites",
+      "count": "28 from 100"
+    }
+  ],
+  "hotelDetailsData": [
+    {
+      "id": "1",
+      "hotel": "Ritz Carlton",
+      "guest": "Ahmed Al-Rashid",
+      "status": "Checked In"
+    },
+    {
+      "id": "2",
+      "hotel": "Ritz Carlton",
+      "guest": "Sarah Johnson",
+      "status": "Checked Out"
+    },
+    {
+      "id": "3",
+      "hotel": "Ritz Carlton",
+      "guest": "Mohammed Hassan",
+      "status": "Checked In"
+    },
+    {
+      "id": "4",
+      "hotel": "Ritz Carlton",
+      "guest": "Fatima Al-Zahra",
+      "status": "Pending"
+    }
+  ],
+  "tripListData": [
+    {
+      "id": "1",
+      "carName": "Toyota Camry",
+      "driver": "Ahmed Hassan"
+    },
+    {
+      "id": "2",
+      "carName": "Honda Accord",
+      "driver": "Mohammed Ali"
+    },
+    {
+      "id": "3",
+      "carName": "BMW X5",
+      "driver": "Omar Abdullah"
+    },
+    {
+      "id": "4",
+      "carName": "Mercedes E-Class",
+      "driver": "Khalid Al-Rashid"
+    }
+  ],
+  "tripsSummaryData": [
+    {
+      "id": "1",
+      "guestName": "Ahmed Al-Rashid",
+      "driver": "Mohammed Hassan"
+    },
+    {
+      "id": "2",
+      "guestName": "Sarah Johnson",
+      "driver": "Omar Abdullah"
+    },
+    {
+      "id": "3",
+      "guestName": "Fatima Al-Zahra",
+      "driver": "Khalid Al-Rashid"
+    },
+    {
+      "id": "4",
+      "guestName": "Yusuf Ahmed",
+      "driver": "Ahmed Hassan"
+    }
+  ],
+  "arrivalGuestsChartData": [
+    { "label": "Arrival", "value": 120, "color": "#880CB9" },
+    { "label": "Upcoming", "value": 60, "color": "#F59E0B" },
+    { "label": "Cancelled", "value": 30, "color": "#F472B6" },
+    { "label": "Return", "value": 35, "color": "#2965B8" },
+    { "label": "Delayed", "value": 5, "color": "#60A5FA" }
+  ],
+  "returnGuestsChartData": [
+    { "label": "Return", "value": 35, "color": "#880CB9" },
+    { "label": "Upcoming", "value": 15, "color": "#F59E0B" },
+    { "label": "Cancelled", "value": 5, "color": "#F472B6" },
+    { "label": "Delayed", "value": 3, "color": "#60A5FA" },
+    { "label": "Arrival", "value": 2, "color": "#2965B8" }
+  ],
+  "ageDistributionChartData": [
+    { "label": "18-25", "value": 45, "color": "#880CB9" },
+    { "label": "26-35", "value": 60, "color": "#F59E0B" },
+    { "label": "36-45", "value": 35, "color": "#F472B6" },
+    { "label": "46-55", "value": 25, "color": "#2965B8" },
+    { "label": "65+", "value": 8, "color": "#60A5FA" }
+  ],
+  "continentChartData": [
+    { "label": "Asia", "value": 45, "color": "#880CB9" },
+    { "label": "Africa", "value": 35, "color": "#F59E0B" },
+    { "label": "Oceania", "value": 25, "color": "#F472B6" },
+    { "label": "Europe", "value": 20, "color": "#2965B8" },
+    { "label": "Americas", "value": 15, "color": "#60A5FA" }
+  ],
+  "genderDistributionChartData": [
+    { "label": "Male", "value": 55, "color": "#880CB9" },
+    { "label": "Other", "value": 3, "color": "#F59E0B" },
+    { "label": "Female", "value": 45, "color": "#8B5CF6" }
+  ],
+  "adminDashboard": {
+    "overviewCards": [
+      {
+        "title": "Total Vendors",
+        "value": "60",
+        "subtitle": "Active Vendors: 46",
+        "icon": "storefront-outline"
+      },
+      {
+        "title": "Total Visits",
+        "value": "6,247",
+        "today": "2,247",
+        "icon": "people-outline"
+      },
+      {
+        "title": "Total Purchases",
+        "value": "3,456",
+        "today": "2,650",
+        "icon": "bag-outline"
+      },
+      {
+        "title": "Total Sales",
+        "value": "SAR 2.5 M",
+        "today": "350k",
+        "icon": "cash-outline"
+      }
+    ],
+    "vendors": [
+      {
+        "name": "Product 1",
+        "visits": 360,
+        "purchases": 220,
+        "sales": "SAR 210K",
+        "conversion": "41%",
+        "status": "High"
+      },
+      {
+        "name": "Product 2",
+        "visits": 160,
+        "purchases": 110,
+        "sales": "SAR 160K",
+        "conversion": "36%",
+        "status": "Medium"
+      },
+      {
+        "name": "Product 3",
+        "visits": 100,
+        "purchases": 90,
+        "sales": "SAR 100K",
+        "conversion": "25%",
+        "status": "Low"
+      }
+    ],
+    "filters": ["Highest Sales", "Most Visits", "Highest conversion"]
+  },
+  "vendorDashboard": {
+    "overviewCards": [
+      {
+        "title": "Total Visits",
+        "value": "3,247",
+        "today": "1,247",
+        "icon": "people-outline"
+      },
+      {
+        "title": "Total Items",
+        "value": "1,456",
+        "today": "456",
+        "icon": "calendar-outline"
+      },
+      {
+        "title": "Total Sales",
+        "value": "SAR 450K",
+        "today": "250k",
+        "icon": "cash-outline"
+      },
+      {
+        "title": "Conversion",
+        "value": "38%",
+        "today": "350k",
+        "icon": "stats-chart-outline"
+      }
+    ],
+    "dateFilters": ["All Purchases", "Jan 08", "Jan 09", "Jan 10", "Jan 11"],
+    "purchases": [
+      {
+        "id": 1,
+        "name": "Product Name 1",
+        "discount": 20,
+        "originalPrice": 5000,
+        "finalPrice": 3000,
+        "recordedPurchaseTime": "06:00PM"
+      },
+      {
+        "id": 2,
+        "name": "Product Name 2",
+        "discount": 20,
+        "originalPrice": 5000,
+        "finalPrice": 3000,
+        "recordedPurchaseTime": "06:00PM"
+      },
+      {
+        "id": 3,
+        "name": "Product Name 3",
+        "discount": 20,
+        "originalPrice": 5000,
+        "finalPrice": 3000,
+        "recordedPurchaseTime": "06:00PM"
+      },
+      {
+        "id": 4,
+        "name": "Product Name 4",
+        "discount": 20,
+        "originalPrice": 5000,
+        "finalPrice": 3000,
+        "recordedPurchaseTime": "06:00PM"
+      }
+    ],
+    "areas": [
+      { "name": "Areas 1", "checkedIn": "450" },
+      { "name": "Areas 2", "checkedIn": "450" },
+      { "name": "Areas 3", "checkedIn": "450" }
+    ],
+    "vendorInfo": {
+      "name": "Vendor Name",
+      "booth": "Booth A-12",
+      "visits": 560,
+      "purchases": 5,
+      "avatar": null
+    }
+  },
+  "organizerDashboard": {
+    "overviewCards": [
+      {
+        "title": "Total Check-In",
+        "value": "1,456",
+        "subtitle": "Across all Areas",
+        "icon": "checkmark-circle-outline"
+      },
+      {
+        "title": "Companions",
+        "value": "2,600",
+        "subtitle": "Across all Areas",
+        "icon": "people-outline"
+      }
+    ],
+    "recentCheckIns": [
+      {
+        "name": "Fatima Noor",
+        "location": "Area 1",
+        "time": "04:03 PM",
+        "companions": "+2 Companions"
+      },
+      {
+        "name": "Fatima Noor",
+        "location": "Area 1",
+        "time": "04:03 PM",
+        "companions": "+2 Companions"
+      },
+      {
+        "name": "Fatima Noor",
+        "location": "Area 1",
+        "time": "04:03 PM",
+        "companions": "+2 Companions"
+      }
+    ],
+    "areas": [
+      { "name": "Areas 1", "checkedIn": "450" },
+      { "name": "Areas 2", "checkedIn": "450" },
+      { "name": "Areas 3", "checkedIn": "450" }
+    ]
+  }
+}

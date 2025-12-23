@@ -6,6 +6,7 @@ import {
   LOGOUT,
   SET_EMAIL,
   SET_PASSWORD,
+  SET_ROLE_PERMISSION,
 } from "./actionTypes";
 
 export const login = (params) => async (dispatch) => {
@@ -18,7 +19,10 @@ export const login = (params) => async (dispatch) => {
       await SecureStore.setItemAsync("accessToken", token);
       await SecureStore.setItemAsync("userInfo", JSON.stringify(response));
 
+      // Extract and store rolePermission
+      const rolePermission = response?.user?.role || null;
       dispatch({ type: LOGIN_SUCCESS, payload: response });
+      dispatch({ type: SET_ROLE_PERMISSION, payload: rolePermission });
       return { type: LOGIN_SUCCESS, payload: response };
     } else {
       console.log("Login failed: No access token in response");
@@ -47,4 +51,9 @@ export const setEmail = (email) => ({
 export const setPassword = (password) => ({
   type: SET_PASSWORD,
   payload: password,
+});
+
+export const setRolePermission = (rolePermission) => ({
+  type: SET_ROLE_PERMISSION,
+  payload: rolePermission,
 });

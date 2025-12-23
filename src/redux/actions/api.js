@@ -3,6 +3,12 @@ import {
   events,
   getEventById,
   flights,
+  trips,
+  getSubEvents,
+  getSubEventById,
+  getResources,
+  getResourceById,
+  getSeatingPlans,
 } from "../../webservice/apiConfig";
 
 import {
@@ -12,6 +18,12 @@ import {
   setEvents,
   setSelectedEvent,
   setFlights,
+  setTrips,
+  setSubEvents,
+  setSelectedSubEvent,
+  setResources,
+  setSelectedResource,
+  setSeatingPlans,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -62,9 +74,99 @@ export const fetchFlights = (eventId, params) => async (dispatch) => {
     const response = await flights(eventId, params);
     dispatch(setFlights(response));
   } catch (error) {
-    console.log("Error in fetchFlights:", error);
     dispatch(setError("Error fetching flights"));
+  } finally {
+    dispatch(setLoading(false));
   }
 };
+
+// Fetch trips for an event
+export const fetchTrips = (eventId, params) => async (dispatch) => {
+  dispatch(setLoading());
+  try {
+    const response = await trips(eventId, params);
+    dispatch(setTrips(response));
+  } catch (error) {
+    console.log("Error in fetchTrips:", error);
+    dispatch(setError("Error fetching trips"));
+  }
+};
+
+// Fetch sub-events for an event
+export const fetchSubEvents = (eventId, params) => async (dispatch) => {
+  dispatch(setLoading());
+  try {
+    const response = await getSubEvents(eventId, params);
+    dispatch(setSubEvents(response));
+  } catch (error) {
+    console.log("Error in fetchSubEvents:", error);
+    dispatch(setError("Error fetching sub-events"));
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+// Fetch sub-event by ID
+export const fetchSubEventById =
+  (eventId, subEventId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      console.log("Fetching sub-event by ID:", subEventId);
+      const response = await getSubEventById(eventId, subEventId, params);
+      dispatch(setSelectedSubEvent(response));
+    } catch (error) {
+      dispatch(setError("Error fetching sub-event details"));
+      console.log("Error fetching sub-event details: ", error);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Fetch resources for an event
+export const fetchResources = (eventId, params) => async (dispatch) => {
+  dispatch(setLoading());
+  try {
+    const response = await getResources(eventId, params);
+    dispatch(setResources(response));
+  } catch (error) {
+    console.log("Error in fetchResources:", error);
+    dispatch(setError("Error fetching resources"));
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+// Fetch resource by ID
+export const fetchResourceById =
+  (resourceId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      console.log("Fetching resource by ID:", resourceId);
+      const response = await getResourceById(resourceId, params);
+      dispatch(setSelectedResource(response));
+    } catch (error) {
+      dispatch(setError("Error fetching resource details"));
+      console.log("Error fetching resource details: ", error);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Fetch seating plans for a sub-event
+export const fetchSeatingPlans =
+  (eventId, subeventId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      const response = await getSeatingPlans(eventId, subeventId, params);
+      dispatch(setSeatingPlans(response));
+    } catch (error) {
+      dispatch(setError("Error fetching seating plans"));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
 export { setSelectedEvent };

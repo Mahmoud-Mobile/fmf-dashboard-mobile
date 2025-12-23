@@ -7,56 +7,18 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useIsFocused, useRoute } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Storage } from "expo-storage";
 import { setSelectedEvent } from "../redux/actions/api";
-import Home from "../screens/Home";
-import Flights from "../screens/Flights";
-import CheckIn from "../screens/CheckIn";
-import Trips from "../screens/Trips";
-import More from "../screens/More";
 import { ImagesWithProps } from "../config/images";
 import { Fonts } from "../Global/fonts";
 import { Colors } from "../Global/colors";
+import {
+  getTabsForEnvironment,
+  getDefaultTabVisibility,
+} from "../config/tabConfig";
 
 const Tab = createBottomTabNavigator();
-
-const TabArr = [
-  {
-    route: "Home",
-    component: Home,
-    icon: "Home_Tab",
-    headerShown: false,
-    titleText: "Home",
-  },
-  {
-    route: "Flights",
-    component: Flights,
-    icon: "Flights_Icon",
-    headerShown: false,
-    titleText: "Flights",
-  },
-  {
-    route: "CheckIn",
-    component: CheckIn,
-    icon: "CheckIn_Icon",
-    headerShown: false,
-    titleText: "Check In",
-  },
-  {
-    route: "Trips",
-    component: Trips,
-    icon: "Chat_Icon",
-    headerShown: false,
-    titleText: "Trips",
-  },
-  {
-    route: "More",
-    component: More,
-    icon: "More_Tab",
-    headerShown: false,
-    titleText: "More",
-  },
-];
 
 const TabButton = ({ item, onPress, routeName }) => {
   const isFocused = useIsFocused();
@@ -110,13 +72,76 @@ const TabButton = ({ item, onPress, routeName }) => {
 const MyTabs = () => {
   const route = useRoute();
   const dispatch = useDispatch();
+  const tabVisibility = useSelector((state) => state.ui?.tabVisibility) || {};
+  const [currentEnvironment, setCurrentEnvironment] = React.useState("fmf");
+  const [TabArr, setTabArr] = React.useState(() =>
+    getTabsForEnvironment("fmf")
+  );
 
-  // Get the selected event from route params and store it in Redux
+  React.useEffect(() => {
+    const loadEnvironment = async () => {
+      try {
+        const selectedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        const env = selectedCategory || "fmf";
+        setCurrentEnvironment(env);
+        setTabArr(getTabsForEnvironment(env));
+      } catch (error) {
+        console.error("Error loading environment:", error);
+        setCurrentEnvironment("fmf");
+        setTabArr(getTabsForEnvironment("fmf"));
+      }
+    };
+    loadEnvironment();
+  }, []);
+
   React.useEffect(() => {
     if (route.params?.selectedEvent) {
       dispatch(setSelectedEvent(route.params.selectedEvent));
     }
   }, [route.params?.selectedEvent, dispatch]);
+
+  const resolvedTabVisibility = React.useMemo(() => {
+    const defaultVisibility = getDefaultTabVisibility(currentEnvironment);
+
+    return TabArr.reduce((acc, tab) => {
+      const stored = tabVisibility?.[tab.route];
+      acc[tab.route] =
+        stored === undefined ? defaultVisibility[tab.route] ?? true : stored;
+      return acc;
+    }, {});
+  }, [tabVisibility, TabArr, currentEnvironment]);
+
+  const visibleRoutes = React.useMemo(() => {
+    const forcedVisible = { ...resolvedTabVisibility };
+
+    TabArr.forEach((tab) => {
+      if (tab.alwaysVisible) {
+        forcedVisible[tab.route] = true;
+      }
+    });
+
+    const sortedTabs = [...TabArr]
+      .filter((tab) => forcedVisible[tab.route])
+      .sort((a, b) => (a.priority || 999) - (b.priority || 999));
+
+    const selected = [];
+    for (const tab of sortedTabs) {
+      if (forcedVisible[tab.route]) {
+        selected.push(tab.route);
+      }
+      if (selected.length >= 5) break;
+    }
+    return new Set(selected);
+  }, [resolvedTabVisibility, TabArr]);
+
+  const visibleTabs = TabArr.filter((t) => visibleRoutes.has(t.route));
+
+  // Don't render navigator if there are no visible tabs
+  if (visibleTabs.length === 0) {
+    return null;
+  }
 
   return (
     <Tab.Navigator
@@ -126,7 +151,7 @@ const MyTabs = () => {
         headerBackLeft: true,
       }}
     >
-      {TabArr.map((item) => (
+      {visibleTabs.map((item) => (
         <Tab.Screen
           key={item.route}
           name={item.route}

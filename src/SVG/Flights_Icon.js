@@ -1,20 +1,27 @@
-import React from "react";
+import * as React from "react";
 import Svg, { Path } from "react-native-svg";
 
-const Flights_Icon = (props) => {
+function Flights_Icon(props) {
+  const size = props.size ?? 24;
+  const color = props.color ?? "#1E1E1E";
+  const opacity = props.opacity ?? 0.9;
+
   return (
     <Svg
-      width={props.width ?? 24}
-      height={props.height ?? 24}
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <Path
-        d="M21 16V14L13 9V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z"
-        fill={props.color ?? "#B4B4B4"}
+        d="M17.375 10.707l2.732-2.57.015-.016a3 3 0 10-4.243-4.243c0 .005-.01.01-.016.016l-2.57 2.732-7.781-2.832a.75.75 0 00-.787.175l-2.25 2.25a.75.75 0 00.114 1.154l5.99 3.993-1.39 1.384H5.25a.75.75 0 00-.53.22l-2.25 2.25a.75.75 0 00.249 1.226l3.452 1.38 1.378 3.446.005.015a.75.75 0 001.236.232l2.238-2.239a.751.751 0 00.222-.53v-1.94l1.384-1.383 3.993 5.99a.75.75 0 001.154.114l2.25-2.25a.75.75 0 00.174-.787l-2.83-7.787zm-.007 9.116l-3.993-5.989a.75.75 0 00-.55-.334h-.074a.75.75 0 00-.53.22l-2.25 2.25a.75.75 0 00-.221.53v1.94l-1.225 1.225-1.078-2.696a.748.748 0 00-.416-.415l-2.694-1.078L5.56 14.25H7.5a.75.75 0 00.53-.22l2.25-2.25a.75.75 0 00-.114-1.154L4.178 6.632l1.265-1.265 7.802 2.837a.75.75 0 00.803-.187l2.9-3.085a1.5 1.5 0 012.12 2.121l-3.08 2.9a.75.75 0 00-.188.802l2.837 7.802-1.269 1.266z"
+        fill={color}
+        opacity={opacity}
       />
     </Svg>
   );
-};
+}
 
 export default Flights_Icon;

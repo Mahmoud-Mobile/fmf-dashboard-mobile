@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Colors } from "../Global/colors";
 import { Fonts } from "../Global/fonts";
 import moment from "moment";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const DateSearchModal = ({
   visible,
@@ -24,10 +25,29 @@ const DateSearchModal = ({
   const [tempDate, setTempDate] = useState(
     selectedDate ? new Date(selectedDate) : new Date()
   );
+  const [showAndroidPicker, setShowAndroidPicker] = useState(false);
 
-  const handleDateChange = (event, selectedDate) => {
-    if (selectedDate) {
-      setTempDate(selectedDate);
+  // Reset temp date when modal opens
+  useEffect(() => {
+    if (visible) {
+      setTempDate(selectedDate ? new Date(selectedDate) : new Date());
+      if (Platform.OS === "android") {
+        setShowAndroidPicker(true);
+      }
+    }
+  }, [visible, selectedDate]);
+
+  const handleDateChange = (event, date) => {
+    if (Platform.OS === "android") {
+      setShowAndroidPicker(false);
+      if (event.type === "set" && date) {
+        onDateSelect(date);
+      }
+      onClose();
+    } else {
+      if (date) {
+        setTempDate(date);
+      }
     }
   };
 
@@ -46,6 +66,19 @@ const DateSearchModal = ({
     return moment(date).format("MMM DD, YYYY");
   };
 
+  // Android: Show native picker directly (no modal wrapper)
+  if (Platform.OS === "android") {
+    return showAndroidPicker ? (
+      <DateTimePicker
+        value={tempDate}
+        mode="date"
+        display="default"
+        onChange={handleDateChange}
+      />
+    ) : null;
+  }
+
+  // iOS: Show compact modal
   return (
     <Modal
       visible={visible}
@@ -65,30 +98,31 @@ const DateSearchModal = ({
         >
           <SafeAreaView style={styles.modalContent}>
             <View style={styles.header}>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>✕</Text>
-              </TouchableOpacity>
-              <Text style={styles.title}>{title}</Text>
-              <View style={styles.placeholder} />
-            </View>
-
-            <View style={styles.content}>
-              <Text style={styles.placeholderText}>{placeholder}</Text>
-
-              <View style={styles.currentSelection}>
-                <Text style={styles.currentSelectionLabel}>Selected Date:</Text>
-                <Text style={styles.currentSelectionValue}>
+              <View style={styles.headerDateContainer}>
+                <MaterialIcons
+                  name="calendar-today"
+                  size={18}
+                  color={Colors.Primary}
+                  style={styles.headerIcon}
+                />
+                <Text style={styles.headerDateText}>
                   {formatDate(tempDate)}
                 </Text>
               </View>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <MaterialIcons name="close" size={22} color={Colors.Gray} />
+              </TouchableOpacity>
+            </View>
 
+            <View style={styles.content}>
               <View style={styles.datePickerContainer}>
                 <DateTimePicker
                   value={tempDate}
                   mode="date"
-                  display={Platform.OS === "ios" ? "inline" : "default"}
+                  display="inline"
                   onChange={handleDateChange}
                   style={styles.datePicker}
+                  textColor={Colors.Primary}
                 />
               </View>
 
@@ -96,15 +130,19 @@ const DateSearchModal = ({
                 <TouchableOpacity
                   style={[styles.button, styles.clearButton]}
                   onPress={handleClear}
+                  activeOpacity={0.7}
                 >
-                  <Text style={styles.clearButtonText}>Clear Filter</Text>
+                  <MaterialIcons name="clear" size={18} color={Colors.Gray} />
+                  <Text style={styles.clearButtonText}>Clear</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={[styles.button, styles.confirmButton]}
                   onPress={handleConfirm}
+                  activeOpacity={0.8}
                 >
-                  <Text style={styles.confirmButtonText}>Apply Filter</Text>
+                  <Text style={styles.confirmButtonText}>Apply</Text>
+                  <MaterialIcons name="check" size={18} color={Colors.White} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -118,18 +156,33 @@ const DateSearchModal = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
     backgroundColor: Colors.White,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: "80%",
-    minHeight: "50%",
+    borderRadius: 24,
+    width: "90%",
+    maxWidth: 400,
+    maxHeight: "85%",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 8,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 24,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
   modalContent: {
-    flex: 1,
+    paddingVertical: 8,
   },
   header: {
     flexDirection: "row",
@@ -138,95 +191,85 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: "#F3F4F6",
+  },
+  headerDateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  headerIcon: {
+    marginRight: 8,
+  },
+  headerDateText: {
+    fontSize: 18,
+    fontFamily: Fonts.FONT_SEMI_BOLD,
+    color: Colors.Primary,
   },
   closeButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#F9FAFB",
     justifyContent: "center",
     alignItems: "center",
   },
-  closeButtonText: {
-    fontSize: 18,
-    color: "#6B7280",
-    fontWeight: "bold",
-  },
-  title: {
-    fontSize: 18,
-    fontFamily: Fonts.FONT_SEMI_BOLD,
-    color: Colors.Primary,
-  },
-  placeholder: {
-    width: 32,
-  },
   content: {
-    flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
-  placeholderText: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: "#6B7280",
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  currentSelection: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-  },
-  currentSelectionLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.FONT_MEDIUM,
-    color: "#64748B",
-    marginBottom: 4,
-  },
-  currentSelectionValue: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_SEMI_BOLD,
-    color: Colors.Primary,
-  },
   datePickerContainer: {
     alignItems: "center",
-    marginBottom: 32,
+    marginBottom: 24,
+    overflow: "hidden",
   },
   datePicker: {
     width: "100%",
-    height: 200,
+    height: 350,
   },
   actionButtons: {
     flexDirection: "row",
-    justifyContent: "space-between",
     gap: 12,
   },
   button: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 12,
+    gap: 8,
   },
   clearButton: {
-    backgroundColor: "#F3F4F6",
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
+    backgroundColor: "#F9FAFB",
+    borderWidth: 1.5,
+    borderColor: "#E5E7EB",
   },
   clearButtonText: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_MEDIUM,
-    color: "#6B7280",
+    fontSize: 15,
+    fontFamily: Fonts.FONT_SEMI_BOLD,
+    color: Colors.Gray,
   },
   confirmButton: {
     backgroundColor: Colors.Primary,
+    ...Platform.select({
+      ios: {
+        shadowColor: Colors.Primary,
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   confirmButtonText: {
-    fontSize: 16,
-    fontFamily: Fonts.FONT_MEDIUM,
+    fontSize: 15,
+    fontFamily: Fonts.FONT_SEMI_BOLD,
     color: Colors.White,
   },
 });

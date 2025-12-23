@@ -9,6 +9,12 @@ const apiSlice = createSlice({
     events: [],
     selectedEvent: {},
     flights: [],
+    trips: [],
+    subEvents: [],
+    selectedSubEvent: {},
+    resources: [],
+    selectedResource: {},
+    seatingPlans: null,
     loading: false,
     error: null,
   },
@@ -43,8 +49,38 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-    setLoading: (state) => {
-      state.loading = true;
+    setTrips: (state, action) => {
+      state.trips = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setSubEvents: (state, action) => {
+      state.subEvents = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setSelectedSubEvent: (state, action) => {
+      state.selectedSubEvent = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setResources: (state, action) => {
+      state.resources = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setSelectedResource: (state, action) => {
+      state.selectedResource = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setSeatingPlans: (state, action) => {
+      state.seatingPlans = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload !== undefined ? action.payload : true;
     },
 
     setError: (state, action) => {
@@ -61,6 +97,12 @@ export const {
   setEvents,
   setSelectedEvent,
   setFlights,
+  setTrips,
+  setSubEvents,
+  setSelectedSubEvent,
+  setResources,
+  setSelectedResource,
+  setSeatingPlans,
   setLoading,
   setError,
 } = apiSlice.actions;

@@ -12,9 +12,9 @@ import styles from "./Styles";
 import { useNavigation } from "@react-navigation/native";
 import CustomInput from "../../components/CustomInput";
 import CustomPressable from "../../components/CustomPressable";
+import EnvironmentSelector from "./components/EnvironmentSelector";
 import { setEmail, setPassword } from "../../redux/actions/authActions";
 import { useDispatch, useSelector } from "react-redux";
-import * as SecureStore from "expo-secure-store";
 import { login } from "../../redux/actions/authActions";
 
 const Login = () => {
@@ -26,7 +26,9 @@ const Login = () => {
 
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [categoryError, setCategoryError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const validateInputs = () => {
     let isValid = true;
@@ -41,6 +43,12 @@ const Login = () => {
       isValid = false;
     } else {
       setPasswordError(false);
+    }
+    if (!selectedCategory) {
+      setCategoryError(true);
+      isValid = false;
+    } else {
+      setCategoryError(false);
     }
     return isValid;
   };
@@ -60,7 +68,7 @@ const Login = () => {
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
           index: 0,
-          routes: [{ name: "Dashboard" }],
+          routes: [{ name: "MainEvent" }],
         });
       }
       setLoading(false);
@@ -70,9 +78,18 @@ const Login = () => {
   };
 
   useEffect(() => {
-    dispatch(setEmail("khaled@lead-360.co"));
-    dispatch(setPassword("password123"));
-  }, []);
+    if (selectedCategory === "fmf") {
+      dispatch(setEmail("fmf@lead-360.co"));
+      dispatch(setPassword("password123"));
+    } else if (selectedCategory === "offerHome") {
+      dispatch(setEmail("demo@lead-360.co"));
+      dispatch(setPassword("password123"));
+    }
+  }, [selectedCategory]);
+
+  const handleCategoryChange = (categoryValue) => {
+    setSelectedCategory(categoryValue);
+  };
 
   return (
     <View style={styles.container}>
@@ -88,17 +105,25 @@ const Login = () => {
           <View style={styles.logoSection}>
             <View style={styles.logoContainer}>
               <Image
-                source={require("../../Assets/FMF-logo.png")}
+                source={require("../../Assets/logo.png")}
                 style={styles.logo}
                 resizeMode="contain"
               />
             </View>
             <Text style={styles.welcomeText}>Welcome Back</Text>
-            <Text style={styles.subtitleText}>Sign in to your FMF account</Text>
+            <Text style={styles.subtitleText}>
+              Please login to your account to continue
+            </Text>
           </View>
 
           <View style={styles.formSection}>
             <Text style={styles.titleText}>Sign In</Text>
+
+            <EnvironmentSelector
+              onCategoryChange={handleCategoryChange}
+              error={categoryError}
+              onErrorChange={setCategoryError}
+            />
 
             <View style={styles.inputContainer}>
               <CustomInput
@@ -138,7 +163,7 @@ const Login = () => {
               />
             </View>
 
-            <Text style={styles.footerText}>FMF Dashboard</Text>
+            <Text style={styles.footerText}>LEAD Dashboard</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

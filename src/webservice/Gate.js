@@ -13,6 +13,7 @@ export const setLogoutHandler = (handler) => {
 
 async function createHeaders(jsonPayload) {
   const accessToken = await SecureStore.getItemAsync("accessToken");
+  // console.log("accessToken", accessToken);
   return {
     "Content-Type": jsonPayload ? "application/json" : "multipart/form-data",
     Authorization: `Bearer ${accessToken}`,
@@ -104,9 +105,11 @@ function handleErrors(error) {
       alert(data.message || "Redirected: " + errorMessage);
       break;
     case 404:
-      alert(
-        data.message || "Not Found: The requested resource could not be found."
-      );
+      // alert(
+      //   data.message || "Not Found: The requested resource could not be found."
+      // );
+      break;
+    case 500:
       break;
     default:
       alert(`Error ${status}: ${errorMessage}`);
@@ -144,13 +147,15 @@ async function Post(url = "", data = {}, method = "POST", jsonPayload = false) {
   const baseURL = await getEnvVars("apiUrl");
   const fullUrl = baseURL + url;
 
+  console.log("POST Request URL:", fullUrl);
+  console.log("POST Request Params:", data);
+
   let formData;
 
-  // Prepare the data as JSON or FormData based on `jsonPayload`
   if (jsonPayload) {
-    formData = JSON.stringify(data); // Send as JSON string
+    formData = JSON.stringify(data);
   } else {
-    formData = buildFormData(data); // Send as FormData
+    formData = buildFormData(data);
   }
 
   const headers = await createHeaders(jsonPayload);

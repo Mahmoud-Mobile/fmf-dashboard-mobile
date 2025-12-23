@@ -38,11 +38,7 @@ const NoInternetScreen = () => {
       <CustomPressable
         onPress={handleCheckConnection}
         title="Check Internet Connection"
-        style={{
-          marginBottom: 30,
-          paddingHorizontal: 40,
-          width: "60%",
-        }}
+        style={{ marginBottom: 30, paddingHorizontal: 40 }}
       />
     </View>
   );

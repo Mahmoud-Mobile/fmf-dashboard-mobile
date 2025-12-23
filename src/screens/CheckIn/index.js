@@ -1,182 +1,155 @@
-import React, { useState, useCallback } from "react";
-import { View, Text, FlatList, RefreshControl, Alert } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Colors } from "../../Global/colors";
-import { getGridColumns } from "../../constant";
-import navigationService from "../../Global/navRef";
-import CustomHeader from "../../components/CustomHeader";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
-import SearchBar from "../../components/SearchBar";
-import EventCard from "./components/EventCard";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { Storage } from "expo-storage";
+import CustomEventHeader from "../../components/CustomEventHeader";
+import CustomCategories from "../../components/CustomCategories";
+import SearchActionRow from "../../components/SearchActionRow";
+import DateSearchModal from "../../components/DateSearchModal";
 import { styles } from "./Styles";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-const mockEvents = [
-  {
-    id: "1",
-    title: "Riyadh Season",
-    subtitle: "Riyadh Season Opening Ceremony",
-    location: "Saudi Arabia",
-    date: "2024-10-24",
-    isCheckedIn: false,
-  },
-  {
-    id: "2",
-    title: "Riyadh Season",
-    subtitle: "Riyadh Season Opening Ceremony",
-    location: "Saudi Arabia",
-    date: "2024-10-24",
-    isCheckedIn: true,
-  },
-  {
-    id: "3",
-    title: "Riyadh Season",
-    subtitle: "Riyadh Season Opening Ceremony",
-    location: "Saudi Arabia",
-    date: "2024-10-24",
-    isCheckedIn: false,
-  },
-  {
-    id: "4",
-    title: "Riyadh Season",
-    subtitle: "Riyadh Season Opening Ceremony",
-    location: "Saudi Arabia",
-    date: "2024-10-24",
-    isCheckedIn: false,
-  },
-];
+import CheckInSubEvent from "./CheckInSubEvent";
+import CheckInResource from "./CheckInResource";
 
 const CheckInScreen = () => {
-  const [events, setEvents] = useState(mockEvents);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
-  const numColumns = getGridColumns();
+  const navigation = useNavigation();
+  const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
+  const [selectedCategory, setSelectedCategory] = useState("subEvent");
+  const [searchText, setSearchText] = useState("");
+  const [viewMode, setViewMode] = useState("list");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const printFunctionRef = useRef(null);
+  const { selectedEvent } = useSelector((state) => state.api);
 
-  const filteredEvents = events.filter(
-    (event) =>
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+  useEffect(() => {
+    const loadEnvironment = async () => {
+      try {
+        const storedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        const env = storedCategory || "fmf";
+        setCurrentEnvironment(env);
+        // If offerHome environment, set default category to resource
+        if (env === "offerHome") {
+          setSelectedCategory("resource");
+        }
+      } catch (error) {
+        setCurrentEnvironment("fmf");
+      }
+    };
+    loadEnvironment();
   }, []);
 
-  const handleCheckIn = (id) => {
-    Alert.alert(
-      "Choose Scanner Type",
-      "How would you like to scan the QR code?",
-      [
-        {
-          text: "Camera Scanner",
-          onPress: () => {
-            console.log("Navigating to CameraQRScanner");
-            if (navigationService.navigation) {
-              navigationService.navigation.navigate("CameraQRScanner");
-            } else {
-              console.log("Navigation service not available");
-              Alert.alert(
-                "Navigation Error",
-                "Navigation service not available"
-              );
-            }
-          },
-        },
-        {
-          text: "Zebra Scanner",
-          onPress: () => {
-            console.log("Navigating to ZebraQR");
-            if (navigationService.navigation) {
-              navigationService.navigation.navigate("ZebraQR");
-            } else {
-              console.log("Navigation service not available");
-              Alert.alert(
-                "Navigation Error",
-                "Navigation service not available"
-              );
-            }
-          },
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const handlePreview = (id) => {
-    const event = events.find((e) => e.id === id);
-    if (event) {
-      console.log("Navigating to PreviewSeats with event:", event);
-      if (navigationService.navigation) {
-        navigationService.navigation.navigate("PreviewSeats", {
-          eventTitle: event.title,
-          eventSubtitle: event.subtitle,
-          location: event.location,
-          date: event.date,
-        });
-      } else {
-        console.log("Navigation service not available");
-        Alert.alert("Navigation Error", "Navigation service not available");
-      }
+  // Ensure selectedCategory is always "resource" when in offerHome environment
+  useEffect(() => {
+    if (currentEnvironment === "offerHome" && selectedCategory === "subEvent") {
+      setSelectedCategory("resource");
     }
-  };
+  }, [currentEnvironment, selectedCategory]);
 
-  const renderEventCard = ({ item }) => (
-    <EventCard
-      event={item}
-      onCheckIn={handleCheckIn}
-      onPreview={handlePreview}
-    />
-  );
+  const categories =
+    currentEnvironment === "offerHome"
+      ? [{ id: "resource", label: "Resource", key: "resource" }]
+      : [
+          { id: "subEvent", label: "Sub Event", key: "subEvent" },
+          { id: "resource", label: "Resource", key: "resource" },
+        ];
+
+  const handleSearchClear = useCallback(() => {
+    setSearchText("");
+  }, []);
+
+  const handleDateSelect = useCallback((date) => {
+    setSelectedDate(date);
+    setShowDateModal(false);
+  }, []);
+
+  const handleDateModalClose = useCallback(() => {
+    setShowDateModal(false);
+  }, []);
+
+  const handlePrint = useCallback(async () => {
+    if (printFunctionRef.current) {
+      await printFunctionRef.current();
+    }
+  }, []);
+
+  const handlePrintReady = useCallback((printFn) => {
+    printFunctionRef.current = printFn;
+  }, []);
+
+  const searchPlaceholder =
+    selectedCategory === "subEvent"
+      ? "Search sub events..."
+      : "Search resources...";
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <CustomHeader title="Check In" center={true} top={0} />
+    <View style={styles.container}>
+      <CustomEventHeader
+        event={selectedEvent}
+        onLeftButtonPress={() => navigation.goBack()}
+        onRightButtonPress={() => navigation.navigate("NotificationScreen")}
+      />
 
-      <View style={styles.searchContainer}>
-        <SearchBar
-          onChangeText={setSearchTerm}
-          placeholder="Search....."
-          value={searchTerm}
+      <SearchActionRow
+        searchPlaceholder={searchPlaceholder}
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        onSearchClear={handleSearchClear}
+        viewMode={viewMode}
+        onToggleViewMode={setViewMode}
+        onPressPrint={handlePrint}
+        isPrinting={isPrinting}
+        onPressDate={() => setShowDateModal(true)}
+        selectedDate={selectedDate}
+        onClearDate={() => setSelectedDate(null)}
+      />
+
+      {currentEnvironment !== "offerHome" && (
+        <CustomCategories
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
         />
-      </View>
+      )}
 
-      {filteredEvents.length > 0 ? (
-        <FlatList
-          data={filteredEvents}
-          renderItem={renderEventCard}
-          keyExtractor={(item) => item.id}
-          numColumns={numColumns}
-          key={numColumns}
-          contentContainerStyle={styles.listContainer}
-          refreshControl={
-            <RefreshControl
-              tintColor={Colors.Primary}
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          }
-          showsVerticalScrollIndicator={false}
+      {selectedCategory === "subEvent" ? (
+        <CheckInSubEvent
+          searchText={searchText}
+          viewMode={viewMode}
+          selectedDate={selectedDate}
+          onPrintReady={handlePrintReady}
+          setIsPrinting={setIsPrinting}
         />
       ) : (
-        <View style={styles.emptyContainer}>
-          <MaterialIcons name="event-busy" size={96} color={Colors.gray} />
-          <Text style={styles.emptyText}>
-            {searchTerm
-              ? "No events found matching your search"
-              : "No events available"}
-          </Text>
-        </View>
+        <CheckInResource
+          searchText={searchText}
+          viewMode={viewMode}
+          selectedDate={selectedDate}
+          onPrintReady={handlePrintReady}
+          setIsPrinting={setIsPrinting}
+        />
       )}
-      <FloatingChatIcon />
-    </SafeAreaView>
+
+      <DateSearchModal
+        visible={showDateModal}
+        onClose={handleDateModalClose}
+        onDateSelect={handleDateSelect}
+        selectedDate={selectedDate}
+        title={
+          selectedCategory === "subEvent"
+            ? "Filter Sub Events by Date"
+            : "Filter Resources by Date"
+        }
+        placeholder={
+          selectedCategory === "subEvent"
+            ? "Select a date to show sub events from that date onwards"
+            : "Select a date to show resources from that date onwards"
+        }
+      />
+    </View>
   );
 };
 

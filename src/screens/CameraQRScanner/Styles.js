@@ -5,31 +5,8 @@ import { Fonts } from "../../Global/fonts";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.Black,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: "rgba(0,0,0,0.8)",
-  },
-  backButton: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: Fonts.FONT_BOLD,
-    color: Colors.White,
-  },
-  placeholder: {
-    width: 40,
-  },
-  cameraContainer: {
-    flex: 1,
-    position: "relative",
-  },
+
   center: {
     flex: 1,
     backgroundColor: Colors.Black,

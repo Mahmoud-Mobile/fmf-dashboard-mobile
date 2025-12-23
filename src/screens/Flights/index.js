@@ -1,22 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Dimensions,
-  RefreshControl,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import * as Print from "expo-print";
-import { shareAsync } from "expo-sharing";
-
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { View, Text, FlatList, RefreshControl, Alert } from "react-native";
+import moment from "moment";
+import CustomEventHeader from "../../components/CustomEventHeader";
 import { useDispatch, useSelector } from "react-redux";
-import CustomHeader from "../../components/CustomHeader";
 import CustomCategories from "../../components/CustomCategories";
-import SearchBar from "../../components/SearchBar";
-import DateSearchButton from "../../components/DateSearchButton";
 import DateSearchModal from "../../components/DateSearchModal";
 import FloatingChatIcon from "../../components/FloatingChatIcon";
 import LoadingModal from "../../components/LoadingModal";
@@ -24,14 +11,16 @@ import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
 import styles from "./Styles";
 
-// Custom Category Components
-import CustomMinistryItem from "./components/CustomMinistryItem";
-import CustomArrivalItem from "./components/CustomArrivalItem";
-import CustomReturnItem from "./components/CustomReturnItem";
-import PDFGenerator from "./components/PDFGenerator";
+import FlightCard from "./components";
 import { useNavigation } from "@react-navigation/native";
-const { width } = Dimensions.get("window");
-const isTablet = width > 768;
+import { horizontalMargin } from "../../config/metrics";
+import SearchActionRow from "../../components/SearchActionRow";
+import { getDeviceDimensions } from "../../constant/deviceUtils";
+import {
+  exportToExcel,
+  formatDateTime,
+  formatStamp,
+} from "../../config/exportToExcel";
 
 const Flights = () => {
   const dispatch = useDispatch();
@@ -44,6 +33,25 @@ const Flights = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [viewMode, setViewMode] = useState("list");
+
+  const { width: screenWidth } = getDeviceDimensions();
+  // console.log(flights?.flights?.[0]);
+  const horizontalPadding = horizontalMargin * 2;
+
+  const numColumns = useMemo(() => {
+    if (viewMode === "list") {
+      return 1;
+    }
+    return 2;
+  }, [viewMode]);
+
+  const { cardWidth } = useMemo(() => {
+    const gapBetweenCards = (numColumns - 1) * 8;
+    const width =
+      (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
+    return { cardWidth: width };
+  }, [numColumns, screenWidth, horizontalPadding]);
 
   const categories = [
     { id: "ministry", label: "Ministry", key: "ministry" },
@@ -51,7 +59,6 @@ const Flights = () => {
     { id: "return", label: "Return", key: "return" },
   ];
 
-  // Filter flights based on search text and date
   const filteredFlights = useMemo(() => {
     let filtered = flights?.flights || [];
 
@@ -59,12 +66,6 @@ const Flights = () => {
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter((flight) => {
-        // Search across all relevant flight fields
-        const airlineName = (
-          flight.arrivalAirlinesName ||
-          flight.returnAirlineName ||
-          ""
-        ).toLowerCase();
         const flightNumber = (
           flight.arrivalFlightNumber ||
           flight.returnFlightNumber ||
@@ -80,20 +81,7 @@ const Flights = () => {
           flight.returnAirport ||
           ""
         ).toLowerCase();
-        const city = (
-          flight.arrivalCity ||
-          flight.returnCity ||
-          ""
-        ).toLowerCase();
-        const country = (
-          flight.arrivalCountry ||
-          flight.returnCountry ||
-          ""
-        ).toLowerCase();
         const flightType = (flight.flightType || "").toLowerCase();
-        const flightClass = (flight.flightClass || "").toLowerCase();
-        const seatNumber = (flight.seatNumber || "").toLowerCase();
-        const bookingReference = (flight.bookingReference || "").toLowerCase();
         const status = (
           flight.arrivalFlightStatus ||
           flight.returnFlightStatus ||
@@ -101,36 +89,42 @@ const Flights = () => {
         ).toLowerCase();
 
         return (
-          airlineName.includes(searchLower) ||
           flightNumber.includes(searchLower) ||
           airportCode.includes(searchLower) ||
           airportName.includes(searchLower) ||
-          city.includes(searchLower) ||
-          country.includes(searchLower) ||
           flightType.includes(searchLower) ||
-          flightClass.includes(searchLower) ||
-          seatNumber.includes(searchLower) ||
-          bookingReference.includes(searchLower) ||
           status.includes(searchLower)
         );
       });
     }
 
-    // Filter by date - show all flights from selected date onwards
     if (selectedDate) {
-      const selectedDateStr = selectedDate.toISOString().split("T")[0];
+      const selectedMoment = moment(selectedDate);
+      const selectedDateStr = selectedMoment.isValid()
+        ? selectedMoment.format("YYYY-MM-DD")
+        : null;
+
+      if (!selectedDateStr) {
+        return filtered;
+      }
 
       filtered = filtered.filter((flight) => {
-        // Parse flight dates correctly - they are in JavaScript Date string format
-        const arrivalDate = flight.arrivalDate
-          ? new Date(flight.arrivalDate).toISOString().split("T")[0]
+        const arrivalMoment = flight.arrivalDate
+          ? moment(flight.arrivalDate)
           : null;
-        const returnDate = flight.returnDate
-          ? new Date(flight.returnDate).toISOString().split("T")[0]
+        const returnMoment = flight.returnDate
+          ? moment(flight.returnDate)
           : null;
 
-        // Show flights that arrive on or after the selected date
-        // OR flights that return on or after the selected date
+        const arrivalDate =
+          arrivalMoment && arrivalMoment.isValid()
+            ? arrivalMoment.format("YYYY-MM-DD")
+            : null;
+        const returnDate =
+          returnMoment && returnMoment.isValid()
+            ? returnMoment.format("YYYY-MM-DD")
+            : null;
+
         return (
           (arrivalDate && arrivalDate >= selectedDateStr) ||
           (returnDate && returnDate >= selectedDateStr)
@@ -158,6 +152,8 @@ const Flights = () => {
       const params = {
         status: "SCHEDULED",
         participantsType: selectedCategory,
+        page: 1,
+        limit: 500,
       };
       dispatch(fetchFlights(selectedEvent.id, params));
     }
@@ -169,7 +165,14 @@ const Flights = () => {
   };
 
   const handleFlightPress = (flight) => {
-    navigation.navigate("FlightDetails", { flight });
+    const selectedCategoryName =
+      categories.find((c) => c.id === selectedCategory)?.label ||
+      selectedCategory;
+    navigation.navigate("FlightDetails", {
+      flight,
+      selectedCategory,
+      selectedCategoryName,
+    });
   };
 
   const handleSearchClear = () => {
@@ -188,50 +191,78 @@ const Flights = () => {
     try {
       setIsPrinting(true);
 
-      // Check if there are flights to print
+      // Check if there are flights to export
       if (filteredFlights.length === 0) {
         Alert.alert(
-          "No Flights to Print",
-          "There are no flights to generate a PDF report. Please adjust your search filters or refresh the data.",
+          "No Flights to Export",
+          "There are no flights to generate an Excel report. Please adjust your search filters or refresh the data.",
           [{ text: "OK" }]
         );
         return;
       }
 
-      // Add timeout to prevent infinite loading
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("PDF generation timeout")), 600000); // 60 seconds timeout
+      // date helpers are imported from config/exportToExcel
+
+      // Prepare data for Excel
+      const excelData = filteredFlights.map((flight) => {
+        let passengerName = "N/A";
+        let airlineName = "N/A";
+        let flightNumber = "N/A";
+        let status = "N/A";
+        let airportCode = "N/A";
+        let airportName = "N/A";
+        let date = "N/A";
+
+        // Extract passenger name
+        passengerName = "Mahmoud Tawba";
+
+        // Category-based data extraction
+        if (selectedCategory === "arrival") {
+          airlineName = flight.arrivalAirlinesName || "N/A";
+          flightNumber = flight.arrivalFlightNumber || "N/A";
+          status = flight.arrivalFlightStatus || "N/A";
+          airportCode = flight.arrivalAirportCode || "N/A";
+          airportName = flight.arrivalAirport || "N/A";
+          date = formatDateTime(flight.arrivalDate);
+        } else if (selectedCategory === "return") {
+          airlineName = flight.returnAirlinesName || "N/A";
+          flightNumber = flight.returnFlightNumber || "N/A";
+          status = flight.returnFlightStatus || "N/A";
+          airportCode = flight.returnAirportCode || "N/A";
+          airportName = flight.returnAirport || "N/A";
+          date = formatDateTime(flight.returnDate);
+        } else {
+          airlineName = flight.arrivalAirlinesName || "N/A";
+          flightNumber = flight.arrivalFlightNumber || "N/A";
+          status = flight.arrivalFlightStatus || "N/A";
+          airportCode = flight.arrivalAirportCode || "N/A";
+          airportName = flight.arrivalAirport || "N/A";
+          date = formatDateTime(flight.arrivalDate);
+        }
+
+        return {
+          "Passenger Name": passengerName,
+          "Airline Name": airlineName,
+          "Flight Number": flightNumber,
+          Status: status,
+          "Airport Code": airportCode,
+          "Airport Name": airportName,
+          Date: date,
+        };
       });
 
-      const generatePromise = async () => {
-        const html = PDFGenerator.generateHTML(
-          filteredFlights,
-          searchText,
-          selectedDate,
-          selectedCategory
-        );
-        const { uri } = await Print.printToFileAsync({ html });
-        console.log("File has been saved to:", uri);
-        await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf" });
-        return uri;
-      };
-
-      await Promise.race([generatePromise(), timeoutPromise]);
-
-      Alert.alert(
-        "Success",
-        `PDF generated successfully with ${filteredFlights.length} flight${
-          filteredFlights.length !== 1 ? "s" : ""
-        }!`
-      );
+      const fileName = `flights_${formatStamp(new Date())}.xlsx`;
+      await exportToExcel({
+        rows: excelData,
+        fileName,
+        sheetName: "Flights",
+      });
     } catch (error) {
-      let errorMessage = "Failed to generate PDF. Please try again.";
+      let errorMessage = "Failed to generate Excel file. Please try again.";
 
-      if (error.message === "PDF generation timeout") {
-        errorMessage = "PDF generation is taking too long. Please try again.";
-      } else if (error.message?.includes("sharing")) {
+      if (error.message?.includes("sharing")) {
         errorMessage =
-          "PDF was generated but couldn't be shared. Please check your device settings.";
+          "Excel file was generated but couldn't be shared. Please check your device settings.";
       }
 
       Alert.alert("Error", errorMessage);
@@ -240,42 +271,180 @@ const Flights = () => {
     }
   };
 
-  const renderFlightItem = ({ item }) => {
-    switch (selectedCategory) {
-      case "ministry":
-        return (
-          <CustomMinistryItem
-            flight={item}
-            onPress={handleFlightPress}
-            isTablet={isTablet}
-          />
-        );
-      case "arrival":
-        return (
-          <CustomArrivalItem
-            flight={item}
-            onPress={handleFlightPress}
-            isTablet={isTablet}
-          />
-        );
-      case "return":
-        return (
-          <CustomReturnItem
-            flight={item}
-            onPress={handleFlightPress}
-            isTablet={isTablet}
-          />
-        );
-      default:
-        return (
-          <CustomMinistryItem
-            flight={item}
-            onPress={handleFlightPress}
-            isTablet={isTablet}
-          />
-        );
+  const prepareFlightCardData = (flight) => {
+    let flightData = {};
+    let timeInfo = [];
+
+    // Static passenger data
+    const passengerData = {
+      userName: "Ahmed Mohamed",
+      userMobile: "+966 65 090 7242",
+      userPhoto:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    };
+
+    if (selectedCategory === "arrival") {
+      flightData = {
+        airlineName: flight.arrivalAirlinesName,
+        flightNumber: flight.arrivalFlightNumber,
+        status: flight.arrivalFlightStatus,
+        airportCode: flight.arrivalAirportCode,
+        airportName: flight.arrivalAirport,
+        ...passengerData,
+      };
+
+      timeInfo.push({
+        label: "Arrival",
+        date: flight.arrivalDate,
+      });
+    } else if (selectedCategory === "return") {
+      flightData = {
+        airlineName:
+          flight.returnAirlinesName || "this parameter is not available",
+        flightNumber: flight.returnFlightNumber,
+        status: flight.returnFlightStatus,
+        airportCode:
+          flight.returnAirportCode || "this parameter is not available",
+        airportName: flight.returnAirport,
+        ...passengerData,
+      };
+
+      timeInfo.push({
+        label: "Return",
+        date: flight.returnDate,
+      });
+    } else {
+      flightData = {
+        airlineName: flight.arrivalAirlinesName,
+        flightNumber: flight.arrivalFlightNumber,
+        status: flight.returnFlightStatus,
+        airportCode: flight.arrivalAirportCode,
+        airportName: flight.arrivalAirport,
+        ...passengerData,
+      };
+
+      timeInfo.push({
+        label: "Arrival",
+        date: flight.arrivalDate,
+      });
     }
+
+    return {
+      ...flightData,
+      timeInfo,
+    };
   };
+
+  const cardSettings = useMemo(() => {
+    const isGrid = viewMode === "grid" && numColumns > 1;
+
+    return {
+      isGrid,
+      component: FlightCard,
+      width: cardWidth,
+      numColumns: numColumns,
+      columnWrapper: isGrid ? styles.columnWrapper : undefined,
+    };
+  }, [cardWidth, numColumns, viewMode]);
+
+  const getActionButtons = useCallback(
+    (flight) => {
+      const isDisabled =
+        flight.isLuggageReceived === true ||
+        flight.isParticipantArrived === true ||
+        flight.isParticipantDeparted === true;
+
+      const isSelected = !isDisabled;
+      const flightId =
+        flight.id ||
+        flight.arrivalFlightNumber ||
+        flight.returnFlightNumber ||
+        "unknown";
+
+      if (selectedCategory === "return") {
+        return [
+          {
+            icon: "flight-takeoff",
+            text: "Plane Taken Off",
+            iconSize: 24,
+            isSelected: isSelected,
+            disabled: isDisabled,
+            iconId: `flight-takeoff-${flightId}`,
+            onPress: () => {
+              Alert.alert(
+                "Plane Taken Off",
+                `Flight ${flight.returnFlightNumber} has taken off successfully!`,
+                [{ text: "OK", style: "default" }]
+              );
+            },
+          },
+        ];
+      } else {
+        return [
+          {
+            icon: "flight-land",
+            text: "Plane Landed",
+            isSelected: isSelected,
+            disabled: isDisabled,
+            iconId: `flight-land-${flightId}`,
+            onPress: () => {
+              Alert.alert(
+                "Plane Landed",
+                `Flight ${flight.arrivalFlightNumber} has landed successfully!`,
+                [{ text: "OK", style: "default" }]
+              );
+            },
+          },
+          {
+            icon: "check-circle",
+            text: "Logged Arrived",
+            isSelected: isSelected,
+            disabled: isDisabled,
+            iconId: `check-circle-${flightId}`,
+            onPress: () => {
+              Alert.alert(
+                "Logged Arrived",
+                `Passenger arrival has been logged for flight ${flight.arrivalFlightNumber}!`,
+                [{ text: "OK", style: "default" }]
+              );
+            },
+          },
+          {
+            icon: "verified-user",
+            text: "Guest Granted",
+            isSelected: isSelected,
+            disabled: isDisabled,
+            iconId: `verified-user-${flightId}`,
+            onPress: () => {
+              Alert.alert(
+                "Guest Granted",
+                `Guest access has been granted for flight ${flight.arrivalFlightNumber}!`,
+                [{ text: "OK", style: "default" }]
+              );
+            },
+          },
+        ];
+      }
+    },
+    [selectedCategory]
+  );
+
+  const renderFlightItem = useCallback(
+    ({ item }) => {
+      const cardData = prepareFlightCardData(item);
+      const CardComponent = cardSettings.component;
+      const actionButtons = getActionButtons(item);
+      return (
+        <CardComponent
+          {...cardData}
+          actionButtons={actionButtons}
+          onPress={() => handleFlightPress(item)}
+          width={cardSettings.width}
+        />
+      );
+    },
+    [cardSettings, handleFlightPress, getActionButtons]
+  );
 
   const renderEmptyComponent = () => <EmptyListComponent />;
 
@@ -289,59 +458,55 @@ const Flights = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <CustomHeader title={selectedEvent?.name || "Event flights"} center />
+    <View style={styles.container}>
+      <CustomEventHeader
+        event={selectedEvent}
+        onLeftButtonPress={() => navigation.goBack()}
+        onRightButtonPress={() => navigation.navigate("NotificationScreen")}
+      />
+
+      <SearchActionRow
+        searchPlaceholder="Search by airline, flight number, airport, city, seat, booking..."
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        onSearchClear={handleSearchClear}
+        viewMode={viewMode}
+        onToggleViewMode={setViewMode}
+        onPressPrint={printToFile}
+        isPrinting={isPrinting}
+        onPressDate={() => setShowDateModal(true)}
+        selectedDate={selectedDate}
+        onClearDate={() => setSelectedDate(null)}
+        // containerStyle={{ marginBottom: 20 }}
+      />
 
       <CustomCategories
         categories={categories}
         selectedCategory={selectedCategory}
         onCategorySelect={setSelectedCategory}
-        horizontal={true}
-        scrollable={true}
       />
-
-      <View style={styles.searchRow}>
-        <SearchBar
-          placeholder="Search flights..."
-          value={searchText}
-          onChangeText={setSearchText}
-          onClear={handleSearchClear}
-          style={styles.searchBarInRow}
-        />
-        <TouchableOpacity
-          style={[styles.printButton, isPrinting && styles.printButtonDisabled]}
-          onPress={printToFile}
-          activeOpacity={0.7}
-          disabled={isPrinting}
-        >
-          <Text style={styles.printButtonText}>{isPrinting ? "⏳" : "📄"}</Text>
-        </TouchableOpacity>
-        <DateSearchButton
-          onPress={() => setShowDateModal(true)}
-          selectedDate={selectedDate}
-          onClear={() => setSelectedDate(null)}
-          title="Show Flights From Date"
-          style={styles.dateButtonInRow}
-        />
-      </View>
-
-      <View style={{ marginHorizontal: 12 }}>
+      <LoadingModal visible={loading} />
+      {!loading && (
         <FlatList
+          key={viewMode}
           data={filteredFlights}
           renderItem={renderFlightItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) =>
+            item.id ? `${item.id}-${index}` : `flight-${index}`
+          }
           ListFooterComponent={renderListFooter}
           ListEmptyComponent={renderEmptyComponent}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           showsVerticalScrollIndicator={false}
-          numColumns={isTablet ? 2 : 1}
-          columnWrapperStyle={isTablet ? styles.row : null}
+          numColumns={cardSettings.numColumns}
+          columnWrapperStyle={cardSettings.columnWrapper}
+          contentContainerStyle={styles.listContainer}
         />
-      </View>
-      <LoadingModal visible={loading} />
-      <FloatingChatIcon />
+      )}
+
+      {/* <FloatingChatIcon /> */}
 
       <DateSearchModal
         visible={showDateModal}
@@ -351,7 +516,7 @@ const Flights = () => {
         title="Filter Flights by Date"
         placeholder="Select a date to show flights from that date onwards"
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

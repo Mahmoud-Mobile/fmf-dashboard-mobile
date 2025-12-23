@@ -1,12 +1,15 @@
 {
   "expo": {
-    "name": "FMF Management",
+    "name": "Lead Ops",
     "slug": "fmf-guest-management",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "plugins": [
+      ["expo-screen-orientation", { "initialOrientation": "PORTRAIT" }]
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "cover",
@@ -14,8 +17,9 @@
     },
     "ios": {
       "supportsTablet": true,
+      "requireFullScreen": true,
       "bundleIdentifier": "com.lead.fmfmanagement",
-      "buildNumber": "1",
+      "buildNumber": "20",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to location to show your current position and provide directions to event locations.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location to show your current position and provide directions to event locations.",
@@ -24,8 +28,9 @@
     },
     "android": {
       "icon": "./assets/icon.png",
+      "orientation": "portrait",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.lead.fmfmanagement",

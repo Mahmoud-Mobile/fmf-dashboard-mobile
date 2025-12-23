@@ -1,106 +1,60 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import { Colors } from "../Global/colors";
-import { Fonts } from "../Global/fonts";
-import moment from "moment";
+import { MaterialIcons } from "@expo/vector-icons";
 
-const DateSearchButton = ({
-  onPress,
-  selectedDate,
-  onClear,
-  style,
-  title = "Filter by Date",
-}) => {
-  const formatDate = (date) => {
-    if (!date) return title;
-    return moment(date).format("MMM DD, YYYY");
-  };
-
+const DateSearchButton = ({ onPress, selectedDate, onClear, style }) => {
   return (
-    <View style={styles.wrapper}>
+    <TouchableOpacity
+      style={[styles.container, style]}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
       {selectedDate && (
         <TouchableOpacity
           style={styles.clearButton}
           onPress={onClear}
           activeOpacity={0.7}
         >
-          <Text style={styles.clearIcon}>✕</Text>
+          <MaterialIcons name="close" size={14} color={Colors.White} />
         </TouchableOpacity>
       )}
       <TouchableOpacity
-        style={[styles.container, { width: selectedDate ? 140 : 50 }, style]}
+        style={[styles.container, style]}
         onPress={onPress}
         activeOpacity={0.7}
       >
-        <View style={styles.buttonContent}>
-          <Text style={styles.icon}>📅</Text>
-          {selectedDate && (
-            <Text style={styles.selectedDateText}>
-              {formatDate(selectedDate)}
-            </Text>
-          )}
-        </View>
+        <MaterialIcons
+          name="filter-list"
+          size={20}
+          color={Colors.SecondaryText}
+        />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 };
-
 const styles = StyleSheet.create({
   wrapper: {
     position: "relative",
     alignItems: "center",
   },
   container: {
-    height: 50,
+    width: 40,
+    height: 45,
     backgroundColor: Colors.White,
-    borderRadius: 12,
-    marginHorizontal: 20,
-    marginVertical: 8,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
   clearButton: {
     position: "absolute",
     top: -5,
     right: 0,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#FF0000",
-    borderWidth: 1,
-    borderColor: "#FF0000",
+    borderRadius: 8,
+    backgroundColor: Colors.Error,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
-  },
-  buttonContent: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  icon: {
-    fontSize: 15,
-    marginRight: 5,
-  },
-  selectedDateText: {
-    fontSize: 12,
-    fontFamily: Fonts.FONT_MEDIUM,
-    color: Colors.Primary,
-    marginLeft: 4,
-  },
-  clearIcon: {
-    fontSize: 10,
-    color: "#FFFFFF",
-    fontWeight: "bold",
   },
 });
 
