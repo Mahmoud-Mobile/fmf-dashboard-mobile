@@ -5,10 +5,10 @@ import CustomEventHeader from "../../components/CustomEventHeader";
 import { useDispatch, useSelector } from "react-redux";
 import CustomCategories from "../../components/CustomCategories";
 import DateSearchModal from "../../components/DateSearchModal";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
 import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
+import { flightArrived, flightDeparted } from "../../webservice/apiConfig";
 import styles from "./Styles";
 
 import FlightCard from "./components";
@@ -147,17 +147,17 @@ const Flights = () => {
     }
   }, [loading, refreshing]);
 
-  const fetchFlightsData = () => {
+  const fetchFlightsData = useCallback(() => {
     if (selectedEvent?.id) {
       const params = {
         status: "SCHEDULED",
         participantsType: selectedCategory,
         page: 1,
-        limit: 500,
+        limit: 5000,
       };
       dispatch(fetchFlights(selectedEvent.id, params));
     }
-  };
+  }, [selectedEvent, selectedCategory, dispatch]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -349,84 +349,150 @@ const Flights = () => {
 
   const getActionButtons = useCallback(
     (flight) => {
-      const isDisabled =
-        flight.isLuggageReceived === true ||
-        flight.isParticipantArrived === true ||
-        flight.isParticipantDeparted === true;
+      const flightId = flight.id;
 
-      const isSelected = !isDisabled;
-      const flightId =
-        flight.id ||
-        flight.arrivalFlightNumber ||
-        flight.returnFlightNumber ||
-        "unknown";
+      // Don't show buttons if flightId is missing
+      if (!flightId) {
+        return [];
+      }
 
+      // Handle return category
       if (selectedCategory === "return") {
+        // Disable if isParticipantDeparted is true
+        const isParticipantDepartedDisabled =
+          flight.isParticipantDeparted === true;
+
+        const handleParticipantDeparted = async () => {
+          try {
+            await flightDeparted({
+              flightId: flightId,
+            });
+            Alert.alert(
+              "Success",
+              "Participant departed status updated successfully!",
+              [{ text: "OK", style: "default" }]
+            );
+            // Refresh flights data
+            fetchFlightsData();
+          } catch (error) {
+            Alert.alert(
+              "Error",
+              "Failed to update participant departed status. Please try again.",
+              [{ text: "OK", style: "default" }]
+            );
+          }
+        };
+
         return [
           {
             icon: "flight-takeoff",
-            text: "Plane Taken Off",
-            iconSize: 24,
-            isSelected: isSelected,
-            disabled: isDisabled,
-            iconId: `flight-takeoff-${flightId}`,
-            onPress: () => {
-              Alert.alert(
-                "Plane Taken Off",
-                `Flight ${flight.returnFlightNumber} has taken off successfully!`,
-                [{ text: "OK", style: "default" }]
-              );
-            },
-          },
-        ];
-      } else {
-        return [
-          {
-            icon: "flight-land",
-            text: "Plane Landed",
-            isSelected: isSelected,
-            disabled: isDisabled,
-            iconId: `flight-land-${flightId}`,
-            onPress: () => {
-              Alert.alert(
-                "Plane Landed",
-                `Flight ${flight.arrivalFlightNumber} has landed successfully!`,
-                [{ text: "OK", style: "default" }]
-              );
-            },
-          },
-          {
-            icon: "check-circle",
-            text: "Logged Arrived",
-            isSelected: isSelected,
-            disabled: isDisabled,
-            iconId: `check-circle-${flightId}`,
-            onPress: () => {
-              Alert.alert(
-                "Logged Arrived",
-                `Passenger arrival has been logged for flight ${flight.arrivalFlightNumber}!`,
-                [{ text: "OK", style: "default" }]
-              );
-            },
-          },
-          {
-            icon: "verified-user",
-            text: "Guest Granted",
-            isSelected: isSelected,
-            disabled: isDisabled,
-            iconId: `verified-user-${flightId}`,
-            onPress: () => {
-              Alert.alert(
-                "Guest Granted",
-                `Guest access has been granted for flight ${flight.arrivalFlightNumber}!`,
-                [{ text: "OK", style: "default" }]
-              );
-            },
+            text: "Participant Departed",
+            isSelected: !isParticipantDepartedDisabled,
+            disabled: isParticipantDepartedDisabled,
+            onPress: handleParticipantDeparted,
           },
         ];
       }
+
+      // Handle arrival and ministry categories
+      // Disable "Meet Done" if isMeetDone is true
+      const isMeetDoneDisabled = flight.isMeetDone === true;
+
+      // Disable "Luggage Received" if isLuggageReceived is true
+      const isLuggageReceivedDisabled = flight.isLuggageReceived === true;
+
+      // Disable "Participant Arrived" if isParticipantArrived is true
+      const isParticipantArrivedDisabled = flight.isParticipantArrived === true;
+
+      const handleMeetDone = async () => {
+        try {
+          await flightArrived({
+            flightId: flightId,
+            isMeetDone: true,
+          });
+          Alert.alert("Success", "Meet done status updated successfully!", [
+            { text: "OK", style: "default" },
+          ]);
+          // Refresh flights data
+          fetchFlightsData();
+        } catch (error) {
+          Alert.alert(
+            "Error",
+            "Failed to update meet done status. Please try again.",
+            [{ text: "OK", style: "default" }]
+          );
+        }
+      };
+
+      const handleLuggageReceived = async () => {
+        try {
+          await flightArrived({
+            flightId: flightId,
+            isLuggageReceived: true,
+          });
+          Alert.alert(
+            "Success",
+            "Luggage received status updated successfully!",
+            [{ text: "OK", style: "default" }]
+          );
+          // Refresh flights data
+          fetchFlightsData();
+        } catch (error) {
+          Alert.alert(
+            "Error",
+            "Failed to update luggage received status. Please try again.",
+            [{ text: "OK", style: "default" }]
+          );
+        }
+      };
+
+      const handleParticipantArrived = async () => {
+        try {
+          await flightArrived({
+            flightId: flightId,
+            isParticipantArrived: true,
+          });
+          Alert.alert(
+            "Success",
+            "Participant arrived status updated successfully!",
+            [{ text: "OK", style: "default" }]
+          );
+          // Refresh flights data
+          fetchFlightsData();
+        } catch (error) {
+          Alert.alert(
+            "Error",
+            "Failed to update participant arrived status. Please try again.",
+            [{ text: "OK", style: "default" }]
+          );
+        }
+      };
+
+      return [
+        {
+          icon: "check-circle",
+          text: "Meet Done",
+          isSelected: !isMeetDoneDisabled,
+          disabled: isMeetDoneDisabled,
+          onPress: handleMeetDone,
+        },
+        {
+          icon: "work",
+          text: "Luggage Received",
+          isSelected: !isLuggageReceivedDisabled,
+          disabled: isLuggageReceivedDisabled,
+          onPress: handleLuggageReceived,
+        },
+        {
+          icon: "person",
+          text: "Participant Arrived",
+          isSelected: !isParticipantArrivedDisabled,
+          disabled: isParticipantArrivedDisabled,
+          onPress: handleParticipantArrived,
+        },
+      ];
     },
-    [selectedCategory]
+    [selectedCategory, fetchFlightsData]
   );
 
   const renderFlightItem = useCallback(
@@ -505,8 +571,6 @@ const Flights = () => {
           contentContainerStyle={styles.listContainer}
         />
       )}
-
-      {/* <FloatingChatIcon /> */}
 
       <DateSearchModal
         visible={showDateModal}

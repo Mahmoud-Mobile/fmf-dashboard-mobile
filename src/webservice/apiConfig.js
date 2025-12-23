@@ -4,6 +4,12 @@ import { Get, Post } from "./Gate";
 const login = async (data) => {
   return await Post("mobile/auth/login", data, "POST", true);
 };
+
+// profile apis
+const profile = async (data) => {
+  return await Get("users/me/profile", data);
+};
+
 // guests apis
 const guests = async (data) => {
   return await Get("guests", data);
@@ -113,8 +119,19 @@ const checkin_OfferHome = async (eventId, vendorId, data) => {
   );
 };
 
+// flights arrived api
+const flightArrived = async (data) => {
+  return await Post("participants/flights/arrived", data, "POST", true);
+};
+
+// flights departed api
+const flightDeparted = async (data) => {
+  return await Post("participants/flights/departed", data, "POST", true);
+};
+
 export {
   login,
+  profile,
   guests,
   getGuestById,
   events,
@@ -132,4 +149,6 @@ export {
   subEvent_ManualRegister,
   getSeatingPlans,
   checkin_OfferHome,
+  flightArrived,
+  flightDeparted,
 };

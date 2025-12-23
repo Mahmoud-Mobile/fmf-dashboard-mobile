@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import SearchActionRow from "../../components/SearchActionRow";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import DateSearchModal from "../../components/DateSearchModal";
 import HotelCard from "./components";

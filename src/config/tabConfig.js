@@ -36,6 +36,7 @@ export const ENVIRONMENT_TABS = {
       priority: 3,
       defaultVisible: true,
     },
+
     {
       route: "Trips",
       component: Trips,
@@ -43,7 +44,7 @@ export const ENVIRONMENT_TABS = {
       headerShown: false,
       titleText: "Trips",
       priority: 4,
-      defaultVisible: true,
+      defaultVisible: false,
     },
     {
       route: "DesignatedCars",
@@ -61,7 +62,7 @@ export const ENVIRONMENT_TABS = {
       headerShown: false,
       titleText: "Hotels",
       priority: 6,
-      defaultVisible: false,
+      defaultVisible: true,
     },
     {
       route: "More",
