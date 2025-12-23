@@ -8,6 +8,15 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff",
+          "mode": "production",
+          "iosDisplayInForeground": true
+        }
+      ],
       ["expo-screen-orientation", { "initialOrientation": "PORTRAIT" }]
     ],
     "splash": {
@@ -20,6 +29,8 @@
       "requireFullScreen": true,
       "bundleIdentifier": "com.lead.fmfmanagement",
       "buildNumber": "23",
+      "googleServicesFile": "./GoogleService-Info.plist",
+
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to location to show your current position and provide directions to event locations.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location to show your current position and provide directions to event locations.",
@@ -27,6 +38,7 @@
       }
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "icon": "./assets/icon.png",
       "orientation": "portrait",
       "adaptiveIcon": {

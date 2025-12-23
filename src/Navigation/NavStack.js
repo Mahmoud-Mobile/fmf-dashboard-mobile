@@ -99,16 +99,7 @@ const NavStack = () => {
         component={NoInternetScreen}
         options={{
           title: "No internet connection",
-          headerBackTitleVisible: false,
           headerLeft: false,
-          animationEnabled: false,
-          headerStyle: {
-            backgroundColor: Colors.Primary,
-          },
-          headerTintColor: "#fff",
-          headerTitleStyle: {
-            fontFamily: Fonts.FONT_MEDIUM,
-          },
           presentation: "card",
         }}
       />

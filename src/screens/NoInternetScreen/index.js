@@ -1,16 +1,12 @@
-import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import React from "react";
+import { View, StyleSheet, Alert, TouchableOpacity, Text } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { useNavigation } from "@react-navigation/native";
 import { Colors } from "../../Global/colors";
-import ValidationModal from "../../components/ValidationModal";
-import CustomPressable from "../../components/CustomPressable";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const NoInternetScreen = () => {
   const navigation = useNavigation();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [validationMessage, setValidationMessage] = useState("");
 
   const handleCheckConnection = () => {
     NetInfo.fetch().then((state) => {
@@ -19,8 +15,8 @@ const NoInternetScreen = () => {
           navigation.goBack();
         }
       } else {
-        setIsModalVisible(true);
-        setValidationMessage(
+        Alert.alert(
+          "Connection Failed",
           "Internet connection failed. Please check your internet connection."
         );
       }
@@ -29,17 +25,14 @@ const NoInternetScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ValidationModal
-        visible={isModalVisible}
-        message={validationMessage}
-        onClose={() => setIsModalVisible(false)}
-      />
       <MaterialIcons name="wifi-off" size={200} color={Colors.Primary} />
-      <CustomPressable
+      <TouchableOpacity
         onPress={handleCheckConnection}
-        title="Check Internet Connection"
-        style={{ marginBottom: 30, paddingHorizontal: 40 }}
-      />
+        style={styles.button}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.buttonText}>Check Internet Connection</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -50,6 +43,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.White,
+  },
+  button: {
+    marginBottom: 30,
+    paddingHorizontal: 40,
+    paddingVertical: 12,
+    backgroundColor: Colors.Primary,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: Colors.White,
+    fontSize: 16,
+    fontWeight: "400",
   },
 });
 export default NoInternetScreen;

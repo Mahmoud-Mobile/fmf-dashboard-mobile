@@ -14,7 +14,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -48,7 +49,7 @@ const App = () => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        navigate("Notification");
+        navigate("NotificationScreen");
       });
 
     return () => {
@@ -78,7 +79,7 @@ const App = () => {
     console.log("getCurrentRoute", navigationRef.current?.getCurrentRoute());
     navigationRef.current.dispatch((state) => {
       const routes = state.routes.filter(
-        (r) => !["Notification"].includes(r.name)
+        (r) => !["NotificationScreen"].includes(r.name)
       );
       return CommonActions.reset({
         ...state,

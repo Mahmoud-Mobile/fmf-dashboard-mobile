@@ -15,6 +15,7 @@ import {
   formatDateTime,
   formatStamp,
 } from "../../config/exportToExcel";
+import { sendNotification } from "../../config/notificationUtils";
 import styles from "./Styles";
 
 // Dummy hotel data
@@ -235,12 +236,25 @@ const Hotels = () => {
         disabled: false,
         iconId: `room-prepared-${hotelId}`,
         onPress: () => {
+          const newValue = !hotel.isRoomPrepared;
           setHotelsData((prev) =>
             prev.map((h) =>
-              h.id === hotel.id
-                ? { ...h, isRoomPrepared: !h.isRoomPrepared }
-                : h
+              h.id === hotel.id ? { ...h, isRoomPrepared: newValue } : h
             )
+          );
+          sendNotification(
+            "Room Prepared Status Updated",
+            `Room ${hotel.roomNumber} at ${hotel.hotelName} has been ${
+              newValue ? "marked as prepared" : "marked as not prepared"
+            } for ${hotel.guestName}`,
+            {
+              type: "room_prepared",
+              hotelId: hotel.id,
+              hotelName: hotel.hotelName,
+              roomNumber: hotel.roomNumber,
+              guestName: hotel.guestName,
+              status: newValue,
+            }
           );
         },
       },
@@ -251,12 +265,25 @@ const Hotels = () => {
         disabled: false,
         iconId: `guest-arrived-${hotelId}`,
         onPress: () => {
+          const newValue = !hotel.isGuestArrived;
           setHotelsData((prev) =>
             prev.map((h) =>
-              h.id === hotel.id
-                ? { ...h, isGuestArrived: !h.isGuestArrived }
-                : h
+              h.id === hotel.id ? { ...h, isGuestArrived: newValue } : h
             )
+          );
+          sendNotification(
+            "Guest Arrival Status Updated",
+            `${hotel.guestName} has ${
+              newValue ? "arrived" : "not arrived"
+            } at ${hotel.hotelName}, Room ${hotel.roomNumber}`,
+            {
+              type: "guest_arrived",
+              hotelId: hotel.id,
+              hotelName: hotel.hotelName,
+              roomNumber: hotel.roomNumber,
+              guestName: hotel.guestName,
+              status: newValue,
+            }
           );
         },
       },
@@ -267,12 +294,25 @@ const Hotels = () => {
         disabled: false,
         iconId: `room-occupied-${hotelId}`,
         onPress: () => {
+          const newValue = !hotel.isRoomOccupied;
           setHotelsData((prev) =>
             prev.map((h) =>
-              h.id === hotel.id
-                ? { ...h, isRoomOccupied: !h.isRoomOccupied }
-                : h
+              h.id === hotel.id ? { ...h, isRoomOccupied: newValue } : h
             )
+          );
+          sendNotification(
+            "Room Occupancy Status Updated",
+            `Room ${hotel.roomNumber} at ${hotel.hotelName} is now ${
+              newValue ? "occupied" : "vacant"
+            } by ${hotel.guestName}`,
+            {
+              type: "room_occupied",
+              hotelId: hotel.id,
+              hotelName: hotel.hotelName,
+              roomNumber: hotel.roomNumber,
+              guestName: hotel.guestName,
+              status: newValue,
+            }
           );
         },
       },
