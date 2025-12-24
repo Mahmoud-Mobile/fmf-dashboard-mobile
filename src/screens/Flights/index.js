@@ -21,6 +21,7 @@ import {
   formatDateTime,
   formatStamp,
 } from "../../config/exportToExcel";
+import { sendNotification } from "../../config/notificationUtils";
 
 const Flights = () => {
   const dispatch = useDispatch();
@@ -461,6 +462,23 @@ const Flights = () => {
             await flightDeparted(participantId, {
               flightId: flightId,
             });
+            
+            // Get participant name for notification
+            const participant = flight.participant || {};
+            const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
+            const flightNumber = flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+            
+            // Send notification
+            await sendNotification(
+              "Participant Departed",
+              `${participantName} has departed on flight ${flightNumber}`,
+              {
+                type: "flight_departed",
+                flightId: flightId,
+                participantId: participantId,
+              }
+            );
+            
             Alert.alert(
               "Success",
               "Participant departed status updated successfully!",
@@ -499,6 +517,23 @@ const Flights = () => {
             await flightDeparted(participantId, {
               flightId: flightId,
             });
+            
+            // Get participant name for notification
+            const participant = flight.participant || {};
+            const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
+            const flightNumber = flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+            
+            // Send notification
+            await sendNotification(
+              "Participant Departed",
+              `${participantName} has departed on flight ${flightNumber}`,
+              {
+                type: "flight_departed",
+                flightId: flightId,
+                participantId: participantId,
+              }
+            );
+            
             Alert.alert(
               "Success",
               "Participant departed status updated successfully!",
@@ -542,6 +577,23 @@ const Flights = () => {
             flightId: flightId,
             isMeetDone: true,
           });
+          
+          // Get participant name for notification
+          const participant = flight.participant || {};
+          const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
+          const flightNumber = flight.arrivalFlightNumber || "N/A";
+          
+          // Send notification
+          await sendNotification(
+            "Meet Done",
+            `Meet completed for ${participantName} on flight ${flightNumber}`,
+            {
+              type: "flight_meet_done",
+              flightId: flightId,
+              participantId: participantId,
+            }
+          );
+          
           Alert.alert("Success", "Meet done status updated successfully!", [
             { text: "OK", style: "default" },
           ]);
@@ -562,6 +614,23 @@ const Flights = () => {
             flightId: flightId,
             isLuggageReceived: true,
           });
+          
+          // Get participant name for notification
+          const participant = flight.participant || {};
+          const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
+          const flightNumber = flight.arrivalFlightNumber || "N/A";
+          
+          // Send notification
+          await sendNotification(
+            "Luggage Received",
+            `Luggage received for ${participantName} on flight ${flightNumber}`,
+            {
+              type: "flight_luggage_received",
+              flightId: flightId,
+              participantId: participantId,
+            }
+          );
+          
           Alert.alert(
             "Success",
             "Luggage received status updated successfully!",
@@ -584,6 +653,23 @@ const Flights = () => {
             flightId: flightId,
             isParticipantArrived: true,
           });
+          
+          // Get participant name for notification
+          const participant = flight.participant || {};
+          const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
+          const flightNumber = flight.arrivalFlightNumber || "N/A";
+          
+          // Send notification
+          await sendNotification(
+            "Participant Arrived",
+            `${participantName} has arrived on flight ${flightNumber}`,
+            {
+              type: "flight_participant_arrived",
+              flightId: flightId,
+              participantId: participantId,
+            }
+          );
+          
           Alert.alert(
             "Success",
             "Participant arrived status updated successfully!",
