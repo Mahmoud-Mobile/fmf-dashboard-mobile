@@ -104,7 +104,7 @@ const FlightCard = ({
   };
 
   const statusConfig = getStatusConfig();
-  
+
   // Get initials: first char of firstName and first char of lastName
   const getInitials = () => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : "";
@@ -115,7 +115,7 @@ const FlightCard = ({
     // Fallback to first char of userName if firstName/lastName not available
     return userName ? userName.charAt(0).toUpperCase() : "";
   };
-  
+
   const userInitials = getInitials();
 
   const getArrivalDateTime = () => {

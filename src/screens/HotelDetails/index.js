@@ -12,13 +12,13 @@ const HotelDetails = ({ route }) => {
   const navigation = useNavigation();
   const [hotel, setHotel] = useState(initialHotel || {});
 
-  const guestName = hotel.guestName || "N/A";
-  const phone = hotel.phone || "N/A";
-  const organizationType = hotel.organizationType || "N/A";
+  const guestName = hotel.guestName || " ";
+  const phone = hotel.phone || " ";
+  const organizationType = hotel.organizationType || " ";
   const arrivalDate = hotel.arrivalDate;
-  const hotelName = hotel.hotelName || "N/A";
-  const roomNumber = hotel.roomNumber || "N/A";
-  const assignedTo = hotel.assignedTo || "N/A";
+  const hotelName = hotel.hotelName || " ";
+  const roomNumber = hotel.roomNumber || " ";
+  const assignedTo = hotel.assignedTo || " ";
   const userPhoto =
     hotel.photo ||
     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face";

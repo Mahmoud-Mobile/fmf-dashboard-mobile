@@ -82,8 +82,8 @@ const Login = () => {
       dispatch(setEmail("fmf@lead-360.co"));
       dispatch(setPassword("password123"));
     } else if (selectedCategory === "offerHome") {
-      dispatch(setEmail("demo@lead-360.co"));
-      dispatch(setPassword("password123"));
+      // dispatch(setEmail("demo@lead-360.co"));
+      // dispatch(setPassword("password123"));
     }
   }, [selectedCategory]);
 

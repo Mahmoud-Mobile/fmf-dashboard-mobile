@@ -32,7 +32,7 @@ const TabButton = ({ item, onPress, routeName }) => {
     scale.value = withTiming(pressed ? 1.1 : focused ? 1.05 : 1, {
       duration: 500,
     });
-    translateY.value = withTiming(focused ? 5 : 1, { duration: 500 });
+    translateY.value = withTiming(focused ? 4 : 1, { duration: 500 });
   }, [pressed, focused]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -190,9 +190,9 @@ const styles = StyleSheet.create({
   },
   titleText: {
     textAlign: "center",
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Fonts.FONT_MEDIUM,
-    paddingTop: 2,
+    paddingTop: 1,
   },
 });
 

@@ -35,7 +35,49 @@ const FlightDetails = ({ route }) => {
       return [];
     }
 
-    // Handle return category
+    // Handle DEPARTURE flight type - show only "Participant Departed" button
+    if (flight.flightType === "DEPARTURE") {
+      // Disable if isParticipantDeparted is true
+      const isParticipantDepartedDisabled =
+        flight.isParticipantDeparted === true;
+
+      const handleParticipantDeparted = async () => {
+        try {
+          await flightDeparted(participantId, {
+            flightId: flightId,
+          });
+          Alert.alert(
+            "Success",
+            "Participant departed status updated successfully!",
+            [
+              {
+                text: "OK",
+                style: "default",
+                onPress: () => navigation.goBack(),
+              },
+            ]
+          );
+        } catch (error) {
+          Alert.alert(
+            "Error",
+            "Failed to update participant departed status. Please try again.",
+            [{ text: "OK", style: "default" }]
+          );
+        }
+      };
+
+      return [
+        {
+          icon: "flight-takeoff",
+          text: "Participant Departed",
+          isSelected: !isParticipantDepartedDisabled,
+          disabled: isParticipantDepartedDisabled,
+          onPress: handleParticipantDeparted,
+        },
+      ];
+    }
+
+    // Handle return category (legacy support)
     if (selectedCategory === "return") {
       // Disable if isParticipantDeparted is true
       const isParticipantDepartedDisabled =
@@ -196,12 +238,28 @@ const FlightDetails = ({ route }) => {
     return <ActionButtonGroup buttons={actionButtons} />;
   };
 
+  // Get flight info based on flightType
+  const getFlightInfo = useMemo(() => {
+    if (flight.flightType === "DEPARTURE") {
+      return {
+        flightNumber: flight.returnFlightNumber || "N/A",
+        airlineName:
+          flight.returnAirlinesName || flight.returnAirlineName || "N/A",
+      };
+    }
+    // Default to arrival data
+    return {
+      flightNumber: flight.arrivalFlightNumber || "N/A",
+      airlineName: flight.arrivalAirlinesName || "N/A",
+    };
+  }, [flight]);
+
   return (
     <View style={styles.container}>
       <CustomHeader
         leftLabel={route.params?.selectedCategoryName}
-        title={flight.arrivalFlightNumber}
-        subtitle={flight.arrivalAirlinesName}
+        title={getFlightInfo.flightNumber}
+        subtitle={getFlightInfo.airlineName}
         onLeftButtonPress={() => navigation.goBack()}
       />
 

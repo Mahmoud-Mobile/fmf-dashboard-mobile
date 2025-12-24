@@ -27,7 +27,8 @@ const Flights = () => {
   const { flights, loading, error } = useSelector((state) => state.api);
   const { selectedEvent } = useSelector((state) => state.api);
   const navigation = useNavigation();
-  const [selectedCategory, setSelectedCategory] = useState("officially");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedFlightType, setSelectedFlightType] = useState("ARRIVAL");
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -36,7 +37,7 @@ const Flights = () => {
   const [viewMode, setViewMode] = useState("list");
 
   const { width: screenWidth } = getDeviceDimensions();
-  // console.log(flights?.flights?.[31]);
+  // console.log(flights?.flights);
   const horizontalPadding = horizontalMargin * 2;
 
   const numColumns = useMemo(() => {
@@ -54,9 +55,13 @@ const Flights = () => {
   }, [numColumns, screenWidth, horizontalPadding]);
 
   const categories = [
-    { id: "officially", label: "Officially", key: "officially" },
-    { id: "arrival", label: "Arrival", key: "arrival" },
-    { id: "return", label: "Return", key: "return" },
+    { id: "all", label: "All", key: "all" },
+    { id: "official", label: "Official", key: "official" },
+  ];
+
+  const flightTypeCategories = [
+    { id: "ARRIVAL", label: "Arrival", key: "ARRIVAL" },
+    { id: "DEPARTURE", label: "Departure", key: "DEPARTURE" },
   ];
 
   const filteredFlights = useMemo(() => {
@@ -143,8 +148,15 @@ const Flights = () => {
       });
     }
 
+    // Filter by flight type
+    if (selectedFlightType) {
+      filtered = filtered.filter((flight) => {
+        return flight.flightType === selectedFlightType;
+      });
+    }
+
     return filtered;
-  }, [flights, searchText, selectedDate]);
+  }, [flights, searchText, selectedDate, selectedFlightType]);
 
   useEffect(() => {
     if (selectedEvent?.id) {
@@ -162,10 +174,15 @@ const Flights = () => {
     if (selectedEvent?.id) {
       const params = {
         status: "SCHEDULED",
-        participantsType: selectedCategory,
         page: 1,
         limit: 5000,
       };
+
+      // Only include participantsType if category is not "all"
+      if (selectedCategory !== "all") {
+        params.participantsType = selectedCategory;
+      }
+
       dispatch(fetchFlights(selectedEvent.id, params));
     }
   }, [selectedEvent, selectedCategory, dispatch]);
@@ -230,28 +247,47 @@ const Flights = () => {
         const lastName = participant.lastName || "";
         passengerName = `${firstName} ${lastName}`.trim() || "N/A";
 
-        // Category-based data extraction
-        if (selectedCategory === "arrival") {
+        // Use flightType to determine which data to export
+        if (flight.flightType === "ARRIVAL") {
           airlineName = flight.arrivalAirlinesName || "N/A";
           flightNumber = flight.arrivalFlightNumber || "N/A";
           status = flight.arrivalFlightStatus || "N/A";
           airportCode = flight.arrivalAirportCode || "N/A";
           airportName = flight.arrivalAirport || "N/A";
           date = formatDateTime(flight.arrivalDate);
-        } else if (selectedCategory === "return") {
-          airlineName = flight.returnAirlinesName || "N/A";
+        } else if (flight.flightType === "DEPARTURE") {
+          airlineName =
+            flight.returnAirlinesName || flight.returnAirlineName || "N/A";
           flightNumber = flight.returnFlightNumber || "N/A";
           status = flight.returnFlightStatus || "N/A";
           airportCode = flight.returnAirportCode || "N/A";
           airportName = flight.returnAirport || "N/A";
           date = formatDateTime(flight.returnDate);
         } else {
-          airlineName = flight.arrivalAirlinesName || "N/A";
-          flightNumber = flight.arrivalFlightNumber || "N/A";
-          status = flight.arrivalFlightStatus || "N/A";
-          airportCode = flight.arrivalAirportCode || "N/A";
-          airportName = flight.arrivalAirport || "N/A";
-          date = formatDateTime(flight.arrivalDate);
+          // Fallback: use selectedCategory for backward compatibility
+          if (selectedCategory === "arrival") {
+            airlineName = flight.arrivalAirlinesName || "N/A";
+            flightNumber = flight.arrivalFlightNumber || "N/A";
+            status = flight.arrivalFlightStatus || "N/A";
+            airportCode = flight.arrivalAirportCode || "N/A";
+            airportName = flight.arrivalAirport || "N/A";
+            date = formatDateTime(flight.arrivalDate);
+          } else if (selectedCategory === "return") {
+            airlineName =
+              flight.returnAirlinesName || flight.returnAirlineName || "N/A";
+            flightNumber = flight.returnFlightNumber || "N/A";
+            status = flight.returnFlightStatus || "N/A";
+            airportCode = flight.returnAirportCode || "N/A";
+            airportName = flight.returnAirport || "N/A";
+            date = formatDateTime(flight.returnDate);
+          } else {
+            airlineName = flight.arrivalAirlinesName || "N/A";
+            flightNumber = flight.arrivalFlightNumber || "N/A";
+            status = flight.arrivalFlightStatus || "N/A";
+            airportCode = flight.arrivalAirportCode || "N/A";
+            airportName = flight.arrivalAirport || "N/A";
+            date = formatDateTime(flight.arrivalDate);
+          }
         }
 
         return {
@@ -305,7 +341,9 @@ const Flights = () => {
       lastName,
     };
 
-    if (selectedCategory === "arrival") {
+    // Use flightType to determine which data to show
+    if (flight.flightType === "ARRIVAL") {
+      // Show arrival data for ARRIVAL flights
       flightData = {
         airlineName: flight.arrivalAirlinesName,
         flightNumber: flight.arrivalFlightNumber,
@@ -319,36 +357,69 @@ const Flights = () => {
         label: "Arrival",
         date: flight.arrivalDate,
       });
-    } else if (selectedCategory === "return") {
+    } else if (flight.flightType === "DEPARTURE") {
+      // Show return/departure data for DEPARTURE flights
       flightData = {
         airlineName:
-          flight.returnAirlinesName || "this parameter is not available",
+          flight.returnAirlinesName || flight.returnAirlineName || "N/A",
         flightNumber: flight.returnFlightNumber,
         status: flight.returnFlightStatus,
-        airportCode:
-          flight.returnAirportCode || "this parameter is not available",
-        airportName: flight.returnAirport,
+        airportCode: flight.returnAirportCode || "N/A",
+        airportName: flight.returnAirport || "N/A",
         ...passengerData,
       };
 
       timeInfo.push({
-        label: "Return",
+        label: "Departure",
         date: flight.returnDate,
       });
     } else {
-      flightData = {
-        airlineName: flight.arrivalAirlinesName,
-        flightNumber: flight.arrivalFlightNumber,
-        status: flight.returnFlightStatus,
-        airportCode: flight.arrivalAirportCode,
-        airportName: flight.arrivalAirport,
-        ...passengerData,
-      };
+      // Fallback: use selectedCategory for backward compatibility
+      if (selectedCategory === "arrival") {
+        flightData = {
+          airlineName: flight.arrivalAirlinesName,
+          flightNumber: flight.arrivalFlightNumber,
+          status: flight.arrivalFlightStatus,
+          airportCode: flight.arrivalAirportCode,
+          airportName: flight.arrivalAirport,
+          ...passengerData,
+        };
 
-      timeInfo.push({
-        label: "Arrival",
-        date: flight.arrivalDate,
-      });
+        timeInfo.push({
+          label: "Arrival",
+          date: flight.arrivalDate,
+        });
+      } else if (selectedCategory === "return") {
+        flightData = {
+          airlineName:
+            flight.returnAirlinesName || flight.returnAirlineName || "N/A",
+          flightNumber: flight.returnFlightNumber,
+          status: flight.returnFlightStatus,
+          airportCode: flight.returnAirportCode || "N/A",
+          airportName: flight.returnAirport || "N/A",
+          ...passengerData,
+        };
+
+        timeInfo.push({
+          label: "Return",
+          date: flight.returnDate,
+        });
+      } else {
+        // Default to arrival data
+        flightData = {
+          airlineName: flight.arrivalAirlinesName,
+          flightNumber: flight.arrivalFlightNumber,
+          status: flight.arrivalFlightStatus,
+          airportCode: flight.arrivalAirportCode,
+          airportName: flight.arrivalAirport,
+          ...passengerData,
+        };
+
+        timeInfo.push({
+          label: "Arrival",
+          date: flight.arrivalDate,
+        });
+      }
     }
 
     return {
@@ -379,7 +450,45 @@ const Flights = () => {
         return [];
       }
 
-      // Handle return category
+      // Handle DEPARTURE flight type - show only "Participant Departed" button
+      if (flight.flightType === "DEPARTURE") {
+        // Disable if isParticipantDeparted is true
+        const isParticipantDepartedDisabled =
+          flight.isParticipantDeparted === true;
+
+        const handleParticipantDeparted = async () => {
+          try {
+            await flightDeparted(participantId, {
+              flightId: flightId,
+            });
+            Alert.alert(
+              "Success",
+              "Participant departed status updated successfully!",
+              [{ text: "OK", style: "default" }]
+            );
+            // Refresh flights data
+            fetchFlightsData();
+          } catch (error) {
+            Alert.alert(
+              "Error",
+              "Failed to update participant departed status. Please try again.",
+              [{ text: "OK", style: "default" }]
+            );
+          }
+        };
+
+        return [
+          {
+            icon: "flight-takeoff",
+            text: "Participant Departed",
+            isSelected: !isParticipantDepartedDisabled,
+            disabled: isParticipantDepartedDisabled,
+            onPress: handleParticipantDeparted,
+          },
+        ];
+      }
+
+      // Handle return category (legacy support)
       if (selectedCategory === "return") {
         // Disable if isParticipantDeparted is true
         const isParticipantDepartedDisabled =
@@ -566,13 +675,18 @@ const Flights = () => {
         onPressDate={() => setShowDateModal(true)}
         selectedDate={selectedDate}
         onClearDate={() => setSelectedDate(null)}
-        // containerStyle={{ marginBottom: 20 }}
       />
 
       <CustomCategories
         categories={categories}
         selectedCategory={selectedCategory}
         onCategorySelect={setSelectedCategory}
+      />
+
+      <CustomCategories
+        categories={flightTypeCategories}
+        selectedCategory={selectedFlightType}
+        onCategorySelect={setSelectedFlightType}
       />
       <LoadingModal visible={loading} />
       {!loading && (

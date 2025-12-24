@@ -112,7 +112,6 @@ const Hotels = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    // Simulate refresh delay
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
@@ -205,7 +204,6 @@ const Hotels = () => {
         [{ text: "OK", style: "default" }]
       );
     } catch (error) {
-      console.error("Error exporting hotels to Excel:", error);
       Alert.alert(
         "Export Failed",
         `Failed to export hotels: ${error.message || "Unknown error"}`,

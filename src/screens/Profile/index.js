@@ -13,9 +13,9 @@ const Profile = () => {
   const dispatch = useDispatch();
   const { profile, loading } = useSelector((state) => state.api);
   const authUser = useSelector((state) => state.auth.user);
+  console.log(authUser?.accessToken);
 
   useEffect(() => {
-    // Fetch profile data if not already loaded
     if (!profile || Object.keys(profile).length === 0) {
       dispatch(fetchProfile());
     }
