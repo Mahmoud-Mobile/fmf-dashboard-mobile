@@ -47,9 +47,7 @@ const AudienceProfile = () => {
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Email</Text>
-              <Text style={styles.infoValue}>
-                {userInfo?.email || "Mo@gmail.com"}
-              </Text>
+              <Text style={styles.infoValue}>{userInfo?.email || " - "}</Text>
             </View>
           </View>
 
@@ -61,9 +59,7 @@ const AudienceProfile = () => {
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Mobile</Text>
-              <Text style={styles.infoValue}>
-                {userInfo?.mobile || "+966 591161089"}
-              </Text>
+              <Text style={styles.infoValue}>{userInfo?.mobile || "-"}</Text>
             </View>
           </View>
 
