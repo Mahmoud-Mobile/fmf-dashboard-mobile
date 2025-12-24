@@ -106,6 +106,20 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginRight: 10,
   },
+  participantIconCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: Colors.Primary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  participantInitial: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.White,
+  },
   participantInfo: {
     flex: 1,
   },

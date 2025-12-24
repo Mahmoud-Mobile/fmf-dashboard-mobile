@@ -120,13 +120,23 @@ const checkin_OfferHome = async (eventId, vendorId, data) => {
 };
 
 // flights arrived api
-const flightArrived = async (data) => {
-  return await Post("participants/flights/arrived", data, "POST", true);
+const flightArrived = async (participantId, data) => {
+  return await Post(
+    `participants/${participantId}/flights/arrived`,
+    data,
+    "POST",
+    true
+  );
 };
 
 // flights departed api
-const flightDeparted = async (data) => {
-  return await Post("participants/flights/departed", data, "POST", true);
+const flightDeparted = async (participantId, data) => {
+  return await Post(
+    `participants/${participantId}/flights/departed`,
+    data,
+    "POST",
+    true
+  );
 };
 
 export {

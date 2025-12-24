@@ -19,9 +19,11 @@ const FlightCard = ({
 
   timeInfo = [],
 
-  userName = "Mahmoud",
-  userMobile = "+9665900000",
-  userPhoto = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+  userName = "N/A",
+  userMobile = "N/A",
+  userPhoto = null,
+  firstName = "",
+  lastName = "",
 
   actionButtons,
 
@@ -102,7 +104,19 @@ const FlightCard = ({
   };
 
   const statusConfig = getStatusConfig();
-  const userInitial = userName ? userName.charAt(0).toUpperCase() : "";
+  
+  // Get initials: first char of firstName and first char of lastName
+  const getInitials = () => {
+    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : "";
+    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : "";
+    if (firstInitial && lastInitial) {
+      return `${firstInitial}${lastInitial}`;
+    }
+    // Fallback to first char of userName if firstName/lastName not available
+    return userName ? userName.charAt(0).toUpperCase() : "";
+  };
+  
+  const userInitials = getInitials();
 
   const getArrivalDateTime = () => {
     if (timeInfo.length > 0 && timeInfo[0].date) {
@@ -138,7 +152,7 @@ const FlightCard = ({
               />
             ) : (
               <View style={styles.userIconCircle}>
-                <Text style={styles.userInitial}>{userInitial}</Text>
+                <Text style={styles.userInitial}>{userInitials}</Text>
               </View>
             )}
             <View style={{ gap: 4 }}>

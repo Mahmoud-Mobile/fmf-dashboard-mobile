@@ -27,7 +27,7 @@ const Flights = () => {
   const { flights, loading, error } = useSelector((state) => state.api);
   const { selectedEvent } = useSelector((state) => state.api);
   const navigation = useNavigation();
-  const [selectedCategory, setSelectedCategory] = useState("ministry");
+  const [selectedCategory, setSelectedCategory] = useState("officially");
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -36,7 +36,7 @@ const Flights = () => {
   const [viewMode, setViewMode] = useState("list");
 
   const { width: screenWidth } = getDeviceDimensions();
-  // console.log(flights?.flights?.[0]);
+  // console.log(flights?.flights?.[31]);
   const horizontalPadding = horizontalMargin * 2;
 
   const numColumns = useMemo(() => {
@@ -54,7 +54,7 @@ const Flights = () => {
   }, [numColumns, screenWidth, horizontalPadding]);
 
   const categories = [
-    { id: "ministry", label: "Ministry", key: "ministry" },
+    { id: "officially", label: "Officially", key: "officially" },
     { id: "arrival", label: "Arrival", key: "arrival" },
     { id: "return", label: "Return", key: "return" },
   ];
@@ -88,12 +88,23 @@ const Flights = () => {
           ""
         ).toLowerCase();
 
+        // Extract participant userName
+        const participant = flight.participant || {};
+        const firstName = (participant.firstName || "").toLowerCase();
+        const lastName = (participant.lastName || "").toLowerCase();
+        const userName = `${firstName} ${lastName}`.trim().toLowerCase();
+        const firstNameOnly = firstName;
+        const lastNameOnly = lastName;
+
         return (
           flightNumber.includes(searchLower) ||
           airportCode.includes(searchLower) ||
           airportName.includes(searchLower) ||
           flightType.includes(searchLower) ||
-          status.includes(searchLower)
+          status.includes(searchLower) ||
+          userName.includes(searchLower) ||
+          firstNameOnly.includes(searchLower) ||
+          lastNameOnly.includes(searchLower)
         );
       });
     }
@@ -213,8 +224,11 @@ const Flights = () => {
         let airportName = "N/A";
         let date = "N/A";
 
-        // Extract passenger name
-        passengerName = "Mahmoud Tawba";
+        // Extract passenger name from participant data
+        const participant = flight.participant || {};
+        const firstName = participant.firstName || "";
+        const lastName = participant.lastName || "";
+        passengerName = `${firstName} ${lastName}`.trim() || "N/A";
 
         // Category-based data extraction
         if (selectedCategory === "arrival") {
@@ -275,12 +289,20 @@ const Flights = () => {
     let flightData = {};
     let timeInfo = [];
 
-    // Static passenger data
+    // Extract participant data from flight object
+    const participant = flight.participant || {};
+    const firstName = participant.firstName || "";
+    const lastName = participant.lastName || "";
+    const userName = `${firstName} ${lastName}`.trim() || "N/A";
+    const userMobile = participant.phone || "N/A";
+    const userPhoto = participant.photo || null;
+
     const passengerData = {
-      userName: "Ahmed Mohamed",
-      userMobile: "+966 65 090 7242",
-      userPhoto:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      userName,
+      userMobile,
+      userPhoto,
+      firstName,
+      lastName,
     };
 
     if (selectedCategory === "arrival") {
@@ -350,9 +372,10 @@ const Flights = () => {
   const getActionButtons = useCallback(
     (flight) => {
       const flightId = flight.id;
+      const participantId = flight.participant?.id;
 
-      // Don't show buttons if flightId is missing
-      if (!flightId) {
+      // Don't show buttons if flightId or participantId is missing
+      if (!flightId || !participantId) {
         return [];
       }
 
@@ -364,7 +387,7 @@ const Flights = () => {
 
         const handleParticipantDeparted = async () => {
           try {
-            await flightDeparted({
+            await flightDeparted(participantId, {
               flightId: flightId,
             });
             Alert.alert(
@@ -394,7 +417,7 @@ const Flights = () => {
         ];
       }
 
-      // Handle arrival and ministry categories
+      // Handle arrival and officially categories
       // Disable "Meet Done" if isMeetDone is true
       const isMeetDoneDisabled = flight.isMeetDone === true;
 
@@ -406,7 +429,7 @@ const Flights = () => {
 
       const handleMeetDone = async () => {
         try {
-          await flightArrived({
+          await flightArrived(participantId, {
             flightId: flightId,
             isMeetDone: true,
           });
@@ -426,7 +449,7 @@ const Flights = () => {
 
       const handleLuggageReceived = async () => {
         try {
-          await flightArrived({
+          await flightArrived(participantId, {
             flightId: flightId,
             isLuggageReceived: true,
           });
@@ -448,7 +471,7 @@ const Flights = () => {
 
       const handleParticipantArrived = async () => {
         try {
-          await flightArrived({
+          await flightArrived(participantId, {
             flightId: flightId,
             isParticipantArrived: true,
           });
@@ -470,18 +493,18 @@ const Flights = () => {
 
       return [
         {
-          icon: "check-circle",
-          text: "Meet Done",
-          isSelected: !isMeetDoneDisabled,
-          disabled: isMeetDoneDisabled,
-          onPress: handleMeetDone,
-        },
-        {
           icon: "work",
           text: "Luggage Received",
           isSelected: !isLuggageReceivedDisabled,
           disabled: isLuggageReceivedDisabled,
           onPress: handleLuggageReceived,
+        },
+        {
+          icon: "check-circle",
+          text: "Meet Done",
+          isSelected: !isMeetDoneDisabled,
+          disabled: isMeetDoneDisabled,
+          onPress: handleMeetDone,
         },
         {
           icon: "person",
@@ -532,7 +555,7 @@ const Flights = () => {
       />
 
       <SearchActionRow
-        searchPlaceholder="Search by airline, flight number, airport, city, seat, booking..."
+        searchPlaceholder="Search by participant name, airline, flight number, airport, city, seat, booking..."
         searchValue={searchText}
         onSearchChange={setSearchText}
         onSearchClear={handleSearchClear}

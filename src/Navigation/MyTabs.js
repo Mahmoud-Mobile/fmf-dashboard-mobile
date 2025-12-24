@@ -73,9 +73,10 @@ const MyTabs = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const tabVisibility = useSelector((state) => state.ui?.tabVisibility) || {};
+  const rolePermission = useSelector((state) => state.auth.user?.user);
   const [currentEnvironment, setCurrentEnvironment] = React.useState("fmf");
   const [TabArr, setTabArr] = React.useState(() =>
-    getTabsForEnvironment("fmf")
+    getTabsForEnvironment("fmf", rolePermission)
   );
 
   React.useEffect(() => {
@@ -86,15 +87,20 @@ const MyTabs = () => {
         });
         const env = selectedCategory || "fmf";
         setCurrentEnvironment(env);
-        setTabArr(getTabsForEnvironment(env));
+        setTabArr(getTabsForEnvironment(env, rolePermission));
       } catch (error) {
-        console.error("Error loading environment:", error);
+        console.log("Error loading environment:", error);
         setCurrentEnvironment("fmf");
-        setTabArr(getTabsForEnvironment("fmf"));
+        setTabArr(getTabsForEnvironment("fmf", rolePermission));
       }
     };
     loadEnvironment();
   }, []);
+
+  // Update tabs when role or environment changes
+  React.useEffect(() => {
+    setTabArr(getTabsForEnvironment(currentEnvironment, rolePermission));
+  }, [currentEnvironment, rolePermission]);
 
   React.useEffect(() => {
     if (route.params?.selectedEvent) {
@@ -103,7 +109,10 @@ const MyTabs = () => {
   }, [route.params?.selectedEvent, dispatch]);
 
   const resolvedTabVisibility = React.useMemo(() => {
-    const defaultVisibility = getDefaultTabVisibility(currentEnvironment);
+    const defaultVisibility = getDefaultTabVisibility(
+      currentEnvironment,
+      rolePermission
+    );
 
     return TabArr.reduce((acc, tab) => {
       const stored = tabVisibility?.[tab.route];
@@ -111,7 +120,7 @@ const MyTabs = () => {
         stored === undefined ? defaultVisibility[tab.route] ?? true : stored;
       return acc;
     }, {});
-  }, [tabVisibility, TabArr, currentEnvironment]);
+  }, [tabVisibility, TabArr, currentEnvironment, rolePermission]);
 
   const visibleRoutes = React.useMemo(() => {
     const forcedVisible = { ...resolvedTabVisibility };

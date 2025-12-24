@@ -7,6 +7,7 @@ import Hotels from "../screens/Hotels";
 import DesignatedCars from "../screens/DesignatedCars";
 import VendorOfferHome from "../screens/OfferHome/VendorOfferHome";
 import DashboardOfferHome from "../screens/OfferHome/DashboardOfferHome";
+import store from "../redux/store";
 export const ENVIRONMENT_TABS = {
   fmf: [
     {
@@ -117,12 +118,30 @@ export const ENVIRONMENT_TABS = {
   ],
 };
 
-export const getTabsForEnvironment = (environment) => {
-  return ENVIRONMENT_TABS[environment] || ENVIRONMENT_TABS.fmf;
+export const getTabsForEnvironment = (environment, role = null) => {
+  const tabs = ENVIRONMENT_TABS[environment] || ENVIRONMENT_TABS.fmf;
+
+  // Get role from Redux store if not provided
+  const rolePermission = role || store.getState()?.auth?.user?.user;
+
+  if (environment === "offerHome" && rolePermission) {
+    const allowedRoutes = {
+      organizer: ["DashboardOfferHome", "CheckIn", "More"],
+      vendor: ["DashboardOfferHome", "VendorOfferHome", "More"],
+      admin: ["DashboardOfferHome", "VendorOfferHome", "More"],
+    };
+
+    const routesForRole = allowedRoutes[rolePermission] || allowedRoutes.vendor;
+    return tabs.filter((tab) => routesForRole.includes(tab.route));
+  }
+
+  return tabs;
 };
 
-export const getDefaultTabVisibility = (environment) => {
-  const tabs = getTabsForEnvironment(environment);
+export const getDefaultTabVisibility = (environment, role = null) => {
+  // Get role from Redux store if not provided
+  const rolePermission = role || store.getState()?.auth?.user?.user;
+  const tabs = getTabsForEnvironment(environment, rolePermission);
   return tabs.reduce((acc, tab) => {
     acc[tab.route] = tab.defaultVisible ?? true;
     return acc;
