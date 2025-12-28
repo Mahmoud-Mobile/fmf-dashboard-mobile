@@ -112,7 +112,7 @@ const getSeatingPlans = async (eventId, subeventId, data) => {
 
 const checkin_OfferHome = async (eventId, vendorId, data) => {
   return await Post(
-    `events/${eventId}/operations/vendors/${vendorId}/check-in`,
+    `events/${eventId}/operations/resources/${vendorId}/check-in`,
     data,
     "POST",
     true
