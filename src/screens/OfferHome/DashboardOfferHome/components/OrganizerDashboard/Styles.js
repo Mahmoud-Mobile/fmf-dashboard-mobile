@@ -1,7 +1,10 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../../../../../Global/colors";
 import { Fonts } from "../../../../../Global/fonts";
-import { horizontalMargin, commonCardStyle } from "../../../../../config/metrics";
+import {
+  horizontalMargin,
+  commonCardStyle,
+} from "../../../../../config/metrics";
 
 export const styles = StyleSheet.create({
   container: {
@@ -11,7 +14,7 @@ export const styles = StyleSheet.create({
     marginBottom: 30,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: Fonts.FONT_BOLD,
     color: Colors.PrimaryText,
     marginBottom: 15,
@@ -64,4 +67,3 @@ export const styles = StyleSheet.create({
     color: Colors.Primary,
   },
 });
-

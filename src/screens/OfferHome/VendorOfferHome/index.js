@@ -159,10 +159,10 @@ const VendorOfferHome = () => {
 
       <RecordPurchaseModal
         ref={recordPurchaseModalRef}
-        productName={selectedProduct?.name || ""}
-        originalPrice={selectedProduct?.originalPrice?.toString() || ""}
-        finalPrice={selectedProduct?.finalPrice?.toString() || ""}
-        discount={selectedProduct?.discount?.toString() || ""}
+        productName=""
+        originalPrice=""
+        finalPrice=""
+        discount=""
         onRecordPurchase={handleRecordPurchase}
         onCancel={handleCancelPurchase}
       />
