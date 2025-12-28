@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FAFAFB",
     borderRadius: 12,
     padding: 12,
+    marginTop: 5,
   },
   section: {
     marginBottom: 24,
@@ -134,6 +135,20 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.Primary,
     marginBottom: 4,
+  },
+  participantTypeContainer: {
+    borderWidth: 1,
+    borderColor: Colors.Primary,
+    paddingVertical: 3,
+    borderRadius: 5,
+    width: "35%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  participantType: {
+    fontSize: 13,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.SecondaryText,
   },
 });
 

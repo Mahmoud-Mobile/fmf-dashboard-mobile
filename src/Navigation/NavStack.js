@@ -28,6 +28,7 @@ import ContactUs from "../screens/ContactUs";
 import TripsDetails from "../screens/TripsDetails";
 import SubEventDetails from "../screens/SubEventDetails";
 import ResourceDetails from "../screens/ResourceDetails";
+import DigitalIdCardScreen from "../screens/DigitalIdCard";
 import { Colors } from "../Global/colors";
 import { Fonts } from "../Global/fonts";
 import NetInfo from "@react-native-community/netinfo";

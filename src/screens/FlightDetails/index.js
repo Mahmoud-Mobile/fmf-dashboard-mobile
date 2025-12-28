@@ -47,12 +47,16 @@ const FlightDetails = ({ route }) => {
           await flightDeparted(participantId, {
             flightId: flightId,
           });
-          
+
           // Get participant name for notification
           const participant = flight.participant || {};
-          const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
-          const flightNumber = flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
-          
+          const participantName =
+            `${participant.firstName || ""} ${
+              participant.lastName || ""
+            }`.trim() || "Participant";
+          const flightNumber =
+            flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+
           // Send notification
           await sendNotification(
             "Participant Departed",
@@ -63,7 +67,7 @@ const FlightDetails = ({ route }) => {
               participantId: participantId,
             }
           );
-          
+
           Alert.alert(
             "Success",
             "Participant departed status updated successfully!",
@@ -106,12 +110,16 @@ const FlightDetails = ({ route }) => {
           await flightDeparted(participantId, {
             flightId: flightId,
           });
-          
+
           // Get participant name for notification
           const participant = flight.participant || {};
-          const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
-          const flightNumber = flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
-          
+          const participantName =
+            `${participant.firstName || ""} ${
+              participant.lastName || ""
+            }`.trim() || "Participant";
+          const flightNumber =
+            flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+
           // Send notification
           await sendNotification(
             "Participant Departed",
@@ -122,7 +130,7 @@ const FlightDetails = ({ route }) => {
               participantId: participantId,
             }
           );
-          
+
           Alert.alert(
             "Success",
             "Participant departed status updated successfully!",
@@ -170,12 +178,15 @@ const FlightDetails = ({ route }) => {
           flightId: flightId,
           isMeetDone: true,
         });
-        
+
         // Get participant name for notification
         const participant = flight.participant || {};
-        const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
+        const participantName =
+          `${participant.firstName || ""} ${
+            participant.lastName || ""
+          }`.trim() || "Participant";
         const flightNumber = flight.arrivalFlightNumber || "N/A";
-        
+
         // Send notification
         await sendNotification(
           "Meet Done",
@@ -186,7 +197,7 @@ const FlightDetails = ({ route }) => {
             participantId: participantId,
           }
         );
-        
+
         Alert.alert("Success", "Meet done status updated successfully!", [
           {
             text: "OK",
@@ -209,12 +220,15 @@ const FlightDetails = ({ route }) => {
           flightId: flightId,
           isLuggageReceived: true,
         });
-        
+
         // Get participant name for notification
         const participant = flight.participant || {};
-        const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
+        const participantName =
+          `${participant.firstName || ""} ${
+            participant.lastName || ""
+          }`.trim() || "Participant";
         const flightNumber = flight.arrivalFlightNumber || "N/A";
-        
+
         // Send notification
         await sendNotification(
           "Luggage Received",
@@ -225,7 +239,7 @@ const FlightDetails = ({ route }) => {
             participantId: participantId,
           }
         );
-        
+
         Alert.alert(
           "Success",
           "Luggage received status updated successfully!",
@@ -252,12 +266,15 @@ const FlightDetails = ({ route }) => {
           flightId: flightId,
           isParticipantArrived: true,
         });
-        
+
         // Get participant name for notification
         const participant = flight.participant || {};
-        const participantName = `${participant.firstName || ""} ${participant.lastName || ""}`.trim() || "Participant";
+        const participantName =
+          `${participant.firstName || ""} ${
+            participant.lastName || ""
+          }`.trim() || "Participant";
         const flightNumber = flight.arrivalFlightNumber || "N/A";
-        
+
         // Send notification
         await sendNotification(
           "Participant Arrived",
@@ -268,7 +285,7 @@ const FlightDetails = ({ route }) => {
             participantId: participantId,
           }
         );
-        
+
         Alert.alert(
           "Success",
           "Participant arrived status updated successfully!",
@@ -340,10 +357,15 @@ const FlightDetails = ({ route }) => {
     };
   }, [flight]);
 
+  const participant = flight.participant || {};
+  const firstName = participant.firstName || "";
+  const lastName = participant.lastName || "";
+  const name = `${firstName} ${lastName}`.trim() || "";
+
   return (
     <View style={styles.container}>
       <CustomHeader
-        leftLabel={route.params?.selectedCategoryName}
+        leftLabel={name ?? ""}
         title={getFlightInfo.flightNumber}
         subtitle={getFlightInfo.airlineName}
         onLeftButtonPress={() => navigation.goBack()}
@@ -366,6 +388,8 @@ const FlightDetails = ({ route }) => {
                   const userName = `${firstName} ${lastName}`.trim() || "N/A";
                   const userMobile = participant.phone || "N/A";
                   const userPhoto = participant.photo || null;
+                  const dynamicParticipantType =
+                    participant.dynamicParticipantType?.name || null;
                   const firstInitial = firstName
                     ? firstName.charAt(0).toUpperCase()
                     : "";
@@ -399,6 +423,13 @@ const FlightDetails = ({ route }) => {
                         <Text style={styles.participantMobile}>
                           {userMobile}
                         </Text>
+                        {dynamicParticipantType && (
+                          <View style={styles.participantTypeContainer}>
+                            <Text style={styles.participantType}>
+                              {dynamicParticipantType}
+                            </Text>
+                          </View>
+                        )}
                       </View>
                     </>
                   );
@@ -443,7 +474,7 @@ const FlightDetails = ({ route }) => {
                 </View>
               </View>
 
-              <View style={[styles.column, { marginLeft: 8 }]}>
+              <View style={[styles.column, { marginRight: 8 }]}>
                 <Text style={styles.sectionTitle}> Booking Details</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Seat:</Text>
@@ -513,7 +544,7 @@ const FlightDetails = ({ route }) => {
                 </View>
               </View>
 
-              <View style={[styles.column, { marginLeft: 8 }]}>
+              <View style={[styles.column, { marginRight: 8 }]}>
                 <Text style={styles.sectionTitle}> Status</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Luggage Received:</Text>
