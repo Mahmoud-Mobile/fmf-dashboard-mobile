@@ -334,6 +334,7 @@ const Flights = () => {
     const userName = `${firstName} ${lastName}`.trim() || "N/A";
     const userMobile = participant.phone || "N/A";
     const userPhoto = participant.photo || null;
+    const participantType = participant?.dynamicParticipantType?.name || null;
 
     const passengerData = {
       userName,
@@ -341,6 +342,7 @@ const Flights = () => {
       userPhoto,
       firstName,
       lastName,
+      participantType,
     };
 
     // Use flightType to determine which data to show

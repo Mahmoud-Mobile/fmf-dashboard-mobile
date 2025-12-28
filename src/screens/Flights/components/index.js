@@ -18,6 +18,7 @@ const FlightCard = ({
   airportName,
 
   timeInfo = [],
+  participantType = null,
 
   userName = "N/A",
   userMobile = "N/A",
@@ -185,16 +186,19 @@ const FlightCard = ({
           { backgroundColor: statusConfig.backgroundColor },
         ]}
       >
-        {statusConfig.icon && (
-          <MaterialIcons
-            name={statusConfig.icon}
-            size={12}
-            color={statusConfig.color}
-          />
-        )}
         <Text style={[styles.statusText, { color: statusConfig.color }]}>
           {status || "N/A"}
         </Text>
+        {participantType && (
+          <>
+            <Text style={[styles.statusText, { color: statusConfig.color }]}>
+              {" • "}
+            </Text>
+            <Text style={[styles.statusText, { color: statusConfig.color }]}>
+              {participantType}
+            </Text>
+          </>
+        )}
       </View>
       {renderActions()}
     </TouchableOpacity>
