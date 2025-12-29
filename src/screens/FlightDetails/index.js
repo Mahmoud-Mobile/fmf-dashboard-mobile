@@ -6,7 +6,12 @@ import styles from "./Styles";
 import moment from "moment";
 import { ActionButton, ActionButtonGroup } from "../../components/ActionButton";
 import { horizontalMargin } from "../../config/metrics";
-import { flightArrived, flightDeparted } from "../../webservice/apiConfig";
+import {
+  markFlightArrived,
+  markFlightDeparted,
+  toggleMeetDone,
+  toggleLuggageReceived,
+} from "../../webservice/apiConfig";
 import { sendNotification } from "../../config/notificationUtils";
 
 const FlightDetails = ({ route }) => {
@@ -44,8 +49,8 @@ const FlightDetails = ({ route }) => {
 
       const handleParticipantDeparted = async () => {
         try {
-          await flightDeparted(participantId, {
-            flightId: flightId,
+          await markFlightDeparted(flightId, participantId, {
+            departed: true,
           });
 
           // Get participant name for notification
@@ -107,8 +112,8 @@ const FlightDetails = ({ route }) => {
 
       const handleParticipantDeparted = async () => {
         try {
-          await flightDeparted(participantId, {
-            flightId: flightId,
+          await markFlightDeparted(flightId, participantId, {
+            departed: true,
           });
 
           // Get participant name for notification
@@ -174,9 +179,8 @@ const FlightDetails = ({ route }) => {
 
     const handleMeetDone = async () => {
       try {
-        await flightArrived(participantId, {
-          flightId: flightId,
-          isMeetDone: true,
+        await toggleMeetDone(flightId, participantId, {
+          meetDone: true,
         });
 
         // Get participant name for notification
@@ -216,9 +220,8 @@ const FlightDetails = ({ route }) => {
 
     const handleLuggageReceived = async () => {
       try {
-        await flightArrived(participantId, {
-          flightId: flightId,
-          isLuggageReceived: true,
+        await toggleLuggageReceived(flightId, participantId, {
+          luggageReceived: true,
         });
 
         // Get participant name for notification
@@ -262,9 +265,8 @@ const FlightDetails = ({ route }) => {
 
     const handleParticipantArrived = async () => {
       try {
-        await flightArrived(participantId, {
-          flightId: flightId,
-          isParticipantArrived: true,
+        await markFlightArrived(flightId, participantId, {
+          arrived: true,
         });
 
         // Get participant name for notification

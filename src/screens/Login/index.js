@@ -16,6 +16,7 @@ import EnvironmentSelector from "./components/EnvironmentSelector";
 import { setEmail, setPassword } from "../../redux/actions/authActions";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/actions/authActions";
+import * as Notifications from "expo-notifications";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -29,6 +30,7 @@ const Login = () => {
   const [categoryError, setCategoryError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [deviceToken, setDeviceToken] = useState(null);
 
   const validateInputs = () => {
     let isValid = true;
@@ -57,9 +59,32 @@ const Login = () => {
     if (!validateInputs()) {
       return;
     }
+
+    let token = deviceToken;
+    if (!token) {
+      try {
+        const { status: existingStatus } =
+          await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+
+        if (existingStatus !== "granted") {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        if (finalStatus === "granted") {
+          const tokenData = await Notifications.getDevicePushTokenAsync();
+          token = tokenData.data;
+          setDeviceToken(token);
+        }
+      } catch (error) {
+        console.log("Error getting device token:", error);
+      }
+    }
+
     const body = {
       email: email,
       password: password,
+      deviceToken: token || "",
     };
     setLoading(true);
     try {
@@ -86,6 +111,31 @@ const Login = () => {
       // dispatch(setPassword("password123"));
     }
   }, [selectedCategory]);
+
+  useEffect(() => {
+    // Get device token on component mount
+    const getDeviceToken = async () => {
+      try {
+        const { status: existingStatus } =
+          await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+
+        if (existingStatus !== "granted") {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+
+        if (finalStatus === "granted") {
+          const tokenData = await Notifications.getDevicePushTokenAsync();
+          setDeviceToken(tokenData.data);
+        }
+      } catch (error) {
+        console.error("Error getting device token:", error);
+      }
+    };
+
+    getDeviceToken();
+  }, []);
 
   const handleCategoryChange = (categoryValue) => {
     setSelectedCategory(categoryValue);

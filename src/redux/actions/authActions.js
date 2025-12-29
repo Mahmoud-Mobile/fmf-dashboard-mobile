@@ -12,7 +12,7 @@ import {
 export const login = (params) => async (dispatch) => {
   try {
     const response = await loginUser(params);
-    const token = response?.accessToken || response?.token;
+    const token = response?.access_token;
 
     if (token) {
       console.log("Setting access token:", token);
@@ -20,7 +20,9 @@ export const login = (params) => async (dispatch) => {
       await SecureStore.setItemAsync("userInfo", JSON.stringify(response));
 
       // Extract and store rolePermission
-      const rolePermission = response?.user?.role || null;
+      // API returns roles as an array, so we'll store the first role or the array
+      const rolePermission =
+        response?.user?.roles?.[0] || response?.user?.role || null;
       dispatch({ type: LOGIN_SUCCESS, payload: response });
       dispatch({ type: SET_ROLE_PERMISSION, payload: rolePermission });
       return { type: LOGIN_SUCCESS, payload: response };

@@ -2,7 +2,7 @@ import { Get, Post } from "./Gate";
 
 // login apis
 const login = async (data) => {
-  return await Post("mobile/auth/login", data, "POST", true);
+  return await Post("mobile/ops/auth/login", data, "POST", true);
 };
 
 // profile apis
@@ -30,9 +30,8 @@ const getEventById = async (id, data) => {
 
 // flights apis
 const flights = async (eventId, data) => {
-  return await Get(`participants/events/${eventId}/flights`, data);
+  return await Get(`mobile/ops/events/${eventId}/flights`, data);
 };
-
 // trips apis
 const trips = async (eventId, data) => {
   return await Get(`events/${eventId}/transportation/trips`, data);
@@ -74,7 +73,6 @@ const resource_Checkin = async (eventId, resourceId, data) => {
     true
   );
 };
-
 const subEvent_Checkout = async (eventId, subEventId, data) => {
   return await Post(
     `mobile/ops/events/${eventId}/sub-events/${subEventId}/check-out`,
@@ -119,20 +117,40 @@ const checkin_OfferHome = async (eventId, vendorId, data) => {
   );
 };
 
-// flights arrived api
-const flightArrived = async (participantId, data) => {
+// Mark flight arrived
+const markFlightArrived = async (flightId, participantId, data) => {
   return await Post(
-    `participants/${participantId}/flights/arrived`,
+    `mobile/ops/flights/${flightId}/participant/${participantId}/mark-arrived`,
     data,
     "POST",
     true
   );
 };
 
-// flights departed api
-const flightDeparted = async (participantId, data) => {
+// Mark flight departed
+const markFlightDeparted = async (flightId, participantId, data) => {
   return await Post(
-    `participants/${participantId}/flights/departed`,
+    `mobile/ops/flights/${flightId}/participant/${participantId}/mark-departed`,
+    data,
+    "POST",
+    true
+  );
+};
+
+// Toggle meet done
+const toggleMeetDone = async (flightId, participantId, data) => {
+  return await Post(
+    `mobile/ops/flights/${flightId}/participant/${participantId}/toggle-meet-done`,
+    data,
+    "POST",
+    true
+  );
+};
+
+// Toggle luggage received
+const toggleLuggageReceived = async (flightId, participantId, data) => {
+  return await Post(
+    `mobile/ops/flights/${flightId}/participant/${participantId}/toggle-luggage-received`,
     data,
     "POST",
     true
@@ -159,6 +177,8 @@ export {
   subEvent_ManualRegister,
   getSeatingPlans,
   checkin_OfferHome,
-  flightArrived,
-  flightDeparted,
+  markFlightArrived,
+  markFlightDeparted,
+  toggleMeetDone,
+  toggleLuggageReceived,
 };

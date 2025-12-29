@@ -8,7 +8,12 @@ import DateSearchModal from "../../components/DateSearchModal";
 import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
-import { flightArrived, flightDeparted } from "../../webservice/apiConfig";
+import {
+  markFlightArrived,
+  markFlightDeparted,
+  toggleMeetDone,
+  toggleLuggageReceived,
+} from "../../webservice/apiConfig";
 import styles from "./Styles";
 
 import FlightCard from "./components";
@@ -175,7 +180,6 @@ const Flights = () => {
   const fetchFlightsData = useCallback(() => {
     if (selectedEvent?.id) {
       const params = {
-        status: "SCHEDULED",
         page: 1,
         limit: 5000,
       };
@@ -462,67 +466,8 @@ const Flights = () => {
 
         const handleParticipantDeparted = async () => {
           try {
-            await flightDeparted(participantId, {
-              flightId: flightId,
-            });
-
-            // Get participant name for notification
-            const participant = flight.participant || {};
-            const participantName =
-              `${participant.firstName || ""} ${
-                participant.lastName || ""
-              }`.trim() || "Participant";
-            const flightNumber =
-              flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
-
-            // Send notification
-            await sendNotification(
-              "Participant Departed",
-              `${participantName} has departed on flight ${flightNumber}`,
-              {
-                type: "flight_departed",
-                flightId: flightId,
-                participantId: participantId,
-              }
-            );
-
-            Alert.alert(
-              "Success",
-              "Participant departed status updated successfully!",
-              [{ text: "OK", style: "default" }]
-            );
-            // Refresh flights data
-            fetchFlightsData();
-          } catch (error) {
-            Alert.alert(
-              "Error",
-              "Failed to update participant departed status. Please try again.",
-              [{ text: "OK", style: "default" }]
-            );
-          }
-        };
-
-        return [
-          {
-            icon: "flight-takeoff",
-            text: "Participant Departed",
-            isSelected: !isParticipantDepartedDisabled,
-            disabled: isParticipantDepartedDisabled,
-            onPress: handleParticipantDeparted,
-          },
-        ];
-      }
-
-      // Handle return category (legacy support)
-      if (selectedCategory === "return") {
-        // Disable if isParticipantDeparted is true
-        const isParticipantDepartedDisabled =
-          flight.isParticipantDeparted === true;
-
-        const handleParticipantDeparted = async () => {
-          try {
-            await flightDeparted(participantId, {
-              flightId: flightId,
+            await markFlightDeparted(flightId, participantId, {
+              departed: true,
             });
 
             // Get participant name for notification
@@ -584,9 +529,8 @@ const Flights = () => {
 
       const handleMeetDone = async () => {
         try {
-          await flightArrived(participantId, {
-            flightId: flightId,
-            isMeetDone: true,
+          await toggleMeetDone(flightId, participantId, {
+            meetDone: true,
           });
 
           // Get participant name for notification
@@ -624,9 +568,8 @@ const Flights = () => {
 
       const handleLuggageReceived = async () => {
         try {
-          await flightArrived(participantId, {
-            flightId: flightId,
-            isLuggageReceived: true,
+          await toggleLuggageReceived(flightId, participantId, {
+            luggageReceived: true,
           });
 
           // Get participant name for notification
@@ -666,9 +609,8 @@ const Flights = () => {
 
       const handleParticipantArrived = async () => {
         try {
-          await flightArrived(participantId, {
-            flightId: flightId,
-            isParticipantArrived: true,
+          await markFlightArrived(flightId, participantId, {
+            arrived: true,
           });
 
           // Get participant name for notification
