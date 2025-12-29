@@ -4,19 +4,14 @@ import React, {
   useImperativeHandle,
   useRef,
 } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import BottomSheet, {
   BottomSheetBackdrop,
-  BottomSheetView,
+  BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { Colors } from "../../Global/colors";
 import { MaterialIcons } from "@expo/vector-icons";
+import DigitalIdCard from "../DigitalIdCard";
 import styles from "./Styles";
 
 const QRScanResultModalSubEvent = forwardRef(
@@ -107,7 +102,7 @@ const QRScanResultModalSubEvent = forwardRef(
         ref={bottomSheetRef}
         index={-1}
         snapPoints={
-          userInfo?.participant?.name ? ["60%", "70%"] : ["40%", "60%", "70%"]
+          userInfo?.participant ? ["60%", "70%"] : ["40%", "60%", "70%"]
         }
         enablePanDownToClose={false}
         onChange={handleSheetChanges}
@@ -115,7 +110,7 @@ const QRScanResultModalSubEvent = forwardRef(
         backgroundStyle={styles.bottomSheetBackground}
         handleIndicatorStyle={styles.handleIndicator}
       >
-        <BottomSheetView style={styles.contentContainer}>
+        <BottomSheetScrollView style={styles.contentContainer}>
           <View style={styles.headerContainer}>
             <TouchableOpacity
               style={styles.closeButton}
@@ -147,64 +142,51 @@ const QRScanResultModalSubEvent = forwardRef(
             </View>
           ) : (
             <View style={styles.userInfoContainer}>
-              {userInfo?.participant?.name && (
-                <>
-                  {userInfo?.participant?.image ? (
-                    <Image
-                      source={{ uri: userInfo.participant.image }}
-                      style={styles.userImage}
-                    />
-                  ) : (
-                    <View style={styles.userImagePlaceholder}>
-                      <MaterialIcons
-                        name="person"
-                        size={32}
-                        color={Colors.gray}
-                      />
-                    </View>
-                  )}
-                </>
-              )}
-
-              {userInfo?.participant?.name && (
-                <Text style={styles.userName}>
-                  {userInfo?.participant?.name}
-                </Text>
-              )}
-
-              {userInfo?.participant?.participantType && (
-                <View style={styles.participantTypeBadge}>
-                  <Text style={styles.participantTypeText}>
-                    {userInfo.participant.participantType}
-                  </Text>
-                </View>
+              {userInfo?.participant && (
+                <DigitalIdCard
+                  id={userInfo?.participant?.id}
+                  name={
+                    userInfo?.participant?.firstName &&
+                    userInfo?.participant?.lastName
+                      ? `${userInfo.participant.firstName} ${userInfo.participant.lastName}`
+                      : userInfo?.participant?.name || "-"
+                  }
+                  image={
+                    userInfo?.participant?.profilePicture ||
+                    userInfo?.participant?.image
+                  }
+                  participantType={
+                    typeof userInfo?.participant?.participantType === "object"
+                      ? userInfo?.participant?.participantType?.name
+                      : userInfo?.participant?.participantType
+                  }
+                  position={userInfo?.participant?.position || "-"}
+                  nationality={
+                    typeof userInfo?.participant?.nationality === "object"
+                      ? userInfo?.participant?.nationality?.name
+                      : userInfo?.participant?.nationality || "-"
+                  }
+                  color={
+                    userInfo?.participant?.participantType?.color ||
+                    Colors.Primary
+                  }
+                />
               )}
 
               {userInfo?.message && (
                 <Text style={styles.messageText}>{userInfo.message}</Text>
               )}
-              {userInfo?.participant?.name && (
+
+              {userInfo?.checkInCount !== undefined && (
                 <View style={styles.infoRow}>
                   <View style={styles.infoItem}>
-                    <MaterialIcons
-                      name="check-circle"
-                      size={16}
-                      color={Colors.Success}
-                    />
                     <Text style={styles.infoLabel}>Check-ins:</Text>
                     <Text style={styles.infoValue}>
-                      {userInfo?.checkInCount ?? 0}
+                      {userInfo.checkInCount}
                     </Text>
                   </View>
                   {userInfo?.isFirstEntry !== undefined && (
                     <View style={styles.infoItem}>
-                      <MaterialIcons
-                        name={userInfo.isFirstEntry ? "new-releases" : "repeat"}
-                        size={16}
-                        color={
-                          userInfo.isFirstEntry ? Colors.Primary : Colors.gray
-                        }
-                      />
                       <Text style={styles.infoLabel}>
                         {userInfo.isFirstEntry ? "First Entry" : "Re-entry"}
                       </Text>
@@ -228,7 +210,7 @@ const QRScanResultModalSubEvent = forwardRef(
               />
               <Text style={styles.buttonText}>Scan Another</Text>
             </TouchableOpacity>
-            {userInfo?.participant?.name && (
+            {userInfo?.participant && (
               <>
                 <TouchableOpacity
                   style={[styles.button, styles.showSeatsButton]}
@@ -242,19 +224,10 @@ const QRScanResultModalSubEvent = forwardRef(
                   />
                   <Text style={styles.buttonText}>Show Seats</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.button, styles.showProfileButton]}
-                  onPress={handleShowProfile}
-                  activeOpacity={0.7}
-                >
-                  <MaterialIcons name="person" size={18} color={Colors.White} />
-                  <Text style={styles.buttonText}>Show Profile</Text>
-                </TouchableOpacity>
               </>
             )}
           </View>
-        </BottomSheetView>
+        </BottomSheetScrollView>
       </BottomSheet>
     );
   }

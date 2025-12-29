@@ -18,7 +18,7 @@ import styles from "./Styles";
 
 const QRScanResultModalResource = forwardRef(
   ({ onScanAnother, userInfo, isLoading = false }, ref) => {
-    console.log("userInfo", userInfo);
+    // console.log("userInfo", userInfo);
     const bottomSheetRef = useRef(null);
     const [timer, setTimer] = useState(4);
     const timerIntervalRef = useRef(null);
