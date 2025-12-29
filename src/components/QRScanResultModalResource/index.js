@@ -18,7 +18,7 @@ import styles from "./Styles";
 
 const QRScanResultModalResource = forwardRef(
   ({ onScanAnother, userInfo, isLoading = false }, ref) => {
-    // console.log("userInfo", userInfo);
+    console.log("userInfo", userInfo);
     const bottomSheetRef = useRef(null);
     const [timer, setTimer] = useState(4);
     const timerIntervalRef = useRef(null);
@@ -178,17 +178,55 @@ const QRScanResultModalResource = forwardRef(
               {userInfo?.participant && (
                 <DigitalIdCard
                   id={userInfo?.participant?.id}
-                  name={userInfo?.participant?.name}
-                  image={userInfo?.participant?.image}
-                  participantType={userInfo?.participant?.participantType}
-                  position="-"
-                  nationality="-"
-                  color={Colors.Primary}
+                  name={
+                    userInfo?.participant?.firstName &&
+                    userInfo?.participant?.lastName
+                      ? `${userInfo.participant.firstName} ${userInfo.participant.lastName}`
+                      : userInfo?.participant?.name || "-"
+                  }
+                  image={
+                    userInfo?.participant?.profilePicture ||
+                    userInfo?.participant?.image
+                  }
+                  participantType={
+                    typeof userInfo?.participant?.participantType === "object"
+                      ? userInfo?.participant?.participantType?.name
+                      : userInfo?.participant?.participantType
+                  }
+                  position={userInfo?.participant?.position || "-"}
+                  nationality={
+                    typeof userInfo?.participant?.nationality === "object"
+                      ? userInfo?.participant?.nationality?.name
+                      : userInfo?.participant?.nationality || "-"
+                  }
+                  color={
+                    userInfo?.participant?.participantType?.color ||
+                    Colors.Primary
+                  }
                 />
               )}
 
               {userInfo?.message && (
                 <Text style={styles.messageText}>{userInfo.message}</Text>
+              )}
+
+              {userInfo?.checkInCount !== undefined && (
+                <View style={styles.infoRow}>
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>Check-ins:</Text>
+                    <Text style={styles.infoValue}>
+                      {userInfo.checkInCount}
+                    </Text>
+                  </View>
+                  {userInfo?.resource && (
+                    <View style={styles.infoItem}>
+                      <Text style={styles.infoLabel}>Location:</Text>
+                      <Text style={styles.infoValue} numberOfLines={1}>
+                        {userInfo.resource.location || userInfo.resource.name}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               )}
             </View>
           )}

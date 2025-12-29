@@ -28,7 +28,7 @@
       "supportsTablet": true,
       "requireFullScreen": true,
       "bundleIdentifier": "com.lead.fmfmanagement",
-      "buildNumber": "28",
+      "buildNumber": "29",
       "googleServicesFile": "./GoogleService-Info.plist",
 
       "infoPlist": {
