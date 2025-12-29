@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   headerContainer: {
     alignItems: "center",
@@ -146,6 +147,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     gap: 10,
     marginTop: 20,
+    marginBottom: 50,
   },
   button: {
     flexDirection: "row",

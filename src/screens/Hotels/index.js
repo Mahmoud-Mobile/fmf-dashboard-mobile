@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import SearchActionRow from "../../components/SearchActionRow";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import DateSearchModal from "../../components/DateSearchModal";
 import HotelCard from "./components";
@@ -16,6 +15,7 @@ import {
   formatDateTime,
   formatStamp,
 } from "../../config/exportToExcel";
+import { sendNotification } from "../../config/notificationUtils";
 import styles from "./Styles";
 
 // Dummy hotel data
@@ -23,7 +23,7 @@ const dummyHotelsData = [
   {
     id: "1",
     guestName: "Ahmed Mohamed",
-    phone: "+966 65 090 7242",
+    phone: "+966 50 123 4567",
     organizationType: "Government",
     arrivalDate: "2026-01-10T16:00:00",
     hotelName: "Marriott Hotel",
@@ -37,48 +37,78 @@ const dummyHotelsData = [
   },
   {
     id: "2",
-    guestName: "Ahmed Mohamed",
-    phone: "+966 65 090 7242",
-    organizationType: "Government",
-    arrivalDate: "2026-01-10T16:00:00",
+    guestName: "Fatima Al-Zahra",
+    phone: "+966 55 234 5678",
+    organizationType: "Private",
+    arrivalDate: "2026-01-11T14:30:00",
     hotelName: "Ritz Carlton Hotel",
-    roomNumber: "207",
-    assignedTo: "Mohammed Al-Rashid",
+    roomNumber: "312",
+    assignedTo: "Sarah Al-Mansouri",
     isRoomPrepared: true,
     isGuestArrived: false,
     isRoomOccupied: false,
     photo:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: "3",
-    guestName: "Ahmed Mohamed",
-    phone: "+966 65 090 7242",
-    organizationType: "Government",
-    arrivalDate: "2026-01-10T16:00:00",
-    hotelName: "Ritz Carlton Hotel",
-    roomNumber: "207",
-    assignedTo: "Mohammed Al-Rashid",
+    guestName: "Khalid Abdullah",
+    phone: "+966 56 345 6789",
+    organizationType: "Corporate",
+    arrivalDate: "2026-01-12T10:00:00",
+    hotelName: "Four Seasons Hotel",
+    roomNumber: "508",
+    assignedTo: "Omar Al-Saud",
     isRoomPrepared: false,
     isGuestArrived: false,
     isRoomOccupied: false,
     photo:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: "4",
-    guestName: "Ahmed Mohamed",
-    phone: "+966 65 090 7242",
+    guestName: "Noura Al-Mutairi",
+    phone: "+966 57 456 7890",
     organizationType: "Government",
-    arrivalDate: "2026-01-10T16:00:00",
+    arrivalDate: "2026-01-13T18:00:00",
     hotelName: "Ritz Carlton Hotel",
-    roomNumber: "207",
-    assignedTo: "Mohammed Al-Rashid",
+    roomNumber: "421",
+    assignedTo: "Layla Al-Hashimi",
     isRoomPrepared: false,
     isGuestArrived: true,
     isRoomOccupied: false,
     photo:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+  },
+  {
+    id: "5",
+    guestName: "Youssef Hassan",
+    phone: "+966 58 567 8901",
+    organizationType: "Private",
+    arrivalDate: "2026-01-14T12:00:00",
+    hotelName: "Marriott Hotel",
+    roomNumber: "105",
+    assignedTo: "Mohammed Al-Rashid",
+    isRoomPrepared: true,
+    isGuestArrived: true,
+    isRoomOccupied: true,
+    photo:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
+  },
+  {
+    id: "6",
+    guestName: "Mariam Al-Otaibi",
+    phone: "+966 59 678 9012",
+    organizationType: "Corporate",
+    arrivalDate: "2026-01-15T15:30:00",
+    hotelName: "Four Seasons Hotel",
+    roomNumber: "623",
+    assignedTo: "Sarah Al-Mansouri",
+    isRoomPrepared: true,
+    isGuestArrived: false,
+    isRoomOccupied: false,
+    photo:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
   },
 ];
 
@@ -112,7 +142,6 @@ const Hotels = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    // Simulate refresh delay
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
@@ -205,7 +234,6 @@ const Hotels = () => {
         [{ text: "OK", style: "default" }]
       );
     } catch (error) {
-      console.error("Error exporting hotels to Excel:", error);
       Alert.alert(
         "Export Failed",
         `Failed to export hotels: ${error.message || "Unknown error"}`,
@@ -236,12 +264,25 @@ const Hotels = () => {
         disabled: false,
         iconId: `room-prepared-${hotelId}`,
         onPress: () => {
+          const newValue = !hotel.isRoomPrepared;
           setHotelsData((prev) =>
             prev.map((h) =>
-              h.id === hotel.id
-                ? { ...h, isRoomPrepared: !h.isRoomPrepared }
-                : h
+              h.id === hotel.id ? { ...h, isRoomPrepared: newValue } : h
             )
+          );
+          sendNotification(
+            "Room Prepared Status Updated",
+            `Room ${hotel.roomNumber} at ${hotel.hotelName} has been ${
+              newValue ? "marked as prepared" : "marked as not prepared"
+            } for ${hotel.guestName}`,
+            {
+              type: "room_prepared",
+              hotelId: hotel.id,
+              hotelName: hotel.hotelName,
+              roomNumber: hotel.roomNumber,
+              guestName: hotel.guestName,
+              status: newValue,
+            }
           );
         },
       },
@@ -252,12 +293,25 @@ const Hotels = () => {
         disabled: false,
         iconId: `guest-arrived-${hotelId}`,
         onPress: () => {
+          const newValue = !hotel.isGuestArrived;
           setHotelsData((prev) =>
             prev.map((h) =>
-              h.id === hotel.id
-                ? { ...h, isGuestArrived: !h.isGuestArrived }
-                : h
+              h.id === hotel.id ? { ...h, isGuestArrived: newValue } : h
             )
+          );
+          sendNotification(
+            "Guest Arrival Status Updated",
+            `${hotel.guestName} has ${
+              newValue ? "arrived" : "not arrived"
+            } at ${hotel.hotelName}, Room ${hotel.roomNumber}`,
+            {
+              type: "guest_arrived",
+              hotelId: hotel.id,
+              hotelName: hotel.hotelName,
+              roomNumber: hotel.roomNumber,
+              guestName: hotel.guestName,
+              status: newValue,
+            }
           );
         },
       },
@@ -268,12 +322,25 @@ const Hotels = () => {
         disabled: false,
         iconId: `room-occupied-${hotelId}`,
         onPress: () => {
+          const newValue = !hotel.isRoomOccupied;
           setHotelsData((prev) =>
             prev.map((h) =>
-              h.id === hotel.id
-                ? { ...h, isRoomOccupied: !h.isRoomOccupied }
-                : h
+              h.id === hotel.id ? { ...h, isRoomOccupied: newValue } : h
             )
+          );
+          sendNotification(
+            "Room Occupancy Status Updated",
+            `Room ${hotel.roomNumber} at ${hotel.hotelName} is now ${
+              newValue ? "occupied" : "vacant"
+            } by ${hotel.guestName}`,
+            {
+              type: "room_occupied",
+              hotelId: hotel.id,
+              hotelName: hotel.hotelName,
+              roomNumber: hotel.roomNumber,
+              guestName: hotel.guestName,
+              status: newValue,
+            }
           );
         },
       },

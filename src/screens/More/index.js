@@ -44,16 +44,15 @@ const More = () => {
       iconColor: "#374151",
       navigation: "Profile",
     },
-
     {
-      id: 3,
+      id: 2,
       title: "Privacy Policy",
       icon: "Location_Icon",
       iconColor: "#374151",
       navigation: "PrivacyPolicy",
     },
     {
-      id: 4,
+      id: 3,
       title: "About",
       icon: "Calendar_Icon",
       iconColor: "#374151",
@@ -61,21 +60,21 @@ const More = () => {
     },
 
     {
-      id: 3,
+      id: 4,
       title: "FAQ",
       icon: "FAQ_Icon",
       iconColor: "#374151",
       navigation: "FAQ",
     },
     {
-      id: 4,
+      id: 5,
       title: "Contact Us",
       icon: "Contact_Icon",
       iconColor: "#374151",
       navigation: "ContactUs",
     },
     {
-      id: 5,
+      id: 6,
       title: "Logout",
       icon: "Logout_Icon",
       iconColor: "#EF4444",

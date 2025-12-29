@@ -218,7 +218,13 @@
     { "label": "Other", "value": 3, "color": "#F59E0B" },
     { "label": "Female", "value": 45, "color": "#8B5CF6" }
   ],
+
   "adminDashboard": {
+    "areas": [
+      { "name": "Areas 1", "checkedIn": "450" },
+      { "name": "Areas 2", "checkedIn": "450" },
+      { "name": "Areas 3", "checkedIn": "450" }
+    ],
     "overviewCards": [
       {
         "title": "Total Vendors",

@@ -89,7 +89,7 @@ function handleErrors(error) {
   // Handle different HTTP statuses and show detailed error messages
   switch (status) {
     case 400:
-      alert(errorMessage);
+      // alert(errorMessage);
       break;
     case 401:
       alert("Unauthorized: The session has expired.");

@@ -1,7 +1,10 @@
 import { StyleSheet, Dimensions } from "react-native";
 import { Colors } from "../../../../../Global/colors";
 import { Fonts } from "../../../../../Global/fonts";
-import { horizontalMargin, commonCardStyle } from "../../../../../config/metrics";
+import {
+  horizontalMargin,
+  commonCardStyle,
+} from "../../../../../config/metrics";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -198,5 +201,8 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.White,
+  },
+  areasOverviewContainer: {
+    marginTop: 20,
   },
 });

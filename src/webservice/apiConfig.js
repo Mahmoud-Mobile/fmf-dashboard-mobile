@@ -4,6 +4,12 @@ import { Get, Post } from "./Gate";
 const login = async (data) => {
   return await Post("mobile/auth/login", data, "POST", true);
 };
+
+// profile apis
+const profile = async (data) => {
+  return await Get("users/me/profile", data);
+};
+
 // guests apis
 const guests = async (data) => {
   return await Get("guests", data);
@@ -53,7 +59,7 @@ const getResourceById = async (resourceId, data) => {
 // check-in apis
 const subEvent_Checkin = async (eventId, subEventId, data) => {
   return await Post(
-    `events/${eventId}/operations/sub-events/${subEventId}/check-in`,
+    `mobile/ops/events/${eventId}/sub-events/${subEventId}/check-in`,
     data,
     "POST",
     true
@@ -62,7 +68,7 @@ const subEvent_Checkin = async (eventId, subEventId, data) => {
 
 const resource_Checkin = async (eventId, resourceId, data) => {
   return await Post(
-    `events/${eventId}/operations/resources/${resourceId}/check-in`,
+    `mobile/ops/events/${eventId}/resources/${resourceId}/check-in`,
     data,
     "POST",
     true
@@ -71,7 +77,7 @@ const resource_Checkin = async (eventId, resourceId, data) => {
 
 const subEvent_Checkout = async (eventId, subEventId, data) => {
   return await Post(
-    `events/${eventId}/operations/sub-events/${subEventId}/check-out`,
+    `mobile/ops/events/${eventId}/sub-events/${subEventId}/check-out`,
     data,
     "POST",
     true
@@ -80,7 +86,7 @@ const subEvent_Checkout = async (eventId, subEventId, data) => {
 
 const resource_Checkout = async (eventId, resourceId, data) => {
   return await Post(
-    `events/${eventId}/operations/resources/${resourceId}/check-out`,
+    `mobile/ops/events/${eventId}/resources/${resourceId}/check-out`,
     data,
     "POST",
     true
@@ -106,7 +112,27 @@ const getSeatingPlans = async (eventId, subeventId, data) => {
 
 const checkin_OfferHome = async (eventId, vendorId, data) => {
   return await Post(
-    `events/${eventId}/operations/vendors/${vendorId}/check-in`,
+    `events/${eventId}/operations/resources/${vendorId}/check-in`,
+    data,
+    "POST",
+    true
+  );
+};
+
+// flights arrived api
+const flightArrived = async (participantId, data) => {
+  return await Post(
+    `participants/${participantId}/flights/arrived`,
+    data,
+    "POST",
+    true
+  );
+};
+
+// flights departed api
+const flightDeparted = async (participantId, data) => {
+  return await Post(
+    `participants/${participantId}/flights/departed`,
     data,
     "POST",
     true
@@ -115,6 +141,7 @@ const checkin_OfferHome = async (eventId, vendorId, data) => {
 
 export {
   login,
+  profile,
   guests,
   getGuestById,
   events,
@@ -132,4 +159,6 @@ export {
   subEvent_ManualRegister,
   getSeatingPlans,
   checkin_OfferHome,
+  flightArrived,
+  flightDeparted,
 };

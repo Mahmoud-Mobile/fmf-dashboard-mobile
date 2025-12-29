@@ -28,8 +28,6 @@ import ContactUs from "../screens/ContactUs";
 import TripsDetails from "../screens/TripsDetails";
 import SubEventDetails from "../screens/SubEventDetails";
 import ResourceDetails from "../screens/ResourceDetails";
-import { Colors } from "../Global/colors";
-import { Fonts } from "../Global/fonts";
 import NetInfo from "@react-native-community/netinfo";
 import * as SecureStore from "expo-secure-store";
 import { logout } from "../redux/actions/authActions";
@@ -99,16 +97,7 @@ const NavStack = () => {
         component={NoInternetScreen}
         options={{
           title: "No internet connection",
-          headerBackTitleVisible: false,
           headerLeft: false,
-          animationEnabled: false,
-          headerStyle: {
-            backgroundColor: Colors.Primary,
-          },
-          headerTintColor: "#fff",
-          headerTitleStyle: {
-            fontFamily: Fonts.FONT_MEDIUM,
-          },
           presentation: "card",
         }}
       />

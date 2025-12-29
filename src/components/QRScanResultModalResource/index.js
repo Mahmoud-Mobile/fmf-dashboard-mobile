@@ -13,15 +13,14 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { Colors } from "../../Global/colors";
 import { MaterialIcons } from "@expo/vector-icons";
+import DigitalIdCard from "../DigitalIdCard";
 import styles from "./Styles";
 
 const QRScanResultModalResource = forwardRef(
-  (
-    { onScanAnother, onShowSeats, onShowProfile, userInfo, isLoading = false },
-    ref
-  ) => {
+  ({ onScanAnother, userInfo, isLoading = false }, ref) => {
+    // console.log("userInfo", userInfo);
     const bottomSheetRef = useRef(null);
-    const [timer, setTimer] = useState(3);
+    const [timer, setTimer] = useState(4);
     const timerIntervalRef = useRef(null);
     const isOpenRef = useRef(false);
 
@@ -29,7 +28,7 @@ const QRScanResultModalResource = forwardRef(
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
       }
-      setTimer(3);
+      setTimer(4);
       timerIntervalRef.current = setInterval(() => {
         setTimer((prev) => {
           if (prev <= 1) {
@@ -52,14 +51,14 @@ const QRScanResultModalResource = forwardRef(
         clearInterval(timerIntervalRef.current);
         timerIntervalRef.current = null;
       }
-      setTimer(3);
+      setTimer(4);
     }, []);
 
     useImperativeHandle(ref, () => ({
       open: () => {
         if (bottomSheetRef.current) {
           try {
-            setTimer(3);
+            setTimer(4);
             isOpenRef.current = true;
             bottomSheetRef.current.snapToIndex(0);
             // Start timer after modal opens
@@ -145,7 +144,7 @@ const QRScanResultModalResource = forwardRef(
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        snapPoints={["50%", "60%"]}
+        snapPoints={["75%", "90%"]}
         enablePanDownToClose={false}
         onChange={handleSheetChanges}
         backdropComponent={renderBackdrop}
@@ -165,14 +164,6 @@ const QRScanResultModalResource = forwardRef(
                 color={Colors.PrimaryText}
               />
             </TouchableOpacity>
-            <View style={styles.successContainer}>
-              <MaterialIcons
-                name="check-circle"
-                size={32}
-                color={Colors.Success}
-              />
-              <Text style={styles.successTitle}>Scan Successful</Text>
-            </View>
           </View>
 
           {isLoading ? (
@@ -184,21 +175,58 @@ const QRScanResultModalResource = forwardRef(
             </View>
           ) : (
             <View style={styles.userInfoContainer}>
-              {/* Timer Display */}
-              <View style={styles.timerContainer}>
-                <Text style={styles.timerText}>{timer}</Text>
-              </View>
-
-              {/* Name */}
-              {userInfo?.participant?.name && (
-                <Text style={styles.userName}>
-                  {userInfo?.participant?.name}
-                </Text>
+              {userInfo?.participant && (
+                <DigitalIdCard
+                  id={userInfo?.participant?.id}
+                  name={
+                    userInfo?.participant?.firstName &&
+                    userInfo?.participant?.lastName
+                      ? `${userInfo.participant.firstName} ${userInfo.participant.lastName}`
+                      : userInfo?.participant?.name || "-"
+                  }
+                  image={
+                    userInfo?.participant?.profilePicture ||
+                    userInfo?.participant?.image
+                  }
+                  participantType={
+                    typeof userInfo?.participant?.participantType === "object"
+                      ? userInfo?.participant?.participantType?.name
+                      : userInfo?.participant?.participantType
+                  }
+                  position={userInfo?.participant?.position || "-"}
+                  nationality={
+                    typeof userInfo?.participant?.nationality === "object"
+                      ? userInfo?.participant?.nationality?.name
+                      : userInfo?.participant?.nationality || "-"
+                  }
+                  color={
+                    userInfo?.participant?.participantType?.color ||
+                    Colors.Primary
+                  }
+                />
               )}
 
-              {/* Message */}
               {userInfo?.message && (
                 <Text style={styles.messageText}>{userInfo.message}</Text>
+              )}
+
+              {userInfo?.checkInCount !== undefined && (
+                <View style={styles.infoRow}>
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>Check-ins:</Text>
+                    <Text style={styles.infoValue}>
+                      {userInfo.checkInCount}
+                    </Text>
+                  </View>
+                  {userInfo?.resource && (
+                    <View style={styles.infoItem}>
+                      <Text style={styles.infoLabel}>Location:</Text>
+                      <Text style={styles.infoValue} numberOfLines={1}>
+                        {userInfo.resource.location || userInfo.resource.name}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               )}
             </View>
           )}
@@ -216,6 +244,9 @@ const QRScanResultModalResource = forwardRef(
               />
               <Text style={styles.buttonText}>Scan Another</Text>
             </TouchableOpacity>
+          </View>
+          <View style={styles.timerContainer}>
+            <Text style={styles.timerText}>{timer}</Text>
           </View>
         </BottomSheetView>
       </BottomSheet>

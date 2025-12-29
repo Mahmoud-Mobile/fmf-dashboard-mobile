@@ -37,11 +37,10 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     color: "#1A1A1A",
-    fontSize: 32,
+    fontSize: 26,
     fontFamily: Fonts.FONT_BOLD,
     textAlign: "center",
     marginBottom: 8,
-    letterSpacing: -0.5,
   },
   subtitleText: {
     color: "#6B7280",

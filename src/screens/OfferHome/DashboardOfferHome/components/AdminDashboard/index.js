@@ -5,6 +5,7 @@ import { Colors } from "../../../../../Global/colors";
 import { styles } from "./Styles";
 import dummyData from "../../../../../data/dummyData.json";
 import OverviewCards from "../OverviewCards";
+import AreasOverview from "../AreasOverview";
 
 const AdminDashboard = () => {
   const [selectedFilter, setSelectedFilter] = useState("Highest Sales");
@@ -13,7 +14,7 @@ const AdminDashboard = () => {
   const filters = adminDashboard.filters;
 
   const overviewCards = adminDashboard.overviewCards;
-
+  const areas = adminDashboard.areas;
   const vendors = adminDashboard.vendors;
 
   const getStatusColor = (status) => {
@@ -160,6 +161,9 @@ const AdminDashboard = () => {
             })}
           </View>
         </ScrollView>
+        <View style={styles.areasOverviewContainer}>
+          <AreasOverview areas={areas} />
+        </View>
       </View>
     </View>
   );

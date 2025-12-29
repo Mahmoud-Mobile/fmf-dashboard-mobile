@@ -343,6 +343,7 @@ const CheckInResource = ({
   const listKeyExtractor = useCallback((item) => {
     return String(item.id);
   }, []);
+  // console.log(filteredEvents);
 
   return (
     <View style={styles.container}>

@@ -11,14 +11,27 @@ import * as Notifications from "expo-notifications";
 import { CommonActions } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Platform } from "react-native";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
 });
+
+// Configure Android notification channel
+if (Platform.OS === "android") {
+  Notifications.setNotificationChannelAsync("default", {
+    name: "Default",
+    importance: Notifications.AndroidImportance.MAX,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: "#FF231F7C",
+    sound: "default",
+  });
+}
 
 const App = () => {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -39,7 +52,43 @@ const App = () => {
     setFontsLoaded(true);
   };
 
+  const navigate = (name, params) => {
+    if (!navigationRef.current) return;
+    console.log("getCurrentRoute", navigationRef.current?.getCurrentRoute());
+    navigationRef.current.dispatch((state) => {
+      const routes = state.routes.filter(
+        (r) => !["NotificationScreen"].includes(r.name)
+      );
+      return CommonActions.reset({
+        ...state,
+        routes,
+        index: 0,
+      });
+    });
+
+    navigationRef.current.navigate(name, params);
+  };
+
   useEffect(() => {
+    // Request notification permissions on app startup
+    const requestPermissions = async () => {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== "granted") {
+        console.warn("Notification permissions not granted");
+        return;
+      }
+    };
+
+    requestPermissions();
+
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         //Parse a notification once it is recieved when app is opened
@@ -48,7 +97,7 @@ const App = () => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        navigate("Notification");
+        navigate("NotificationScreen");
       });
 
     return () => {
@@ -73,22 +122,6 @@ const App = () => {
   if (!fontsLoaded) {
     return null; // You can return a loading indicator if needed
   }
-
-  const navigate = (name, params) => {
-    console.log("getCurrentRoute", navigationRef.current?.getCurrentRoute());
-    navigationRef.current.dispatch((state) => {
-      const routes = state.routes.filter(
-        (r) => !["Notification"].includes(r.name)
-      );
-      return CommonActions.reset({
-        ...state,
-        routes,
-        index: 0,
-      });
-    });
-
-    navigationRef.current.navigate(name, params);
-  };
 
   return (
     <SafeAreaProvider>

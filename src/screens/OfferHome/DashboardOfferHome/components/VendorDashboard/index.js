@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../../../Global/colors";
-import AreasOverview from "../AreasOverview";
 import OverviewCards from "../OverviewCards.js";
 import { styles, customItemStyles } from "./Styles";
 import dummyData from "../../../../../data/dummyData.json";
@@ -130,7 +129,6 @@ const VendorDashboard = () => {
   const overviewCards = vendorDashboard.overviewCards;
   const dateFilters = vendorDashboard.dateFilters;
   const purchases = vendorDashboard.purchases;
-  const areas = vendorDashboard.areas;
   const vendorInfo = vendorDashboard.vendorInfo;
 
   return (
@@ -162,8 +160,6 @@ const VendorDashboard = () => {
           </View>
         </View>
       </View>
-
-      <AreasOverview areas={areas} />
     </View>
   );
 };

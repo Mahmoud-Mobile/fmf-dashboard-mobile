@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   userInitial: {
-    fontSize: 20,
+    fontSize: 14,
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.White,
   },

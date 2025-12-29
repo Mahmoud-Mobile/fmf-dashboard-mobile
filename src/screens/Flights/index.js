@@ -5,10 +5,10 @@ import CustomEventHeader from "../../components/CustomEventHeader";
 import { useDispatch, useSelector } from "react-redux";
 import CustomCategories from "../../components/CustomCategories";
 import DateSearchModal from "../../components/DateSearchModal";
-import FloatingChatIcon from "../../components/FloatingChatIcon";
 import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
+import { flightArrived, flightDeparted } from "../../webservice/apiConfig";
 import styles from "./Styles";
 
 import FlightCard from "./components";
@@ -21,13 +21,15 @@ import {
   formatDateTime,
   formatStamp,
 } from "../../config/exportToExcel";
+import { sendNotification } from "../../config/notificationUtils";
 
 const Flights = () => {
   const dispatch = useDispatch();
   const { flights, loading, error } = useSelector((state) => state.api);
   const { selectedEvent } = useSelector((state) => state.api);
   const navigation = useNavigation();
-  const [selectedCategory, setSelectedCategory] = useState("ministry");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedFlightType, setSelectedFlightType] = useState("ARRIVAL");
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -36,7 +38,7 @@ const Flights = () => {
   const [viewMode, setViewMode] = useState("list");
 
   const { width: screenWidth } = getDeviceDimensions();
-  // console.log(flights?.flights?.[0]);
+  // console.log(flights?.flights);
   const horizontalPadding = horizontalMargin * 2;
 
   const numColumns = useMemo(() => {
@@ -54,10 +56,15 @@ const Flights = () => {
   }, [numColumns, screenWidth, horizontalPadding]);
 
   const categories = [
-    { id: "ministry", label: "Ministry", key: "ministry" },
-    { id: "arrival", label: "Arrival", key: "arrival" },
-    { id: "return", label: "Return", key: "return" },
+    { id: "all", label: "All", key: "all" },
+    { id: "official", label: "Official", key: "official" },
   ];
+
+  const flightTypeCategories = [
+    { id: "ARRIVAL", label: "Arrival", key: "ARRIVAL" },
+    { id: "DEPARTURE", label: "Departure", key: "DEPARTURE" },
+  ];
+  // console.log(filteredFlights[0]);
 
   const filteredFlights = useMemo(() => {
     let filtered = flights?.flights || [];
@@ -88,12 +95,23 @@ const Flights = () => {
           ""
         ).toLowerCase();
 
+        // Extract participant userName
+        const participant = flight.participant || {};
+        const firstName = (participant.firstName || "").toLowerCase();
+        const lastName = (participant.lastName || "").toLowerCase();
+        const userName = `${firstName} ${lastName}`.trim().toLowerCase();
+        const firstNameOnly = firstName;
+        const lastNameOnly = lastName;
+
         return (
           flightNumber.includes(searchLower) ||
           airportCode.includes(searchLower) ||
           airportName.includes(searchLower) ||
           flightType.includes(searchLower) ||
-          status.includes(searchLower)
+          status.includes(searchLower) ||
+          userName.includes(searchLower) ||
+          firstNameOnly.includes(searchLower) ||
+          lastNameOnly.includes(searchLower)
         );
       });
     }
@@ -132,8 +150,15 @@ const Flights = () => {
       });
     }
 
+    // Filter by flight type
+    if (selectedFlightType) {
+      filtered = filtered.filter((flight) => {
+        return flight.flightType === selectedFlightType;
+      });
+    }
+
     return filtered;
-  }, [flights, searchText, selectedDate]);
+  }, [flights, searchText, selectedDate, selectedFlightType]);
 
   useEffect(() => {
     if (selectedEvent?.id) {
@@ -147,17 +172,22 @@ const Flights = () => {
     }
   }, [loading, refreshing]);
 
-  const fetchFlightsData = () => {
+  const fetchFlightsData = useCallback(() => {
     if (selectedEvent?.id) {
       const params = {
         status: "SCHEDULED",
-        participantsType: selectedCategory,
         page: 1,
-        limit: 500,
+        limit: 5000,
       };
+
+      // Only include participantsType if category is not "all"
+      if (selectedCategory !== "all") {
+        params.participantsType = selectedCategory;
+      }
+
       dispatch(fetchFlights(selectedEvent.id, params));
     }
-  };
+  }, [selectedEvent, selectedCategory, dispatch]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -213,31 +243,53 @@ const Flights = () => {
         let airportName = "N/A";
         let date = "N/A";
 
-        // Extract passenger name
-        passengerName = "Mahmoud Tawba";
+        // Extract passenger name from participant data
+        const participant = flight.participant || {};
+        const firstName = participant.firstName || "";
+        const lastName = participant.lastName || "";
+        passengerName = `${firstName} ${lastName}`.trim() || "N/A";
 
-        // Category-based data extraction
-        if (selectedCategory === "arrival") {
+        // Use flightType to determine which data to export
+        if (flight.flightType === "ARRIVAL") {
           airlineName = flight.arrivalAirlinesName || "N/A";
           flightNumber = flight.arrivalFlightNumber || "N/A";
           status = flight.arrivalFlightStatus || "N/A";
           airportCode = flight.arrivalAirportCode || "N/A";
           airportName = flight.arrivalAirport || "N/A";
           date = formatDateTime(flight.arrivalDate);
-        } else if (selectedCategory === "return") {
-          airlineName = flight.returnAirlinesName || "N/A";
+        } else if (flight.flightType === "DEPARTURE") {
+          airlineName =
+            flight.returnAirlinesName || flight.returnAirlineName || "N/A";
           flightNumber = flight.returnFlightNumber || "N/A";
           status = flight.returnFlightStatus || "N/A";
           airportCode = flight.returnAirportCode || "N/A";
           airportName = flight.returnAirport || "N/A";
           date = formatDateTime(flight.returnDate);
         } else {
-          airlineName = flight.arrivalAirlinesName || "N/A";
-          flightNumber = flight.arrivalFlightNumber || "N/A";
-          status = flight.arrivalFlightStatus || "N/A";
-          airportCode = flight.arrivalAirportCode || "N/A";
-          airportName = flight.arrivalAirport || "N/A";
-          date = formatDateTime(flight.arrivalDate);
+          // Fallback: use selectedCategory for backward compatibility
+          if (selectedCategory === "arrival") {
+            airlineName = flight.arrivalAirlinesName || "N/A";
+            flightNumber = flight.arrivalFlightNumber || "N/A";
+            status = flight.arrivalFlightStatus || "N/A";
+            airportCode = flight.arrivalAirportCode || "N/A";
+            airportName = flight.arrivalAirport || "N/A";
+            date = formatDateTime(flight.arrivalDate);
+          } else if (selectedCategory === "return") {
+            airlineName =
+              flight.returnAirlinesName || flight.returnAirlineName || "N/A";
+            flightNumber = flight.returnFlightNumber || "N/A";
+            status = flight.returnFlightStatus || "N/A";
+            airportCode = flight.returnAirportCode || "N/A";
+            airportName = flight.returnAirport || "N/A";
+            date = formatDateTime(flight.returnDate);
+          } else {
+            airlineName = flight.arrivalAirlinesName || "N/A";
+            flightNumber = flight.arrivalFlightNumber || "N/A";
+            status = flight.arrivalFlightStatus || "N/A";
+            airportCode = flight.arrivalAirportCode || "N/A";
+            airportName = flight.arrivalAirport || "N/A";
+            date = formatDateTime(flight.arrivalDate);
+          }
         }
 
         return {
@@ -275,15 +327,27 @@ const Flights = () => {
     let flightData = {};
     let timeInfo = [];
 
-    // Static passenger data
+    // Extract participant data from flight object
+    const participant = flight.participant || {};
+    const firstName = participant.firstName || "";
+    const lastName = participant.lastName || "";
+    const userName = `${firstName} ${lastName}`.trim() || "N/A";
+    const userMobile = participant.phone || "N/A";
+    const userPhoto = participant.photo || null;
+    const participantType = participant?.dynamicParticipantType?.name || null;
+
     const passengerData = {
-      userName: "Ahmed Mohamed",
-      userMobile: "+966 65 090 7242",
-      userPhoto:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      userName,
+      userMobile,
+      userPhoto,
+      firstName,
+      lastName,
+      participantType,
     };
 
-    if (selectedCategory === "arrival") {
+    // Use flightType to determine which data to show
+    if (flight.flightType === "ARRIVAL") {
+      // Show arrival data for ARRIVAL flights
       flightData = {
         airlineName: flight.arrivalAirlinesName,
         flightNumber: flight.arrivalFlightNumber,
@@ -297,36 +361,69 @@ const Flights = () => {
         label: "Arrival",
         date: flight.arrivalDate,
       });
-    } else if (selectedCategory === "return") {
+    } else if (flight.flightType === "DEPARTURE") {
+      // Show return/departure data for DEPARTURE flights
       flightData = {
         airlineName:
-          flight.returnAirlinesName || "this parameter is not available",
+          flight.returnAirlinesName || flight.returnAirlineName || "N/A",
         flightNumber: flight.returnFlightNumber,
         status: flight.returnFlightStatus,
-        airportCode:
-          flight.returnAirportCode || "this parameter is not available",
-        airportName: flight.returnAirport,
+        airportCode: flight.returnAirportCode || "N/A",
+        airportName: flight.returnAirport || "N/A",
         ...passengerData,
       };
 
       timeInfo.push({
-        label: "Return",
+        label: "Departure",
         date: flight.returnDate,
       });
     } else {
-      flightData = {
-        airlineName: flight.arrivalAirlinesName,
-        flightNumber: flight.arrivalFlightNumber,
-        status: flight.returnFlightStatus,
-        airportCode: flight.arrivalAirportCode,
-        airportName: flight.arrivalAirport,
-        ...passengerData,
-      };
+      // Fallback: use selectedCategory for backward compatibility
+      if (selectedCategory === "arrival") {
+        flightData = {
+          airlineName: flight.arrivalAirlinesName,
+          flightNumber: flight.arrivalFlightNumber,
+          status: flight.arrivalFlightStatus,
+          airportCode: flight.arrivalAirportCode,
+          airportName: flight.arrivalAirport,
+          ...passengerData,
+        };
 
-      timeInfo.push({
-        label: "Arrival",
-        date: flight.arrivalDate,
-      });
+        timeInfo.push({
+          label: "Arrival",
+          date: flight.arrivalDate,
+        });
+      } else if (selectedCategory === "return") {
+        flightData = {
+          airlineName:
+            flight.returnAirlinesName || flight.returnAirlineName || "N/A",
+          flightNumber: flight.returnFlightNumber,
+          status: flight.returnFlightStatus,
+          airportCode: flight.returnAirportCode || "N/A",
+          airportName: flight.returnAirport || "N/A",
+          ...passengerData,
+        };
+
+        timeInfo.push({
+          label: "Return",
+          date: flight.returnDate,
+        });
+      } else {
+        // Default to arrival data
+        flightData = {
+          airlineName: flight.arrivalAirlinesName,
+          flightNumber: flight.arrivalFlightNumber,
+          status: flight.arrivalFlightStatus,
+          airportCode: flight.arrivalAirportCode,
+          airportName: flight.arrivalAirport,
+          ...passengerData,
+        };
+
+        timeInfo.push({
+          label: "Arrival",
+          date: flight.arrivalDate,
+        });
+      }
     }
 
     return {
@@ -349,84 +446,291 @@ const Flights = () => {
 
   const getActionButtons = useCallback(
     (flight) => {
-      const isDisabled =
-        flight.isLuggageReceived === true ||
-        flight.isParticipantArrived === true ||
-        flight.isParticipantDeparted === true;
+      const flightId = flight.id;
+      const participantId = flight.participant?.id;
 
-      const isSelected = !isDisabled;
-      const flightId =
-        flight.id ||
-        flight.arrivalFlightNumber ||
-        flight.returnFlightNumber ||
-        "unknown";
+      // Don't show buttons if flightId or participantId is missing
+      if (!flightId || !participantId) {
+        return [];
+      }
 
-      if (selectedCategory === "return") {
+      // Handle DEPARTURE flight type - show only "Participant Departed" button
+      if (flight.flightType === "DEPARTURE") {
+        // Disable if isParticipantDeparted is true
+        const isParticipantDepartedDisabled =
+          flight.isParticipantDeparted === true;
+
+        const handleParticipantDeparted = async () => {
+          try {
+            await flightDeparted(participantId, {
+              flightId: flightId,
+            });
+
+            // Get participant name for notification
+            const participant = flight.participant || {};
+            const participantName =
+              `${participant.firstName || ""} ${
+                participant.lastName || ""
+              }`.trim() || "Participant";
+            const flightNumber =
+              flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+
+            // Send notification
+            await sendNotification(
+              "Participant Departed",
+              `${participantName} has departed on flight ${flightNumber}`,
+              {
+                type: "flight_departed",
+                flightId: flightId,
+                participantId: participantId,
+              }
+            );
+
+            Alert.alert(
+              "Success",
+              "Participant departed status updated successfully!",
+              [{ text: "OK", style: "default" }]
+            );
+            // Refresh flights data
+            fetchFlightsData();
+          } catch (error) {
+            Alert.alert(
+              "Error",
+              "Failed to update participant departed status. Please try again.",
+              [{ text: "OK", style: "default" }]
+            );
+          }
+        };
+
         return [
           {
             icon: "flight-takeoff",
-            text: "Plane Taken Off",
-            iconSize: 24,
-            isSelected: isSelected,
-            disabled: isDisabled,
-            iconId: `flight-takeoff-${flightId}`,
-            onPress: () => {
-              Alert.alert(
-                "Plane Taken Off",
-                `Flight ${flight.returnFlightNumber} has taken off successfully!`,
-                [{ text: "OK", style: "default" }]
-              );
-            },
-          },
-        ];
-      } else {
-        return [
-          {
-            icon: "flight-land",
-            text: "Plane Landed",
-            isSelected: isSelected,
-            disabled: isDisabled,
-            iconId: `flight-land-${flightId}`,
-            onPress: () => {
-              Alert.alert(
-                "Plane Landed",
-                `Flight ${flight.arrivalFlightNumber} has landed successfully!`,
-                [{ text: "OK", style: "default" }]
-              );
-            },
-          },
-          {
-            icon: "check-circle",
-            text: "Logged Arrived",
-            isSelected: isSelected,
-            disabled: isDisabled,
-            iconId: `check-circle-${flightId}`,
-            onPress: () => {
-              Alert.alert(
-                "Logged Arrived",
-                `Passenger arrival has been logged for flight ${flight.arrivalFlightNumber}!`,
-                [{ text: "OK", style: "default" }]
-              );
-            },
-          },
-          {
-            icon: "verified-user",
-            text: "Guest Granted",
-            isSelected: isSelected,
-            disabled: isDisabled,
-            iconId: `verified-user-${flightId}`,
-            onPress: () => {
-              Alert.alert(
-                "Guest Granted",
-                `Guest access has been granted for flight ${flight.arrivalFlightNumber}!`,
-                [{ text: "OK", style: "default" }]
-              );
-            },
+            text: "Participant Departed",
+            isSelected: !isParticipantDepartedDisabled,
+            disabled: isParticipantDepartedDisabled,
+            onPress: handleParticipantDeparted,
           },
         ];
       }
+
+      // Handle return category (legacy support)
+      if (selectedCategory === "return") {
+        // Disable if isParticipantDeparted is true
+        const isParticipantDepartedDisabled =
+          flight.isParticipantDeparted === true;
+
+        const handleParticipantDeparted = async () => {
+          try {
+            await flightDeparted(participantId, {
+              flightId: flightId,
+            });
+
+            // Get participant name for notification
+            const participant = flight.participant || {};
+            const participantName =
+              `${participant.firstName || ""} ${
+                participant.lastName || ""
+              }`.trim() || "Participant";
+            const flightNumber =
+              flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+
+            // Send notification
+            await sendNotification(
+              "Participant Departed",
+              `${participantName} has departed on flight ${flightNumber}`,
+              {
+                type: "flight_departed",
+                flightId: flightId,
+                participantId: participantId,
+              }
+            );
+
+            Alert.alert(
+              "Success",
+              "Participant departed status updated successfully!",
+              [{ text: "OK", style: "default" }]
+            );
+            // Refresh flights data
+            fetchFlightsData();
+          } catch (error) {
+            Alert.alert(
+              "Error",
+              "Failed to update participant departed status. Please try again.",
+              [{ text: "OK", style: "default" }]
+            );
+          }
+        };
+
+        return [
+          {
+            icon: "flight-takeoff",
+            text: "Participant Departed",
+            isSelected: !isParticipantDepartedDisabled,
+            disabled: isParticipantDepartedDisabled,
+            onPress: handleParticipantDeparted,
+          },
+        ];
+      }
+
+      // Handle arrival and officially categories
+      // Disable "Meet Done" if isMeetDone is true
+      const isMeetDoneDisabled = flight.isMeetDone === true;
+
+      // Disable "Luggage Received" if isLuggageReceived is true
+      const isLuggageReceivedDisabled = flight.isLuggageReceived === true;
+
+      // Disable "Participant Arrived" if isParticipantArrived is true
+      const isParticipantArrivedDisabled = flight.isParticipantArrived === true;
+
+      const handleMeetDone = async () => {
+        try {
+          await flightArrived(participantId, {
+            flightId: flightId,
+            isMeetDone: true,
+          });
+
+          // Get participant name for notification
+          const participant = flight.participant || {};
+          const participantName =
+            `${participant.firstName || ""} ${
+              participant.lastName || ""
+            }`.trim() || "Participant";
+          const flightNumber = flight.arrivalFlightNumber || "N/A";
+
+          // Send notification
+          await sendNotification(
+            "Meet Done",
+            `Meet completed for ${participantName} on flight ${flightNumber}`,
+            {
+              type: "flight_meet_done",
+              flightId: flightId,
+              participantId: participantId,
+            }
+          );
+
+          Alert.alert("Success", "Meet done status updated successfully!", [
+            { text: "OK", style: "default" },
+          ]);
+          // Refresh flights data
+          fetchFlightsData();
+        } catch (error) {
+          Alert.alert(
+            "Error",
+            "Failed to update meet done status. Please try again.",
+            [{ text: "OK", style: "default" }]
+          );
+        }
+      };
+
+      const handleLuggageReceived = async () => {
+        try {
+          await flightArrived(participantId, {
+            flightId: flightId,
+            isLuggageReceived: true,
+          });
+
+          // Get participant name for notification
+          const participant = flight.participant || {};
+          const participantName =
+            `${participant.firstName || ""} ${
+              participant.lastName || ""
+            }`.trim() || "Participant";
+          const flightNumber = flight.arrivalFlightNumber || "N/A";
+
+          // Send notification
+          await sendNotification(
+            "Luggage Received",
+            `Luggage received for ${participantName} on flight ${flightNumber}`,
+            {
+              type: "flight_luggage_received",
+              flightId: flightId,
+              participantId: participantId,
+            }
+          );
+
+          Alert.alert(
+            "Success",
+            "Luggage received status updated successfully!",
+            [{ text: "OK", style: "default" }]
+          );
+          // Refresh flights data
+          fetchFlightsData();
+        } catch (error) {
+          Alert.alert(
+            "Error",
+            "Failed to update luggage received status. Please try again.",
+            [{ text: "OK", style: "default" }]
+          );
+        }
+      };
+
+      const handleParticipantArrived = async () => {
+        try {
+          await flightArrived(participantId, {
+            flightId: flightId,
+            isParticipantArrived: true,
+          });
+
+          // Get participant name for notification
+          const participant = flight.participant || {};
+          const participantName =
+            `${participant.firstName || ""} ${
+              participant.lastName || ""
+            }`.trim() || "Participant";
+          const flightNumber = flight.arrivalFlightNumber || "N/A";
+
+          // Send notification
+          await sendNotification(
+            "Participant Arrived",
+            `${participantName} has arrived on flight ${flightNumber}`,
+            {
+              type: "flight_participant_arrived",
+              flightId: flightId,
+              participantId: participantId,
+            }
+          );
+
+          Alert.alert(
+            "Success",
+            "Participant arrived status updated successfully!",
+            [{ text: "OK", style: "default" }]
+          );
+          // Refresh flights data
+          fetchFlightsData();
+        } catch (error) {
+          Alert.alert(
+            "Error",
+            "Failed to update participant arrived status. Please try again.",
+            [{ text: "OK", style: "default" }]
+          );
+        }
+      };
+
+      return [
+        {
+          icon: "work",
+          text: "Luggage Received",
+          isSelected: !isLuggageReceivedDisabled,
+          disabled: isLuggageReceivedDisabled,
+          onPress: handleLuggageReceived,
+        },
+        {
+          icon: "check-circle",
+          text: "Meet Done",
+          isSelected: !isMeetDoneDisabled,
+          disabled: isMeetDoneDisabled,
+          onPress: handleMeetDone,
+        },
+        {
+          icon: "person",
+          text: "Participant Arrived",
+          isSelected: !isParticipantArrivedDisabled,
+          disabled: isParticipantArrivedDisabled,
+          onPress: handleParticipantArrived,
+        },
+      ];
     },
-    [selectedCategory]
+    [selectedCategory, fetchFlightsData]
   );
 
   const renderFlightItem = useCallback(
@@ -466,7 +770,7 @@ const Flights = () => {
       />
 
       <SearchActionRow
-        searchPlaceholder="Search by airline, flight number, airport, city, seat, booking..."
+        searchPlaceholder="Search by participant name, airline, flight number, airport, city, seat, booking..."
         searchValue={searchText}
         onSearchChange={setSearchText}
         onSearchClear={handleSearchClear}
@@ -477,13 +781,18 @@ const Flights = () => {
         onPressDate={() => setShowDateModal(true)}
         selectedDate={selectedDate}
         onClearDate={() => setSelectedDate(null)}
-        // containerStyle={{ marginBottom: 20 }}
       />
 
       <CustomCategories
         categories={categories}
         selectedCategory={selectedCategory}
         onCategorySelect={setSelectedCategory}
+      />
+
+      <CustomCategories
+        categories={flightTypeCategories}
+        selectedCategory={selectedFlightType}
+        onCategorySelect={setSelectedFlightType}
       />
       <LoadingModal visible={loading} />
       {!loading && (
@@ -505,8 +814,6 @@ const Flights = () => {
           contentContainerStyle={styles.listContainer}
         />
       )}
-
-      {/* <FloatingChatIcon /> */}
 
       <DateSearchModal
         visible={showDateModal}

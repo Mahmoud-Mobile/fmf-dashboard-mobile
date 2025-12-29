@@ -9,7 +9,6 @@ import {
   Platform,
   TextInput,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
 import CustomPressable from "../../components/CustomPressable";
