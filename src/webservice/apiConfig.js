@@ -59,7 +59,7 @@ const getResourceById = async (resourceId, data) => {
 // check-in apis
 const subEvent_Checkin = async (eventId, subEventId, data) => {
   return await Post(
-    `events/${eventId}/operations/sub-events/${subEventId}/check-in`,
+    `mobile/ops/events/${eventId}/sub-events/${subEventId}/check-in`,
     data,
     "POST",
     true
@@ -68,7 +68,7 @@ const subEvent_Checkin = async (eventId, subEventId, data) => {
 
 const resource_Checkin = async (eventId, resourceId, data) => {
   return await Post(
-    `events/${eventId}/operations/resources/${resourceId}/check-in`,
+    `mobile/ops/events/${eventId}/resources/${resourceId}/check-in`,
     data,
     "POST",
     true
@@ -77,7 +77,7 @@ const resource_Checkin = async (eventId, resourceId, data) => {
 
 const subEvent_Checkout = async (eventId, subEventId, data) => {
   return await Post(
-    `events/${eventId}/operations/sub-events/${subEventId}/check-out`,
+    `mobile/ops/events/${eventId}/sub-events/${subEventId}/check-out`,
     data,
     "POST",
     true
@@ -86,7 +86,7 @@ const subEvent_Checkout = async (eventId, subEventId, data) => {
 
 const resource_Checkout = async (eventId, resourceId, data) => {
   return await Post(
-    `events/${eventId}/operations/resources/${resourceId}/check-out`,
+    `mobile/ops/events/${eventId}/resources/${resourceId}/check-out`,
     data,
     "POST",
     true

@@ -26,7 +26,7 @@ const CameraQRScanner = ({ onScanned }) => {
   const scanLocation = route.params?.scanLocation;
   const mode = route.params?.mode || "checkin"; // "checkin" or "checkout"
 
-  console.log("route params", route.params);
+  // console.log("route params", route.params);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
