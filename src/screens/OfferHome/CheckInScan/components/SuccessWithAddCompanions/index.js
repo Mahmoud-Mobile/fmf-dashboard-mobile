@@ -8,11 +8,10 @@ import {
   TextInput,
 } from "react-native";
 import { Colors } from "../../../../../Global/colors";
-import { Fonts } from "../../../../../Global/fonts";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "./Styles";
 
-const OrgSuccessModal = forwardRef(
+const SuccessWithAddCompanions = forwardRef(
   ({ visitorInfo = null, onCompleteCheckIn, onClose }, ref) => {
     const [visible, setVisible] = useState(false);
     const [companionsCount, setCompanionsCount] = useState(0);
@@ -203,6 +202,6 @@ const OrgSuccessModal = forwardRef(
   }
 );
 
-OrgSuccessModal.displayName = "OrgSuccessModal";
+SuccessWithAddCompanions.displayName = "SuccessWithAddCompanions";
 
-export default OrgSuccessModal;
+export default SuccessWithAddCompanions;
