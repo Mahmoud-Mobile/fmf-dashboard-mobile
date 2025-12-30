@@ -9,10 +9,10 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { Ionicons } from "@expo/vector-icons";
 import CustomEventHeader from "../../../components/CustomEventHeader";
 import { styles } from "./Styles";
 import { Colors } from "../../../Global/colors";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
 
 const SelectYourArea = () => {
   const navigation = useNavigation();
@@ -26,55 +26,8 @@ const SelectYourArea = () => {
     { id: 5, name: "Area 5" },
   ];
 
-  const handleAreaPress = (area) => {
-    const alertButtons = [
-      {
-        text: "Camera Scanner",
-        onPress: () => {
-          navigation.navigate("CameraQRScannerOfferHome", {
-            eventId: selectedEvent?.id,
-            areaId: area?.id,
-          });
-        },
-      },
-    ];
-
-    if (Platform.OS !== "ios") {
-      alertButtons.push({
-        text: "Zebra Scanner",
-        onPress: () => {
-          navigation.navigate("ZebraQROfferHome", {
-            eventId: selectedEvent?.id,
-            areaId: area?.id,
-            manualMode: false,
-          });
-        },
-      });
-    }
-
-    alertButtons.push(
-      {
-        text: "Check guest code manually",
-        onPress: () => {
-          navigation.navigate("ZebraQROfferHome", {
-            eventId: selectedEvent?.id,
-            areaId: area?.id,
-            manualMode: true,
-          });
-        },
-      },
-      {
-        text: "Cancel",
-        style: "cancel",
-      }
-    );
-
-    Alert.alert(
-      "Choose Scanner Type",
-      "How would you like to scan the QR code?",
-      alertButtons,
-      { cancelable: true }
-    );
+  const handleAreaPress = () => {
+    navigation.navigate("CheckInScan");
   };
 
   return (
@@ -108,7 +61,7 @@ const SelectYourArea = () => {
                 activeOpacity={0.7}
               >
                 <View style={styles.areaContent}>
-                  <Ionicons
+                  <EvilIcons
                     name="location"
                     size={20}
                     color={Colors.Gray}
