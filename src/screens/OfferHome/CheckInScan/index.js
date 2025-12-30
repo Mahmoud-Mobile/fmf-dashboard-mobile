@@ -207,7 +207,6 @@ const CheckInScan = () => {
       </View>
     );
   }
-
   return (
     <View style={styles.container}>
       <CustomHeader leftLabel="Camera Scanner" onLeftButtonPress={handleBack} />
@@ -235,46 +234,58 @@ const CheckInScan = () => {
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
       </View>
-
-      {roleConifg === "vendor" && (
-        <View style={styles.actionTypeContainer}>
-          <TouchableOpacity
-            style={styles.actionTypeOption}
-            onPress={() => setSelectedActionType("visit")}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                selectedActionType === "visit" && styles.checkboxChecked,
-              ]}
-            >
-              {selectedActionType === "visit" && (
-                <MaterialIcons name="check" size={18} color={Colors.White} />
-              )}
-            </View>
-            <Text style={styles.actionTypeText}>Visit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionTypeOption}
-            onPress={() => setSelectedActionType("purchase")}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                selectedActionType === "purchase" && styles.checkboxChecked,
-              ]}
-            >
-              {selectedActionType === "purchase" && (
-                <MaterialIcons name="check" size={18} color={Colors.White} />
-              )}
-            </View>
-            <Text style={styles.actionTypeText}>Transaction</Text>
-          </TouchableOpacity>
-        </View>
+      {actionType && (
+        <>
+          {roleConifg === "vendor" ||
+            (roleConifg === "admin" && (
+              <View style={styles.actionTypeContainer}>
+                <TouchableOpacity
+                  style={styles.actionTypeOption}
+                  onPress={() => setSelectedActionType("visit")}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      styles.checkbox,
+                      selectedActionType === "visit" && styles.checkboxChecked,
+                    ]}
+                  >
+                    {selectedActionType === "visit" && (
+                      <MaterialIcons
+                        name="check"
+                        size={18}
+                        color={Colors.White}
+                      />
+                    )}
+                  </View>
+                  <Text style={styles.actionTypeText}>Visit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.actionTypeOption}
+                  onPress={() => setSelectedActionType("purchase")}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      styles.checkbox,
+                      selectedActionType === "purchase" &&
+                        styles.checkboxChecked,
+                    ]}
+                  >
+                    {selectedActionType === "purchase" && (
+                      <MaterialIcons
+                        name="check"
+                        size={18}
+                        color={Colors.White}
+                      />
+                    )}
+                  </View>
+                  <Text style={styles.actionTypeText}>Transaction</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+        </>
       )}
-
       <View style={styles.container}>
         {isFocused ? (
           <CameraView
