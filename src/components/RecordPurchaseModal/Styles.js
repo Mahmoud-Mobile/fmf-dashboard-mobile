@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { Colors } from "../../Global/colors";
 import { Fonts } from "../../Global/fonts";
 
@@ -117,7 +117,7 @@ export const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: Colors.LightGray,
-    marginBottom: 50,
+    marginBottom: Platform.OS === "ios" ? 50 : 100,
   },
   modalButton: {
     flex: 1,

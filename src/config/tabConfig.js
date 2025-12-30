@@ -132,7 +132,7 @@ export const getTabsForEnvironment = (environment, role = null) => {
 
   // Get role from Redux store if not provided
   // const rolePermission = role || store.getState()?.auth?.user?.user;
-  const rolePermission = "vendor";
+  const rolePermission = "admin";
 
   if (environment === "offerHome" && rolePermission) {
     const allowedRoutes = {

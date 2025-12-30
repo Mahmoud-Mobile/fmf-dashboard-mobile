@@ -209,6 +209,13 @@ const RecordPurchaseModal = forwardRef(
       },
     }));
 
+    // Ensure modal is closed on mount
+    useEffect(() => {
+      if (bottomSheetRef.current) {
+        bottomSheetRef.current.close();
+      }
+    }, []);
+
     const handleSheetChanges = useCallback((index) => {
       if (index === -1) {
         setNotes("");
@@ -280,7 +287,7 @@ const RecordPurchaseModal = forwardRef(
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        snapPoints={["95%", "100%"]}
+        snapPoints={["90%", "95%"]}
         enablePanDownToClose={false}
         onChange={handleSheetChanges}
         backdropComponent={renderBackdrop}

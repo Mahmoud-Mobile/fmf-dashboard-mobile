@@ -111,7 +111,8 @@ function handleErrors(error, showAlert = false) {
     case 404:
       if (showAlert) {
         alert(
-          data.message || "Not Found: The requested resource could not be found."
+          data.message ||
+            "Not Found: The requested resource could not be found."
         );
       }
       break;
@@ -160,7 +161,13 @@ function buildFormData(data) {
   }
   return formData;
 }
-async function Post(url = "", data = {}, method = "POST", jsonPayload = false, showAlert = false) {
+async function Post(
+  url = "",
+  data = {},
+  method = "POST",
+  jsonPayload = false,
+  showAlert = false
+) {
   const baseURL = await getEnvVars("apiUrl");
   const fullUrl = baseURL + url;
 

@@ -90,7 +90,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await dispatch(login(body, true)); // showAlert=true to show 400 errors
-
+      // console.log("response", JSON.stringify(response, null, 2));
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
           index: 0,
@@ -103,18 +103,21 @@ const Login = () => {
       setLoading(false);
       // Additional error handling if needed (when showAlert=false)
       if (!error?.response && error?.status === 400) {
-        Alert.alert("Login Failed", error.errorMessage || "Invalid credentials");
+        Alert.alert(
+          "Login Failed",
+          error.errorMessage || "Invalid credentials"
+        );
       }
     }
   };
 
   useEffect(() => {
     if (selectedCategory === "fmf") {
-      dispatch(setEmail("fmf@lead-360.co"));
-      dispatch(setPassword("password123"));
-    } else if (selectedCategory === "offerHome") {
-      // dispatch(setEmail("demo@lead-360.co"));
+      // dispatch(setEmail("fmf@lead-360.co"));
       // dispatch(setPassword("password123"));
+    } else if (selectedCategory === "offerHome") {
+      dispatch(setEmail("demo@lead-360.co"));
+      dispatch(setPassword("password123"));
     }
   }, [selectedCategory]);
 
@@ -136,7 +139,7 @@ const Login = () => {
           setDeviceToken(tokenData.data);
         }
       } catch (error) {
-        console.error("Error getting device token:", error);
+        console.log("Error getting device token:", error);
       }
     };
 

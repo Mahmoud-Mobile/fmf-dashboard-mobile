@@ -25,9 +25,9 @@ const DashboardOfferHome = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {rolePermission !== "organizer" && <OrganizerDashboard />}
+        {rolePermission == "organizer" && <OrganizerDashboard />}
         {rolePermission == "vendor" && <VendorDashboard />}
-        {rolePermission == "admin" && <AdminDashboard />}
+        {rolePermission !== "admin" && <AdminDashboard />}
       </ScrollView>
     </View>
   );
