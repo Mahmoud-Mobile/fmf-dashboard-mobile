@@ -6,15 +6,12 @@ import CustomEventHeader from "../../../components/CustomEventHeader";
 import SearchActionRow from "../../../components/SearchActionRow";
 import CustomItem from "./components";
 import { vendorData as vendorsData } from "./components/vendorData";
-import RecordPurchaseModal from "../../../components/RecordPurchaseModal";
 import { styles } from "./Styles";
 
 const VendorOfferHome = () => {
   const navigation = useNavigation();
   const { selectedEvent } = useSelector((state) => state.api);
   const [searchText, setSearchText] = useState("");
-  const recordPurchaseModalRef = useRef(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const filteredVendors = useMemo(() => {
     if (!searchText.trim()) return vendorsData;
@@ -33,70 +30,13 @@ const VendorOfferHome = () => {
     setSearchText("");
   };
 
-  const handleVisitPress = useCallback(
-    (vendor) => {
-      const alertButtons = [
-        {
-          text: "Camera Scanner",
-          onPress: () => {
-            navigation.navigate("CameraQRScannerOfferHome", {
-              eventId: selectedEvent?.id,
-              vendorId: vendor?.id,
-            });
-          },
-        },
-      ];
-
-      if (Platform.OS !== "ios") {
-        alertButtons.push({
-          text: "Zebra Scanner",
-          onPress: () => {
-            navigation.navigate("ZebraQROfferHome", {
-              eventId: selectedEvent?.id,
-              vendorId: vendor?.id,
-              manualMode: false,
-            });
-          },
-        });
-      }
-
-      alertButtons.push(
-        {
-          text: "Check guest code manually",
-          onPress: () => {
-            navigation.navigate("ZebraQROfferHome", {
-              eventId: selectedEvent?.id,
-              vendorId: vendor?.id,
-              manualMode: true,
-            });
-          },
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        }
-      );
-
-      Alert.alert(
-        "Choose Scanner Type",
-        "How would you like to scan the QR code?",
-        alertButtons,
-        { cancelable: true }
-      );
-    },
-    [selectedEvent?.id, navigation]
-  );
-
-  const handlePurchasePress = (item) => {
-    setSelectedProduct(item);
-    recordPurchaseModalRef.current?.open();
+  const handleVisitPress = (vendor, actionType = "visit") => {
+    navigation.navigate("CheckInScan", {
+      slectedVendor: vendor,
+      actionType: actionType, // "visit" or "purchase"
+    });
   };
 
-  const handleRecordPurchase = (purchaseData) => {
-    console.log("Purchase recorded:", purchaseData);
-  };
-
-  const handleCancelPurchase = () => {};
 
   const renderVendorCard = ({ item: vendor }) => {
     const renderProductItem = ({ item, index }) => (
@@ -104,8 +44,8 @@ const VendorOfferHome = () => {
         item={item}
         vendorData={vendor}
         index={index}
-        onVisitPress={() => handleVisitPress(vendor)}
-        onPurchasePress={() => handlePurchasePress(item)}
+        onVisitPress={() => handleVisitPress(vendor, "visit")}
+        onPurchasePress={() => handleVisitPress(vendor, "purchase")}
       />
     );
 
@@ -115,10 +55,8 @@ const VendorOfferHome = () => {
           item={null}
           vendorData={vendor}
           index={0}
-          onVisitPress={() => handleVisitPress(vendor)}
-          onPurchasePress={() =>
-            handlePurchasePress(vendor.products?.[0] || null)
-          }
+          onVisitPress={() => handleVisitPress(vendor, "visit")}
+          onPurchasePress={() => handleVisitPress(vendor, "purchase")}
           showVendorOnly={true}
         />
         <View style={styles.separator} />
@@ -155,16 +93,6 @@ const VendorOfferHome = () => {
         keyExtractor={(vendor) => `vendor-${vendor.id}`}
         contentContainerStyle={styles.productsList}
         showsVerticalScrollIndicator={false}
-      />
-
-      <RecordPurchaseModal
-        ref={recordPurchaseModalRef}
-        productName=""
-        originalPrice=""
-        finalPrice=""
-        discount=""
-        onRecordPurchase={handleRecordPurchase}
-        onCancel={handleCancelPurchase}
       />
     </View>
   );

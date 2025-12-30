@@ -15,8 +15,9 @@ export const styles = StyleSheet.create({
     marginTop: 8,
   },
   modalContentContainer: {
-    flex: 1,
+    // flex: 1,
     paddingHorizontal: 20,
+    marginBottom: 20,
   },
   modalHeaderContainer: {
     alignItems: "center",
@@ -48,10 +49,10 @@ export const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
   labelText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.PrimaryText,
     marginBottom: 8,
@@ -62,7 +63,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     backgroundColor: Colors.White,
@@ -74,7 +75,6 @@ export const styles = StyleSheet.create({
   },
   textAreaInput: {
     minHeight: 100,
-    textAlignVertical: "top",
     paddingTop: 12,
   },
   summaryContainer: {
@@ -115,9 +115,9 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     paddingTop: 16,
-    paddingBottom: 20,
     borderTopWidth: 1,
     borderTopColor: Colors.LightGray,
+    marginBottom: 120,
   },
   modalButton: {
     flex: 1,

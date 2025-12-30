@@ -7,6 +7,7 @@ import {
   Platform,
   Image,
   StatusBar,
+  Alert,
 } from "react-native";
 import styles from "./Styles";
 import { useNavigation } from "@react-navigation/native";
@@ -88,7 +89,7 @@ const Login = () => {
     };
     setLoading(true);
     try {
-      const response = await dispatch(login(body));
+      const response = await dispatch(login(body, true)); // showAlert=true to show 400 errors
 
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
@@ -96,9 +97,14 @@ const Login = () => {
           routes: [{ name: "MainEvent" }],
         });
       }
+      // Error alerts are handled in Gate.js when showAlert=true
       setLoading(false);
     } catch (error) {
       setLoading(false);
+      // Additional error handling if needed (when showAlert=false)
+      if (!error?.response && error?.status === 400) {
+        Alert.alert("Login Failed", error.errorMessage || "Invalid credentials");
+      }
     }
   };
 

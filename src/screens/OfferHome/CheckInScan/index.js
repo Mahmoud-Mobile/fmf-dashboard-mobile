@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import {
@@ -19,6 +20,8 @@ import { styles } from "./Styles";
 import OrgSuccessModal from "./components/OrgSuccessModal";
 import CheckInSuccessModal from "./components/CheckInSuccessModal";
 import CheckInDeclineModal from "./components/CheckInDeclineModal";
+import RecordPurchaseModal from "../../../components/RecordPurchaseModal";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const dummyVisitorInfo = {
   name: "Ahmed Al-Mansour",
@@ -32,7 +35,9 @@ const dummyVisitorInfo = {
 const CheckInScan = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const roleConifg = "organizer";
+  const roleConifg = "vendor";
+
+  const { slectedVendor, actionType } = route.params || {};
 
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -41,11 +46,15 @@ const CheckInScan = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [manualCode, setManualCode] = useState("");
+  const [selectedActionType, setSelectedActionType] = useState(
+    actionType || "visit"
+  );
   const isLockedRef = useRef(false);
   const isFocused = useIsFocused();
   const orgSuccessModalRef = useRef(null);
   const checkInSuccessModalRef = useRef(null);
   const checkInDeclineModalRef = useRef(null);
+  const recordPurchaseModalRef = useRef(null);
 
   const handleBack = () => {
     navigation.goBack();
@@ -69,16 +78,15 @@ const CheckInScan = () => {
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const shouldSucceed = Math.random() > 0.3;
+        // Always return success until new config is implemented
+        setUserInfo({ participant: { name: "Test User" } });
+        setIsSuccess(true);
 
-        if (shouldSucceed) {
-          setUserInfo({ participant: { name: "Test User" } });
-          setIsSuccess(true);
-          checkInSuccessModalRef.current?.open();
+        // Show RecordPurchaseModal if selectedActionType is "purchase", otherwise show CheckInSuccessModal
+        if (selectedActionType === "purchase") {
+          recordPurchaseModalRef.current?.open();
         } else {
-          setErrorMessage("Check-in declined. Visitor not approved.");
-          setIsSuccess(false);
-          checkInDeclineModalRef.current?.open();
+          checkInSuccessModalRef.current?.open();
         }
       } catch (error) {
         const errorMsg =
@@ -91,7 +99,7 @@ const CheckInScan = () => {
         setIsLoadingUserInfo(false);
       }
     },
-    [roleConifg]
+    [roleConifg, selectedActionType]
   );
 
   const handleCompleteCheckIn = useCallback(async (companionsCount) => {
@@ -162,6 +170,27 @@ const CheckInScan = () => {
     }
   }, [isFocused]);
 
+  const handleRecordPurchaseConfirm = useCallback(
+    (purchaseData) => {
+      recordPurchaseModalRef.current?.close();
+
+      Alert.alert(
+        "Success",
+        "Purchase recorded successfully!",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              handleScanAnother();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    },
+    [handleScanAnother]
+  );
+
   if (!isReady) {
     return (
       <View style={styles.container}>
@@ -207,6 +236,45 @@ const CheckInScan = () => {
         </TouchableOpacity>
       </View>
 
+      {roleConifg === "vendor" && (
+        <View style={styles.actionTypeContainer}>
+          <TouchableOpacity
+            style={styles.actionTypeOption}
+            onPress={() => setSelectedActionType("visit")}
+            activeOpacity={0.7}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                selectedActionType === "visit" && styles.checkboxChecked,
+              ]}
+            >
+              {selectedActionType === "visit" && (
+                <MaterialIcons name="check" size={18} color={Colors.White} />
+              )}
+            </View>
+            <Text style={styles.actionTypeText}>Visit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionTypeOption}
+            onPress={() => setSelectedActionType("purchase")}
+            activeOpacity={0.7}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                selectedActionType === "purchase" && styles.checkboxChecked,
+              ]}
+            >
+              {selectedActionType === "purchase" && (
+                <MaterialIcons name="check" size={18} color={Colors.White} />
+              )}
+            </View>
+            <Text style={styles.actionTypeText}>Transaction</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <View style={styles.container}>
         {isFocused ? (
           <CameraView
@@ -229,7 +297,7 @@ const CheckInScan = () => {
         </View>
       </View>
 
-      {roleConifg === "organizer" ? (
+      {roleConifg === "organizer" && (
         <>
           <OrgSuccessModal
             ref={orgSuccessModalRef}
@@ -250,7 +318,9 @@ const CheckInScan = () => {
             onClose={handleTryAgain}
           />
         </>
-      ) : (
+      )}
+
+      {roleConifg === "vendor" && (
         <>
           <CheckInSuccessModal
             ref={checkInSuccessModalRef}
@@ -263,6 +333,18 @@ const CheckInScan = () => {
             ref={checkInDeclineModalRef}
             message={errorMessage}
             onClose={handleTryAgain}
+          />
+          <RecordPurchaseModal
+            ref={recordPurchaseModalRef}
+            productName=""
+            originalPrice=""
+            finalPrice=""
+            discount=""
+            onRecordPurchase={handleRecordPurchaseConfirm}
+            onCancel={() => {
+              recordPurchaseModalRef.current?.close();
+              handleScanAnother();
+            }}
           />
         </>
       )}

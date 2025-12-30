@@ -1,8 +1,8 @@
 import { Get, Post } from "./Gate";
 
 // login apis
-const login = async (data) => {
-  return await Post("mobile/ops/auth/login", data, "POST", true);
+const login = async (data, showAlert = true) => {
+  return await Post("mobile/ops/auth/login", data, "POST", true, showAlert);
 };
 
 // profile apis

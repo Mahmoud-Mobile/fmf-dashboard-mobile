@@ -115,7 +115,7 @@ const CustomItem = ({
               styles.visitButton,
               isSmallScreen && styles.visitButtonSmall,
             ]}
-            onPress={onVisitPress}
+            onPress={() => onVisitPress && onVisitPress()}
             activeOpacity={0.7}
           >
             <Text

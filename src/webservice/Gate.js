@@ -46,10 +46,12 @@ async function handleUnauthorized() {
   }
 }
 
-function handleErrors(error) {
+function handleErrors(error, showAlert = false) {
   const { response } = error;
   if (!response) {
-    alert("Something went wrong. Please try again later.");
+    if (showAlert) {
+      alert("Something went wrong. Please try again later.");
+    }
     return Promise.reject(error);
   }
 
@@ -89,7 +91,9 @@ function handleErrors(error) {
   // Handle different HTTP statuses and show detailed error messages
   switch (status) {
     case 400:
-      // alert(errorMessage);
+      if (showAlert) {
+        alert(errorMessage);
+      }
       break;
     case 401:
       alert("Unauthorized: The session has expired.");
@@ -105,17 +109,30 @@ function handleErrors(error) {
       alert(data.message || "Redirected: " + errorMessage);
       break;
     case 404:
-      // alert(
-      //   data.message || "Not Found: The requested resource could not be found."
-      // );
+      if (showAlert) {
+        alert(
+          data.message || "Not Found: The requested resource could not be found."
+        );
+      }
       break;
     case 500:
+      if (showAlert) {
+        alert("Server error. Please try again later.");
+      }
       break;
     default:
-      alert(`Error ${status}: ${errorMessage}`);
+      if (showAlert) {
+        alert(`Error ${status}: ${errorMessage}`);
+      }
   }
 
-  return Promise.reject(error);
+  // Return error object with status and message for conditional handling
+  return Promise.reject({
+    ...error,
+    status,
+    errorMessage,
+    response,
+  });
 }
 
 function buildQueryParams(data) {
@@ -143,7 +160,7 @@ function buildFormData(data) {
   }
   return formData;
 }
-async function Post(url = "", data = {}, method = "POST", jsonPayload = false) {
+async function Post(url = "", data = {}, method = "POST", jsonPayload = false, showAlert = false) {
   const baseURL = await getEnvVars("apiUrl");
   const fullUrl = baseURL + url;
 
@@ -171,11 +188,11 @@ async function Post(url = "", data = {}, method = "POST", jsonPayload = false) {
 
     return response.data;
   } catch (error) {
-    return handleErrors(error);
+    return handleErrors(error, showAlert);
   }
 }
 
-async function Get(url = "", data = {}) {
+async function Get(url = "", data = {}, showAlert = false) {
   const baseURL = await getEnvVars("apiUrl");
   const fullUrl = `${baseURL}${url}?${buildQueryParams(data)}`;
 
@@ -190,7 +207,7 @@ async function Get(url = "", data = {}) {
     });
     return response.data;
   } catch (error) {
-    return handleErrors(error);
+    return handleErrors(error, showAlert);
   }
 }
 

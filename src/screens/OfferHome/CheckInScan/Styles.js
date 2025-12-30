@@ -102,4 +102,37 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_Semi,
     color: Colors.White,
   },
+  actionTypeContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: Colors.White,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderColor,
+    gap: 24,
+  },
+  actionTypeOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderWidth: 2,
+    borderColor: Colors.borderColor,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.White,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.Primary,
+    borderColor: Colors.Primary,
+  },
+  actionTypeText: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.PrimaryText,
+  },
 });
