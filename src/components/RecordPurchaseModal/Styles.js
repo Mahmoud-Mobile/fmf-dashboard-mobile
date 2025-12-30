@@ -117,7 +117,7 @@ export const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: Colors.LightGray,
-    marginBottom: 120,
+    marginBottom: 50,
   },
   modalButton: {
     flex: 1,

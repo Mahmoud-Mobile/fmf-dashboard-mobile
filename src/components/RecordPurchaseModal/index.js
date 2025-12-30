@@ -6,11 +6,18 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { View, Text, TouchableOpacity, Keyboard } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Keyboard,
+  TextInput,
+  Platform,
+  KeyboardAvoidingView,
+} from "react-native";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
-  BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
 import { Colors } from "../../Global/colors";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -283,170 +290,178 @@ const RecordPurchaseModal = forwardRef(
         // keyboardBlurBehavior="restore"
         // android_keyboardInputMode="adjustResize"
       >
-        <BottomSheetScrollView
-          style={styles.modalContentContainer}
-          // keyboardShouldPersistTaps="handled"
-          // nestedScrollEnabled={true}
-          showsVerticalScrollIndicator={true}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
         >
-          <View style={styles.modalHeaderContainer}>
-            <Text style={styles.modalTitle}>Record Purchase</Text>
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={handleClose}
-              activeOpacity={0.6}
-            >
-              <MaterialIcons
-                name="close"
-                size={24}
-                color={Colors.PrimaryText}
+          <BottomSheetScrollView
+            style={styles.modalContentContainer}
+            // keyboardShouldPersistTaps="handled"
+            // nestedScrollEnabled={true}
+            showsVerticalScrollIndicator={true}
+          >
+            <View style={styles.modalHeaderContainer}>
+              <Text style={styles.modalTitle}>Record Purchase</Text>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={handleClose}
+                activeOpacity={0.6}
+              >
+                <MaterialIcons
+                  name="close"
+                  size={24}
+                  color={Colors.PrimaryText}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.labelText}>Product Name / ID</Text>
+              <TextInput
+                ref={productNameRef}
+                style={styles.textInput}
+                value={productNameValue}
+                onChangeText={setProductNameValue}
+                onFocus={handleTextInputFocus}
+                onSubmitEditing={() => quantityRef.current?.focus()}
+                returnKeyType="next"
+                placeholder="Enter product name or ID"
+                placeholderTextColor={Colors.SecondaryText}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.labelText}>Product Name / ID</Text>
-            <BottomSheetTextInput
-              ref={productNameRef}
-              style={styles.textInput}
-              value={productNameValue}
-              onChangeText={setProductNameValue}
-              onFocus={handleTextInputFocus}
-              onSubmitEditing={() => quantityRef.current?.focus()}
-              returnKeyType="next"
-              placeholder="Enter product name or ID"
-              placeholderTextColor={Colors.SecondaryText}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.labelText}>purchase Quantity</Text>
+              <TextInput
+                ref={quantityRef}
+                style={styles.textInput}
+                value={quantity}
+                onChangeText={setQuantity}
+                onFocus={handleTextInputFocus}
+                onSubmitEditing={() => originalPriceRef.current?.focus()}
+                returnKeyType="next"
+                keyboardType="numeric"
+                placeholder="Enter quantity"
+                placeholderTextColor={Colors.SecondaryText}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.labelText}>purchase Quantity</Text>
-            <BottomSheetTextInput
-              ref={quantityRef}
-              style={styles.textInput}
-              value={quantity}
-              onChangeText={setQuantity}
-              onFocus={handleTextInputFocus}
-              onSubmitEditing={() => originalPriceRef.current?.focus()}
-              returnKeyType="next"
-              keyboardType="numeric"
-              placeholder="Enter quantity"
-              placeholderTextColor={Colors.SecondaryText}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.labelText}>Original Price (SAR)</Text>
+              <TextInput
+                ref={originalPriceRef}
+                style={styles.textInput}
+                value={originalPrice}
+                onChangeText={setOriginalPrice}
+                onFocus={handleTextInputFocus}
+                onSubmitEditing={() => discountRef.current?.focus()}
+                returnKeyType="next"
+                keyboardType="numeric"
+                placeholder="Enter original price"
+                placeholderTextColor={Colors.SecondaryText}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.labelText}>Original Price (SAR)</Text>
-            <BottomSheetTextInput
-              ref={originalPriceRef}
-              style={styles.textInput}
-              value={originalPrice}
-              onChangeText={setOriginalPrice}
-              onFocus={handleTextInputFocus}
-              onSubmitEditing={() => discountRef.current?.focus()}
-              returnKeyType="next"
-              keyboardType="numeric"
-              placeholder="Enter original price"
-              placeholderTextColor={Colors.SecondaryText}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.labelText}>Discount (%)</Text>
+              <TextInput
+                ref={discountRef}
+                style={styles.textInput}
+                value={discount}
+                onChangeText={(text) => {
+                  setDiscount(text);
+                  lastEditedRef.current = "discount";
+                }}
+                onFocus={handleTextInputFocus}
+                onSubmitEditing={() => finalPriceRef.current?.focus()}
+                returnKeyType="next"
+                keyboardType="numeric"
+                placeholder="Enter discount percentage"
+                placeholderTextColor={Colors.SecondaryText}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.labelText}>Discount (%)</Text>
-            <BottomSheetTextInput
-              ref={discountRef}
-              style={styles.textInput}
-              value={discount}
-              onChangeText={(text) => {
-                setDiscount(text);
-                lastEditedRef.current = "discount";
-              }}
-              onFocus={handleTextInputFocus}
-              onSubmitEditing={() => finalPriceRef.current?.focus()}
-              returnKeyType="next"
-              keyboardType="numeric"
-              placeholder="Enter discount percentage"
-              placeholderTextColor={Colors.SecondaryText}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.labelText}>Final Price (SAR)</Text>
+              <TextInput
+                ref={finalPriceRef}
+                style={styles.textInput}
+                value={
+                  finalPrice !== ""
+                    ? finalPrice
+                    : originalPrice !== "" && discount !== ""
+                    ? currentFinalPrice.toFixed(2)
+                    : ""
+                }
+                onChangeText={(text) => {
+                  setFinalPrice(text);
+                  lastEditedRef.current = "finalPrice";
+                }}
+                onFocus={handleTextInputFocus}
+                onSubmitEditing={() => notesRef.current?.focus()}
+                returnKeyType="next"
+                keyboardType="numeric"
+                placeholder="Enter final price"
+                placeholderTextColor={Colors.SecondaryText}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.labelText}>Final Price (SAR)</Text>
-            <BottomSheetTextInput
-              ref={finalPriceRef}
-              style={styles.textInput}
-              value={
-                finalPrice !== ""
-                  ? finalPrice
-                  : originalPrice !== "" && discount !== ""
-                  ? currentFinalPrice.toFixed(2)
-                  : ""
-              }
-              onChangeText={(text) => {
-                setFinalPrice(text);
-                lastEditedRef.current = "finalPrice";
-              }}
-              onFocus={handleTextInputFocus}
-              onSubmitEditing={() => notesRef.current?.focus()}
-              returnKeyType="next"
-              keyboardType="numeric"
-              placeholder="Enter final price"
-              placeholderTextColor={Colors.SecondaryText}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.labelText}>Purchase Notes (Optional)</Text>
+              <TextInput
+                ref={notesRef}
+                style={[styles.textInput, styles.textAreaInput]}
+                value={notes}
+                onChangeText={setNotes}
+                onFocus={handleNotesInputFocus}
+                onSubmitEditing={() => Keyboard.dismiss()}
+                returnKeyType="done"
+                placeholder="Any additional Notes...."
+                placeholderTextColor={Colors.SecondaryText}
+                multiline
+                textAlignVertical="top"
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.labelText}>Purchase Notes (Optional)</Text>
-            <BottomSheetTextInput
-              ref={notesRef}
-              style={[styles.textInput, styles.textAreaInput]}
-              value={notes}
-              onChangeText={setNotes}
-              onFocus={handleNotesInputFocus}
-              onSubmitEditing={() => Keyboard.dismiss()}
-              returnKeyType="done"
-              placeholder="Any additional Notes...."
-              placeholderTextColor={Colors.SecondaryText}
-              multiline
-            />
-          </View>
-
-          <View style={styles.summaryContainer}>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Original Price:</Text>
-              <Text style={styles.summaryValue}>
-                SAR {formatCurrency(original * qty)}
+            <View style={styles.summaryContainer}>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Original Price:</Text>
+                <Text style={styles.summaryValue}>
+                  SAR {formatCurrency(original * qty)}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Final Price:</Text>
+                <Text style={styles.summaryValueBold}>
+                  SAR {formatCurrency(currentFinalPrice * qty)}
+                </Text>
+              </View>
+              <Text style={styles.savedText}>
+                You saved SAR {formatCurrency(savedAmount)} (
+                {currentDiscountValue.toFixed(2)}% off)
               </Text>
             </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Final Price:</Text>
-              <Text style={styles.summaryValueBold}>
-                SAR {formatCurrency(currentFinalPrice * qty)}
-              </Text>
-            </View>
-            <Text style={styles.savedText}>
-              You saved SAR {formatCurrency(savedAmount)} (
-              {currentDiscountValue.toFixed(2)}% off)
-            </Text>
-          </View>
 
-          <View style={styles.modalButtonsContainer}>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.modalCancelButton]}
-              onPress={handleClose}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.modalCancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.modalRecordButton]}
-              onPress={handleRecordPurchase}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.modalRecordButtonText}>Record Purchase</Text>
-            </TouchableOpacity>
-          </View>
-        </BottomSheetScrollView>
+            <View style={styles.modalButtonsContainer}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={handleClose}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalCancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalRecordButton]}
+                onPress={handleRecordPurchase}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalRecordButtonText}>
+                  Record Purchase
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </BottomSheetScrollView>
+        </KeyboardAvoidingView>
       </BottomSheet>
     );
   }
