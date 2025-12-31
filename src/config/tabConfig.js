@@ -126,13 +126,13 @@ export const ENVIRONMENT_TABS = {
     },
   ],
 };
+const rolePermission = "admin";
+// const rolePermission = role || store.getState()?.auth?.user?.user;
 
 export const getTabsForEnvironment = (environment, role = null) => {
   const tabs = ENVIRONMENT_TABS[environment] || ENVIRONMENT_TABS.fmf;
 
   // Get role from Redux store if not provided
-  // const rolePermission = role || store.getState()?.auth?.user?.user;
-  const rolePermission = "admin";
 
   if (environment === "offerHome" && rolePermission) {
     const allowedRoutes = {
@@ -155,8 +155,6 @@ export const getTabsForEnvironment = (environment, role = null) => {
 
 export const getDefaultTabVisibility = (environment, role = null) => {
   // Get role from Redux store if not provided
-  // const rolePermission = role || store.getState()?.auth?.user?.user;
-  const rolePermission = "organizer";
   const tabs = getTabsForEnvironment(environment, rolePermission);
   return tabs.reduce((acc, tab) => {
     acc[tab.route] = tab.defaultVisible ?? true;

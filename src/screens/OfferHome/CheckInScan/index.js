@@ -23,7 +23,7 @@ import CheckInDeclineModal from "./components/CheckInDeclineModal";
 import RecordPurchaseModal from "../../../components/RecordPurchaseModal";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const dummyVisitorInfo = {
+const DUMMY_VISITOR_INFO = {
   name: "Ahmed Al-Mansour",
   email: "ahmed@gmail.com",
   mobile: "+971 50 123 4567",
@@ -32,79 +32,99 @@ const dummyVisitorInfo = {
   image: null,
 };
 
+const ROLE_CONFIG = "vendor";
+const SOURCE_SCREENS = {
+  SELECT_YOUR_AREA: "SelectYourArea",
+  VENDOR_OFFER_HOME: "VendorOfferHome",
+};
+
 const CheckInScan = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const roleConifg = "vendor";
+  const { slectedVendor, actionType, sourceScreen } = route.params || {};
 
-  const { slectedVendor, actionType } = route.params || {};
-
+  // State management
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [isSuccess, setIsSuccess] = useState(false);
   const [manualCode, setManualCode] = useState("");
   const [selectedActionType, setSelectedActionType] = useState(
     actionType || "visit"
   );
+
+  // Refs
   const isLockedRef = useRef(false);
   const isFocused = useIsFocused();
-  const SuccessWithAddCompanionsRef = useRef(null);
+  const successWithAddCompanionsRef = useRef(null);
   const checkInSuccessModalRef = useRef(null);
   const checkInDeclineModalRef = useRef(null);
   const recordPurchaseModalRef = useRef(null);
 
+  // Log source screen
+  useEffect(() => {
+    if (sourceScreen) {
+      console.log("CheckInScan: Navigated from screen:", sourceScreen);
+    } else {
+      console.log("CheckInScan: No source screen provided");
+    }
+  }, [sourceScreen]);
+
+  // Navigation handlers
   const handleBack = () => {
     navigation.goBack();
   };
 
+  // Scan handlers
   const handleScanned = useCallback(
     async (qrCode) => {
-      console.log("qrCode", qrCode);
+      console.log("QR Code scanned:", qrCode);
       setIsLoadingUserInfo(true);
       setErrorMessage(null);
       setUserInfo(null);
-      setIsSuccess(false);
 
       try {
-        if (roleConifg === "organizer") {
-          setUserInfo(dummyVisitorInfo);
-          setIsSuccess(true);
-          SuccessWithAddCompanionsRef.current?.open();
-          return;
-        }
-
+        // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // Always return success until new config is implemented
-        setUserInfo({ participant: { name: "Test User" } });
-        setIsSuccess(true);
+        // Determine which modal to show based on source screen and role
+        const isFromSelectYourArea =
+          sourceScreen === SOURCE_SCREENS.SELECT_YOUR_AREA;
+        const isOrganizer = ROLE_CONFIG === "organizer";
+        const isVendorOrAdmin =
+          ROLE_CONFIG === "vendor" || ROLE_CONFIG === "admin";
 
-        // Show RecordPurchaseModal if selectedActionType is "purchase", otherwise show CheckInSuccessModal
-        if (selectedActionType === "purchase") {
-          recordPurchaseModalRef.current?.open();
-        } else {
-          checkInSuccessModalRef.current?.open();
+        if (isFromSelectYourArea || isOrganizer) {
+          // Show SuccessWithAddCompanions first for SelectYourArea or organizer role
+          setUserInfo(DUMMY_VISITOR_INFO);
+          successWithAddCompanionsRef.current?.open();
+        } else if (isVendorOrAdmin) {
+          // For vendor/admin from VendorOfferHome
+          setUserInfo({ participant: { name: "Test User" } });
+          if (selectedActionType === "purchase") {
+            recordPurchaseModalRef.current?.open();
+          } else {
+            checkInSuccessModalRef.current?.open();
+          }
         }
       } catch (error) {
         const errorMsg =
           error?.message || "Failed to check in. Please try again.";
         setErrorMessage(errorMsg);
         setUserInfo(null);
-        setIsSuccess(false);
         checkInDeclineModalRef.current?.open();
       } finally {
         setIsLoadingUserInfo(false);
       }
     },
-    [roleConifg, selectedActionType]
+    [sourceScreen, selectedActionType]
   );
 
+  // Modal handlers
   const handleCompleteCheckIn = useCallback(async (companionsCount) => {
     console.log("Completing check-in with companions:", companionsCount);
-    SuccessWithAddCompanionsRef.current?.close();
+    successWithAddCompanionsRef.current?.close();
 
     setTimeout(() => {
       checkInSuccessModalRef.current?.open();
@@ -115,15 +135,14 @@ const CheckInScan = () => {
     isLockedRef.current = false;
     setUserInfo(null);
     setErrorMessage(null);
-    setIsSuccess(false);
   }, []);
 
   const handleTryAgain = useCallback(() => {
     isLockedRef.current = false;
     setErrorMessage(null);
-    setIsSuccess(false);
   }, []);
 
+  // Input handlers
   const handleManualCodeSubmit = useCallback(async () => {
     if (isLockedRef.current || !manualCode.trim()) return;
 
@@ -154,6 +173,7 @@ const CheckInScan = () => {
     [handleScanned]
   );
 
+  // Permission handling
   useEffect(() => {
     if (!permission) return;
     if (!permission.granted) {
@@ -163,6 +183,7 @@ const CheckInScan = () => {
 
   const isReady = Boolean(permission?.granted);
 
+  // Reset processing state when screen loses focus
   useEffect(() => {
     if (!isFocused) {
       isLockedRef.current = false;
@@ -170,6 +191,7 @@ const CheckInScan = () => {
     }
   }, [isFocused]);
 
+  // Purchase handler
   const handleRecordPurchaseConfirm = useCallback(
     (purchaseData) => {
       recordPurchaseModalRef.current?.close();
@@ -180,9 +202,7 @@ const CheckInScan = () => {
         [
           {
             text: "OK",
-            onPress: () => {
-              handleScanAnother();
-            },
+            onPress: handleScanAnother,
           },
         ],
         { cancelable: false }
@@ -190,6 +210,40 @@ const CheckInScan = () => {
     },
     [handleScanAnother]
   );
+
+  // Helper functions
+  const shouldShowActionTypeSelector = () => {
+    return (
+      sourceScreen === SOURCE_SCREENS.VENDOR_OFFER_HOME &&
+      (ROLE_CONFIG === "vendor" || ROLE_CONFIG === "admin")
+    );
+  };
+
+  const shouldShowSuccessWithCompanionsModals = () => {
+    // Show for SelectYourArea (any role) or organizer role
+    return (
+      sourceScreen === SOURCE_SCREENS.SELECT_YOUR_AREA ||
+      ROLE_CONFIG === "organizer"
+    );
+  };
+
+  const shouldShowVendorModals = () => {
+    // Show for VendorOfferHome with vendor/admin role
+    return (
+      sourceScreen === SOURCE_SCREENS.VENDOR_OFFER_HOME &&
+      (ROLE_CONFIG === "vendor" || ROLE_CONFIG === "admin")
+    );
+  };
+
+  const getVisitorName = () => {
+    if (
+      sourceScreen === SOURCE_SCREENS.SELECT_YOUR_AREA ||
+      ROLE_CONFIG === "organizer"
+    ) {
+      return userInfo?.name || DUMMY_VISITOR_INFO?.name;
+    }
+    return userInfo?.participant?.name;
+  };
 
   if (!isReady) {
     return (
@@ -234,55 +288,45 @@ const CheckInScan = () => {
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
       </View>
-      {actionType && (
-        <>
-          {(roleConifg === "vendor" || roleConifg === "admin") && (
-            <View style={styles.actionTypeContainer}>
-              <TouchableOpacity
-                style={styles.actionTypeOption}
-                onPress={() => setSelectedActionType("visit")}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[
-                    styles.checkbox,
-                    selectedActionType === "visit" && styles.checkboxChecked,
-                  ]}
-                >
-                  {selectedActionType === "visit" && (
-                    <MaterialIcons
-                      name="check"
-                      size={18}
-                      color={Colors.White}
-                    />
-                  )}
-                </View>
-                <Text style={styles.actionTypeText}>Visit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.actionTypeOption}
-                onPress={() => setSelectedActionType("purchase")}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[
-                    styles.checkbox,
-                    selectedActionType === "purchase" && styles.checkboxChecked,
-                  ]}
-                >
-                  {selectedActionType === "purchase" && (
-                    <MaterialIcons
-                      name="check"
-                      size={18}
-                      color={Colors.White}
-                    />
-                  )}
-                </View>
-                <Text style={styles.actionTypeText}>Transaction</Text>
-              </TouchableOpacity>
+
+      {/* Action Type Selector - Only for VendorOfferHome */}
+      {shouldShowActionTypeSelector() && (
+        <View style={styles.actionTypeContainer}>
+          <TouchableOpacity
+            style={styles.actionTypeOption}
+            onPress={() => setSelectedActionType("visit")}
+            activeOpacity={0.7}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                selectedActionType === "visit" && styles.checkboxChecked,
+              ]}
+            >
+              {selectedActionType === "visit" && (
+                <MaterialIcons name="check" size={18} color={Colors.White} />
+              )}
             </View>
-          )}
-        </>
+            <Text style={styles.actionTypeText}>Visit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionTypeOption}
+            onPress={() => setSelectedActionType("purchase")}
+            activeOpacity={0.7}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                selectedActionType === "purchase" && styles.checkboxChecked,
+              ]}
+            >
+              {selectedActionType === "purchase" && (
+                <MaterialIcons name="check" size={18} color={Colors.White} />
+              )}
+            </View>
+            <Text style={styles.actionTypeText}>Transaction</Text>
+          </TouchableOpacity>
+        </View>
       )}
       <View style={styles.container}>
         {isFocused ? (
@@ -306,17 +350,18 @@ const CheckInScan = () => {
         </View>
       </View>
 
-      {(roleConifg === "organizer" || roleConifg === "admin") && (
+      {/* Modals for SelectYourArea or Organizer - Show SuccessWithAddCompanions first */}
+      {shouldShowSuccessWithCompanionsModals() && (
         <>
           <SuccessWithAddCompanions
-            ref={SuccessWithAddCompanionsRef}
-            visitorInfo={userInfo || dummyVisitorInfo}
+            ref={successWithAddCompanionsRef}
+            visitorInfo={userInfo || DUMMY_VISITOR_INFO}
             onCompleteCheckIn={handleCompleteCheckIn}
             onClose={handleScanAnother}
           />
           <CheckInSuccessModal
             ref={checkInSuccessModalRef}
-            visitorName={userInfo?.name || dummyVisitorInfo?.name}
+            visitorName={getVisitorName()}
             location={userInfo?.location}
             dateTime={new Date().toLocaleString()}
             onClose={handleScanAnother}
@@ -329,11 +374,12 @@ const CheckInScan = () => {
         </>
       )}
 
-      {(roleConifg === "vendor" || roleConifg === "admin") && (
+      {/* Modals for VendorOfferHome - Show CheckInSuccessModal or RecordPurchaseModal */}
+      {shouldShowVendorModals() && (
         <>
           <CheckInSuccessModal
             ref={checkInSuccessModalRef}
-            visitorName={userInfo?.participant?.name}
+            visitorName={getVisitorName()}
             location={userInfo?.location}
             dateTime={new Date().toLocaleString()}
             onClose={handleScanAnother}

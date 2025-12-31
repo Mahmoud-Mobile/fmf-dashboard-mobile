@@ -34,9 +34,9 @@ const VendorOfferHome = () => {
     navigation.navigate("CheckInScan", {
       slectedVendor: vendor,
       actionType: actionType, // "visit" or "purchase"
+      sourceScreen: "VendorOfferHome",
     });
   };
-
 
   const renderVendorCard = ({ item: vendor }) => {
     const renderProductItem = ({ item, index }) => (

@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Platform,
-} from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import CustomEventHeader from "../../../components/CustomEventHeader";
@@ -27,7 +20,9 @@ const SelectYourArea = () => {
   ];
 
   const handleAreaPress = () => {
-    navigation.navigate("CheckInScan");
+    navigation.navigate("CheckInScan", {
+      sourceScreen: "SelectYourArea",
+    });
   };
 
   return (
