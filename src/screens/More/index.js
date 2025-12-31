@@ -16,7 +16,6 @@ const More = () => {
   const [userInfo, setUserInfo] = useState(null);
   const dispatch = useDispatch();
   const { profile, loading, error } = useSelector((state) => state.api);
-
   useEffect(() => {
     const loadUserInfo = async () => {
       try {
@@ -30,7 +29,7 @@ const More = () => {
     };
     loadUserInfo();
   }, []);
-
+  console.log(userInfo?.access_token);
   const handleLogout = async () => {
     await dispatch(logout());
     navigation.navigate("Login");

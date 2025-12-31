@@ -1,27 +1,22 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { View, Text, ScrollView, Image, Alert } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./Styles";
 import moment from "moment";
 import { ActionButton, ActionButtonGroup } from "../../components/ActionButton";
 import { horizontalMargin } from "../../config/metrics";
+import {
+  markAccommodationAsCheckedIn,
+  markAccommodationAsCheckedOut,
+} from "../../redux/actions/api";
 
 const HotelDetails = ({ route }) => {
-  const { hotel: initialHotel } = route.params;
+  const acc = route.params?.hotel || {};
   const navigation = useNavigation();
-  const [hotel, setHotel] = useState(initialHotel || {});
-
-  const guestName = hotel.guestName || " ";
-  const phone = hotel.phone || " ";
-  const organizationType = hotel.organizationType || " ";
-  const arrivalDate = hotel.arrivalDate;
-  const hotelName = hotel.hotelName || " ";
-  const roomNumber = hotel.roomNumber || " ";
-  const assignedTo = hotel.assignedTo || " ";
-  const userPhoto =
-    hotel.photo ||
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face";
+  const dispatch = useDispatch();
+  const { selectedEvent } = useSelector((state) => state.api);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -38,71 +33,70 @@ const HotelDetails = ({ route }) => {
   };
 
   const actionButtons = useMemo(() => {
-    const hotelId = hotel.id || "unknown";
+    const hotelId = acc.accommodation?.id || "unknown";
+    const isCheckedIn = acc.accommodation?.isCheckedIn || false;
+    const isCheckedOut = acc.accommodation?.isCheckedOut || false;
 
     return [
       {
-        icon: "home",
-        text: "Room Prepared",
-        isSelected: hotel.isRoomPrepared || false,
-        disabled: false,
-        iconId: `room-prepared-${hotelId}`,
-        onPress: () => {
-          setHotel((prev) => ({
-            ...prev,
-            isRoomPrepared: !prev.isRoomPrepared,
-          }));
-          Alert.alert(
-            "Room Prepared",
-            `Room ${roomNumber} has been ${
-              hotel.isRoomPrepared ? "marked as not prepared" : "prepared"
-            }!`,
-            [{ text: "OK", style: "default" }]
-          );
+        icon: "check-circle",
+        text: "Check In",
+        isSelected: isCheckedIn,
+        disabled: isCheckedIn,
+        iconId: `check-in-${hotelId}`,
+        onPress: async () => {
+          try {
+            await dispatch(
+              markAccommodationAsCheckedIn(
+                selectedEvent?.id,
+                acc.accommodation?.id
+              )
+            );
+            Alert.alert(
+              "Check In Successful",
+              "Guest has been checked in successfully!",
+              [{ text: "OK", style: "default" }]
+            );
+          } catch (error) {
+            console.log(error);
+            Alert.alert(
+              "Check In Failed",
+              `Failed to check in: ${error.message || "Unknown error"}`,
+              [{ text: "OK", style: "default" }]
+            );
+          }
         },
       },
       {
-        icon: "person",
-        text: "Guest Arrived",
-        isSelected: hotel.isGuestArrived || false,
-        disabled: false,
-        iconId: `guest-arrived-${hotelId}`,
-        onPress: () => {
-          setHotel((prev) => ({
-            ...prev,
-            isGuestArrived: !prev.isGuestArrived,
-          }));
-          Alert.alert(
-            "Guest Arrived",
-            `Guest ${guestName} has ${
-              hotel.isGuestArrived ? "not arrived" : "arrived"
-            }!`,
-            [{ text: "OK", style: "default" }]
-          );
-        },
-      },
-      {
-        icon: "hotel",
-        text: "Room Occupied",
-        isSelected: hotel.isRoomOccupied || false,
-        disabled: false,
-        iconId: `room-occupied-${hotelId}`,
-        onPress: () => {
-          setHotel((prev) => ({
-            ...prev,
-            isRoomOccupied: !prev.isRoomOccupied,
-          }));
-          Alert.alert(
-            "Room Occupied",
-            `Room ${roomNumber} is now ${
-              hotel.isRoomOccupied ? "vacant" : "occupied"
-            }!`,
-            [{ text: "OK", style: "default" }]
-          );
+        icon: "exit-to-app",
+        text: "Check Out",
+        isSelected: isCheckedOut,
+        disabled: isCheckedOut,
+        iconId: `check-out-${hotelId}`,
+        onPress: async () => {
+          try {
+            await dispatch(
+              markAccommodationAsCheckedOut(
+                selectedEvent?.id,
+                acc.accommodation?.id
+              )
+            );
+            Alert.alert(
+              "Check Out Successful",
+              "Guest has been checked out successfully!",
+              [{ text: "OK", style: "default" }]
+            );
+          } catch (error) {
+            Alert.alert(
+              "Check Out Failed",
+              `Failed to check out: ${error.message || "Unknown error"}`,
+              [{ text: "OK", style: "default" }]
+            );
+          }
         },
       },
     ];
-  }, [hotel, roomNumber, guestName]);
+  }, [acc, dispatch, selectedEvent?.id]);
 
   const renderActions = () => {
     if (!actionButtons || actionButtons.length === 0) return null;
@@ -118,7 +112,7 @@ const HotelDetails = ({ route }) => {
     <View style={styles.container}>
       <CustomHeader
         leftLabel="Hotels"
-        title={hotelName || "Hotel Details"}
+        title={acc.accommodation?.hotelName || "Hotel Details"}
         onLeftButtonPress={() => navigation.goBack()}
       />
 
@@ -134,14 +128,21 @@ const HotelDetails = ({ route }) => {
               <View style={styles.participantContainer}>
                 <Image
                   source={{
-                    uri: userPhoto,
+                    uri:
+                      acc.participant?.photo ||
+                      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
                   }}
                   style={styles.participantPhoto}
                   resizeMode="cover"
                 />
                 <View style={styles.participantInfo}>
-                  <Text style={styles.participantName}>{guestName}</Text>
-                  <Text style={styles.participantMobile}>{phone}</Text>
+                  <Text style={styles.participantName}>
+                    {acc.participant?.firstName || ""}{" "}
+                    {acc.participant?.lastName || ""}
+                  </Text>
+                  <Text style={styles.participantMobile}>
+                    {acc.participant?.email || " "}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -151,66 +152,35 @@ const HotelDetails = ({ route }) => {
                 <Text style={styles.sectionTitle}>Hotel Details</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Hotel Name:</Text>
-                  <Text style={styles.value}>{hotelName}</Text>
+                  <Text style={styles.value}>
+                    {acc.accommodation?.hotelName || " "}
+                  </Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Room Number:</Text>
-                  <Text style={styles.value}>{roomNumber}</Text>
+                  <Text style={styles.value}>
+                    {acc.accommodation?.roomNumber || " "}
+                  </Text>
                 </View>
                 <View style={styles.infoRow}>
-                  <Text style={styles.label}>Arrival Date:</Text>
-                  <Text style={styles.value}>{formatDate(arrivalDate)}</Text>
+                  <Text style={styles.label}>Check In Date:</Text>
+                  <Text style={styles.value}>
+                    {formatDate(acc.accommodation?.checkInDate)}
+                  </Text>
                 </View>
                 <View style={styles.infoRow}>
-                  <Text style={styles.label}>Organization Type:</Text>
-                  <Text style={styles.value}>{organizationType}</Text>
+                  <Text style={styles.label}>Check Out Date:</Text>
+                  <Text style={styles.value}>
+                    {formatDate(acc.accommodation?.checkOutDate)}
+                  </Text>
                 </View>
                 <View style={styles.infoRow}>
-                  <Text style={styles.label}>Assigned To:</Text>
-                  <Text style={styles.value}>{assignedTo}</Text>
+                  <Text style={styles.label}>Status:</Text>
+                  <Text style={styles.value}>
+                    {acc.accommodation?.status || " "}
+                  </Text>
                 </View>
               </View>
-
-              {/* <View style={[styles.column, { marginTop: 16 }]}>
-                <Text style={styles.sectionTitle}>Room Status</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Room Prepared:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      hotel.isRoomPrepared ? styles.statusYes : styles.statusNo,
-                    ]}
-                  >
-                    {hotel.isRoomPrepared ? "Yes" : "No"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Guest Arrived:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      hotel.isGuestArrived ? styles.statusYes : styles.statusNo,
-                    ]}
-                  >
-                    {hotel.isGuestArrived ? "Yes" : "No"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Room Occupied:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      hotel.isRoomOccupied ? styles.statusYes : styles.statusNo,
-                    ]}
-                  >
-                    {hotel.isRoomOccupied ? "Yes" : "No"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Hotel ID:</Text>
-                  <Text style={styles.value}>{hotel.id || "N/A"}</Text>
-                </View>
-              </View> */}
             </View>
           </View>
           <View

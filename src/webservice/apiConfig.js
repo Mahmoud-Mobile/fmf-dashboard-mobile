@@ -157,6 +157,34 @@ const toggleLuggageReceived = async (flightId, participantId, data) => {
   );
 };
 
+// accommodation apis
+const getAccommodationParticipants = async (eventId, data) => {
+  return await Get(
+    `mobile/ops/events/${eventId}/accommodation/participants`,
+    data
+  );
+};
+
+// Mark accommodation checked in
+const markAccommodationCheckedIn = async (eventId, accommodationId, data) => {
+  return await Post(
+    `mobile/ops/events/${eventId}/accommodation/${accommodationId}/mark-checked-in`,
+    data,
+    "POST",
+    true
+  );
+};
+
+// Mark accommodation checked out
+const markAccommodationCheckedOut = async (eventId, accommodationId, data) => {
+  return await Post(
+    `mobile/ops/events/${eventId}/accommodation/${accommodationId}/mark-checked-out`,
+    data,
+    "POST",
+    true
+  );
+};
+
 export {
   login,
   profile,
@@ -181,4 +209,7 @@ export {
   markFlightDeparted,
   toggleMeetDone,
   toggleLuggageReceived,
+  getAccommodationParticipants,
+  markAccommodationCheckedIn,
+  markAccommodationCheckedOut,
 };

@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { View, FlatList, RefreshControl, Alert } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import SearchActionRow from "../../components/SearchActionRow";
 import EmptyListComponent from "../../components/EmptyListComponent";
@@ -15,113 +16,27 @@ import {
   formatDateTime,
   formatStamp,
 } from "../../config/exportToExcel";
-import { sendNotification } from "../../config/notificationUtils";
+import {
+  fetchAccommodationParticipants,
+  markAccommodationAsCheckedIn,
+  markAccommodationAsCheckedOut,
+} from "../../redux/actions/api";
+import LoadingModal from "../../components/LoadingModal";
 import styles from "./Styles";
 
-// Dummy hotel data
-const dummyHotelsData = [
-  {
-    id: "1",
-    guestName: "Ahmed Mohamed",
-    phone: "+966 50 123 4567",
-    organizationType: "Government",
-    arrivalDate: "2026-01-10T16:00:00",
-    hotelName: "Marriott Hotel",
-    roomNumber: "207",
-    assignedTo: "Mohammed Al-Rashid",
-    isRoomPrepared: false,
-    isGuestArrived: true,
-    isRoomOccupied: true,
-    photo:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: "2",
-    guestName: "Fatima Al-Zahra",
-    phone: "+966 55 234 5678",
-    organizationType: "Private",
-    arrivalDate: "2026-01-11T14:30:00",
-    hotelName: "Ritz Carlton Hotel",
-    roomNumber: "312",
-    assignedTo: "Sarah Al-Mansouri",
-    isRoomPrepared: true,
-    isGuestArrived: false,
-    isRoomOccupied: false,
-    photo:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: "3",
-    guestName: "Khalid Abdullah",
-    phone: "+966 56 345 6789",
-    organizationType: "Corporate",
-    arrivalDate: "2026-01-12T10:00:00",
-    hotelName: "Four Seasons Hotel",
-    roomNumber: "508",
-    assignedTo: "Omar Al-Saud",
-    isRoomPrepared: false,
-    isGuestArrived: false,
-    isRoomOccupied: false,
-    photo:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: "4",
-    guestName: "Noura Al-Mutairi",
-    phone: "+966 57 456 7890",
-    organizationType: "Government",
-    arrivalDate: "2026-01-13T18:00:00",
-    hotelName: "Ritz Carlton Hotel",
-    roomNumber: "421",
-    assignedTo: "Layla Al-Hashimi",
-    isRoomPrepared: false,
-    isGuestArrived: true,
-    isRoomOccupied: false,
-    photo:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: "5",
-    guestName: "Youssef Hassan",
-    phone: "+966 58 567 8901",
-    organizationType: "Private",
-    arrivalDate: "2026-01-14T12:00:00",
-    hotelName: "Marriott Hotel",
-    roomNumber: "105",
-    assignedTo: "Mohammed Al-Rashid",
-    isRoomPrepared: true,
-    isGuestArrived: true,
-    isRoomOccupied: true,
-    photo:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: "6",
-    guestName: "Mariam Al-Otaibi",
-    phone: "+966 59 678 9012",
-    organizationType: "Corporate",
-    arrivalDate: "2026-01-15T15:30:00",
-    hotelName: "Four Seasons Hotel",
-    roomNumber: "623",
-    assignedTo: "Sarah Al-Mansouri",
-    isRoomPrepared: true,
-    isGuestArrived: false,
-    isRoomOccupied: false,
-    photo:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
-  },
-];
-
 const Hotels = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { selectedEvent } = useSelector((state) => state.api);
+  const { selectedEvent, accommodation, loading } = useSelector(
+    (state) => state.api
+  );
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [viewMode, setViewMode] = useState("list");
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
-  const [hotelsData, setHotelsData] = useState(dummyHotelsData);
+  const [hotelsData, setHotelsData] = useState([]);
 
   const { width: screenWidth } = getDeviceDimensions();
   const horizontalPadding = horizontalMargin * 2;
@@ -140,11 +55,57 @@ const Hotels = () => {
     return { cardWidth: width };
   }, [numColumns, screenWidth, horizontalPadding]);
 
+  useEffect(() => {
+    if (
+      accommodation &&
+      accommodation.participants &&
+      accommodation.participants.length > 0
+    ) {
+      const transformedData = accommodation.participants.map((item) => {
+        const acc = item.accommodation || {};
+        return {
+          id: acc.id || "",
+          hotelId: acc.hotelId || "",
+          hotelName: acc.hotelName || "",
+          roomId: acc.roomId || "",
+          roomNumber: acc.roomNumber || " ",
+          checkInDate: acc.checkInDate || null,
+          checkOutDate: acc.checkOutDate || null,
+          status: acc.status || " ",
+          isCheckedIn: acc.isCheckedIn || false,
+          isCheckedOut: acc.isCheckedOut || false,
+          originalParticipant: item,
+        };
+      });
+      setHotelsData(transformedData);
+    } else {
+      setHotelsData([]);
+    }
+  }, [accommodation]);
+
+  useEffect(() => {
+    if (selectedEvent?.id) {
+      dispatch(
+        fetchAccommodationParticipants(selectedEvent.id, {
+          page: 1,
+          limit: 1000,
+        })
+      );
+    }
+  }, [selectedEvent?.id, dispatch]);
+
   const onRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    if (selectedEvent?.id) {
+      dispatch(
+        fetchAccommodationParticipants(selectedEvent.id, {
+          page: 1,
+          limit: 1000,
+        })
+      ).finally(() => {
+        setRefreshing(false);
+      });
+    }
   };
 
   const filteredHotels = useMemo(() => {
@@ -154,22 +115,40 @@ const Hotels = () => {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(
         (hotel) =>
-          hotel?.guestName?.toLowerCase().includes(searchLower) ||
           hotel?.hotelName?.toLowerCase().includes(searchLower) ||
           hotel?.roomNumber?.toLowerCase().includes(searchLower) ||
-          hotel?.phone?.toLowerCase().includes(searchLower) ||
-          hotel?.assignedTo?.toLowerCase().includes(searchLower)
+          hotel?.status?.toLowerCase().includes(searchLower)
       );
     }
 
     if (selectedDate) {
-      const selectedDateStr = selectedDate.toISOString().split("T")[0];
+      const selectedMoment = moment(new Date(selectedDate)).startOf("day");
+      if (!selectedMoment.isValid()) {
+        return filtered;
+      }
+
       filtered = filtered.filter((hotel) => {
-        if (hotel?.arrivalDate) {
-          const hotelDate = new Date(hotel.arrivalDate)
-            .toISOString()
-            .split("T")[0];
-          return hotelDate >= selectedDateStr;
+        const checkInMoment = hotel?.checkInDate
+          ? moment(new Date(hotel.checkInDate)).startOf("day")
+          : null;
+        const checkOutMoment = hotel?.checkOutDate
+          ? moment(new Date(hotel.checkOutDate)).startOf("day")
+          : null;
+
+        if (
+          checkInMoment &&
+          checkInMoment.isValid() &&
+          checkOutMoment &&
+          checkOutMoment.isValid()
+        ) {
+          return (
+            selectedMoment.isSameOrAfter(checkInMoment) &&
+            selectedMoment.isSameOrBefore(checkOutMoment)
+          );
+        } else if (checkInMoment && checkInMoment.isValid()) {
+          return selectedMoment.isSameOrAfter(checkInMoment);
+        } else if (checkOutMoment && checkOutMoment.isValid()) {
+          return selectedMoment.isSameOrBefore(checkOutMoment);
         }
         return false;
       });
@@ -202,20 +181,16 @@ const Hotels = () => {
 
     setIsPrinting(true);
     try {
-      // Transform hotels data into Excel rows
       const excelRows = filteredHotels.map((hotel) => {
         return {
-          "Hotel ID": hotel.id || "N/A",
-          "Guest Name": hotel.guestName || "N/A",
-          "Guest Mobile": hotel.phone || "N/A",
-          "Organization Type": hotel.organizationType || "N/A",
-          "Arrival Date": formatDateTime(hotel.arrivalDate),
-          "Hotel Name": hotel.hotelName || "N/A",
-          "Room Number": hotel.roomNumber || "N/A",
-          "Assigned To": hotel.assignedTo || "N/A",
-          "Room Prepared": hotel.isRoomPrepared ? "Yes" : "No",
-          "Guest Arrived": hotel.isGuestArrived ? "Yes" : "No",
-          "Room Occupied": hotel.isRoomOccupied ? "Yes" : "No",
+          "Hotel ID": hotel.id || " ",
+          "Hotel Name": hotel.hotelName || " ",
+          "Room Number": hotel.roomNumber || " ",
+          "Check In Date": formatDateTime(hotel.checkInDate),
+          "Check Out Date": formatDateTime(hotel.checkOutDate),
+          Status: hotel.status || " ",
+          "Checked In": hotel.isCheckedIn ? "Yes" : "No",
+          "Checked Out": hotel.isCheckedOut ? "Yes" : "No",
         };
       });
 
@@ -253,104 +228,73 @@ const Hotels = () => {
     };
   }, [numColumns, viewMode]);
 
-  const getActionButtons = useCallback((hotel) => {
-    const hotelId = hotel.id || "unknown";
+  const getActionButtons = useCallback(
+    (hotel) => {
+      const hotelId = hotel.id || "unknown";
+      const isCheckedIn = hotel.isCheckedIn || false;
+      const isCheckedOut = hotel.isCheckedOut || false;
 
-    return [
-      {
-        icon: "home",
-        text: "Room Prepared",
-        isSelected: hotel.isRoomPrepared || false,
-        disabled: false,
-        iconId: `room-prepared-${hotelId}`,
-        onPress: () => {
-          const newValue = !hotel.isRoomPrepared;
-          setHotelsData((prev) =>
-            prev.map((h) =>
-              h.id === hotel.id ? { ...h, isRoomPrepared: newValue } : h
-            )
-          );
-          sendNotification(
-            "Room Prepared Status Updated",
-            `Room ${hotel.roomNumber} at ${hotel.hotelName} has been ${
-              newValue ? "marked as prepared" : "marked as not prepared"
-            } for ${hotel.guestName}`,
-            {
-              type: "room_prepared",
-              hotelId: hotel.id,
-              hotelName: hotel.hotelName,
-              roomNumber: hotel.roomNumber,
-              guestName: hotel.guestName,
-              status: newValue,
+      return [
+        {
+          icon: "check-circle",
+          text: "Check In",
+          isSelected: isCheckedIn,
+          disabled: isCheckedIn,
+          iconId: `check-in-${hotelId}`,
+          onPress: async () => {
+            try {
+              await dispatch(
+                markAccommodationAsCheckedIn(selectedEvent?.id, hotel.id)
+              );
+              setHotelsData((prev) =>
+                prev.map((h) =>
+                  h.id === hotel.id ? { ...h, isCheckedIn: true } : h
+                )
+              );
+            } catch (error) {
+              console.log(error);
+              Alert.alert(
+                "Check In Failed",
+                `Failed to check in: ${error.message || "Unknown error"}`,
+                [{ text: "OK", style: "default" }]
+              );
             }
-          );
+          },
         },
-      },
-      {
-        icon: "person",
-        text: "Guest Arrived",
-        isSelected: hotel.isGuestArrived || false,
-        disabled: false,
-        iconId: `guest-arrived-${hotelId}`,
-        onPress: () => {
-          const newValue = !hotel.isGuestArrived;
-          setHotelsData((prev) =>
-            prev.map((h) =>
-              h.id === hotel.id ? { ...h, isGuestArrived: newValue } : h
-            )
-          );
-          sendNotification(
-            "Guest Arrival Status Updated",
-            `${hotel.guestName} has ${
-              newValue ? "arrived" : "not arrived"
-            } at ${hotel.hotelName}, Room ${hotel.roomNumber}`,
-            {
-              type: "guest_arrived",
-              hotelId: hotel.id,
-              hotelName: hotel.hotelName,
-              roomNumber: hotel.roomNumber,
-              guestName: hotel.guestName,
-              status: newValue,
+        {
+          icon: "exit-to-app",
+          text: "Check Out",
+          isSelected: isCheckedOut,
+          disabled: isCheckedOut,
+          iconId: `check-out-${hotelId}`,
+          onPress: async () => {
+            try {
+              await dispatch(
+                markAccommodationAsCheckedOut(selectedEvent?.id, hotel.id)
+              );
+              setHotelsData((prev) =>
+                prev.map((h) =>
+                  h.id === hotel.id ? { ...h, isCheckedOut: true } : h
+                )
+              );
+            } catch (error) {
+              Alert.alert(
+                "Check Out Failed",
+                `Failed to check out: ${error.message || "Unknown error"}`,
+                [{ text: "OK", style: "default" }]
+              );
             }
-          );
+          },
         },
-      },
-      {
-        icon: "hotel",
-        text: "Room Occupied",
-        isSelected: hotel.isRoomOccupied || false,
-        disabled: false,
-        iconId: `room-occupied-${hotelId}`,
-        onPress: () => {
-          const newValue = !hotel.isRoomOccupied;
-          setHotelsData((prev) =>
-            prev.map((h) =>
-              h.id === hotel.id ? { ...h, isRoomOccupied: newValue } : h
-            )
-          );
-          sendNotification(
-            "Room Occupancy Status Updated",
-            `Room ${hotel.roomNumber} at ${hotel.hotelName} is now ${
-              newValue ? "occupied" : "vacant"
-            } by ${hotel.guestName}`,
-            {
-              type: "room_occupied",
-              hotelId: hotel.id,
-              hotelName: hotel.hotelName,
-              roomNumber: hotel.roomNumber,
-              guestName: hotel.guestName,
-              status: newValue,
-            }
-          );
-        },
-      },
-    ];
-  }, []);
+      ];
+    },
+    [dispatch, selectedEvent?.id]
+  );
 
   const handleHotelPress = useCallback(
     (item) => {
       navigation.navigate("HotelDetails", {
-        hotel: item,
+        hotel: item.originalParticipant || item,
       });
     },
     [navigation]
@@ -382,7 +326,6 @@ const Hotels = () => {
         onLeftButtonPress={() => navigation.goBack()}
         onRightButtonPress={() => navigation.navigate("NotificationScreen")}
       />
-
       <SearchActionRow
         searchPlaceholder="Search hotels..."
         searchValue={searchText}
@@ -396,43 +339,46 @@ const Hotels = () => {
         selectedDate={selectedDate}
         onClearDate={() => setSelectedDate(null)}
       />
-      <FlatList
-        key={viewMode}
-        data={filteredHotels}
-        renderItem={renderHotelCard}
-        keyExtractor={listKeyExtractor}
-        numColumns={cardSettings.numColumns}
-        columnWrapperStyle={cardSettings.columnWrapper}
-        ListEmptyComponent={
-          <EmptyListComponent
-            title={
-              searchText || selectedDate
-                ? "No Hotels Found"
-                : "No Hotels Available"
-            }
-            description={
-              searchText || selectedDate
-                ? "No hotels match your search criteria. Try adjusting your filters."
-                : "There are no hotels available at the moment."
-            }
-          />
-        }
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[Colors.Primary]}
-            tintColor={Colors.Primary}
-          />
-        }
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={
-          filteredHotels.length === 0
-            ? styles.emptyContainer
-            : styles.listContainer
-        }
-        contentInsetAdjustmentBehavior="always"
-      />
+      {loading ? (
+        <LoadingModal visible={loading} />
+      ) : (
+        <FlatList
+          key={viewMode}
+          data={filteredHotels}
+          renderItem={renderHotelCard}
+          keyExtractor={listKeyExtractor}
+          numColumns={cardSettings.numColumns}
+          columnWrapperStyle={cardSettings.columnWrapper}
+          ListEmptyComponent={
+            <EmptyListComponent
+              title={
+                searchText || selectedDate
+                  ? "No Hotels Found"
+                  : "No Hotels Available"
+              }
+              description={
+                searchText || selectedDate
+                  ? "No hotels match your search criteria. Try adjusting your filters."
+                  : "There are no hotels available at the moment."
+              }
+            />
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[Colors.Primary]}
+              tintColor={Colors.Primary}
+            />
+          }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={
+            filteredHotels.length === 0
+              ? styles.emptyContainer
+              : styles.listContainer
+          }
+        />
+      )}
       <DateSearchModal
         visible={showDateModal}
         onClose={handleDateModalClose}

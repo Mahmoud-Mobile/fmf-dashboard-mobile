@@ -15,6 +15,7 @@ const apiSlice = createSlice({
     resources: [],
     selectedResource: {},
     seatingPlans: null,
+    accommodation: [],
     loading: false,
     error: null,
   },
@@ -79,6 +80,18 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setAccommodation: (state, action) => {
+      state.accommodation = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    updateAccommodationItem: (state, action) => {
+      const { id, updates } = action.payload;
+      const index = state.accommodation.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        state.accommodation[index] = { ...state.accommodation[index], ...updates };
+      }
+    },
     setLoading: (state, action) => {
       state.loading = action.payload !== undefined ? action.payload : true;
     },
@@ -103,6 +116,8 @@ export const {
   setResources,
   setSelectedResource,
   setSeatingPlans,
+  setAccommodation,
+  updateAccommodationItem,
   setLoading,
   setError,
 } = apiSlice.actions;

@@ -9,6 +9,9 @@ import {
   getResources,
   getResourceById,
   getSeatingPlans,
+  getAccommodationParticipants,
+  markAccommodationCheckedIn,
+  markAccommodationCheckedOut,
 } from "../../webservice/apiConfig";
 
 import {
@@ -24,6 +27,8 @@ import {
   setResources,
   setSelectedResource,
   setSeatingPlans,
+  setAccommodation,
+  updateAccommodationItem,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -166,6 +171,60 @@ export const fetchSeatingPlans =
       dispatch(setError("Error fetching seating plans"));
     } finally {
       dispatch(setLoading(false));
+    }
+  };
+
+// Fetch accommodation participants for an event
+export const fetchAccommodationParticipants =
+  (eventId, params) => async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      const response = await getAccommodationParticipants(eventId, params);
+      if (response) {
+        dispatch(setAccommodation(response));
+      }
+    } catch (error) {
+      dispatch(setError("Error fetching accommodation participants"));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Mark accommodation checked in
+export const markAccommodationAsCheckedIn =
+  (eventId, accommodationId) => async (dispatch) => {
+    try {
+      await markAccommodationCheckedIn(eventId, accommodationId, {
+        checkedIn: true,
+      });
+      dispatch(
+        updateAccommodationItem({
+          id: accommodationId,
+          updates: { isCheckedIn: true },
+        })
+      );
+    } catch (error) {
+      dispatch(setError("Error marking accommodation as checked in"));
+      throw error;
+    }
+  };
+
+// Mark accommodation checked out
+export const markAccommodationAsCheckedOut =
+  (eventId, accommodationId) => async (dispatch) => {
+    try {
+      await markAccommodationCheckedOut(eventId, accommodationId, {
+        checkedOut: true,
+      });
+      dispatch(
+        updateAccommodationItem({
+          id: accommodationId,
+          updates: { isCheckedOut: true },
+        })
+      );
+    } catch (error) {
+      dispatch(setError("Error marking accommodation as checked out"));
+      throw error;
     }
   };
 
