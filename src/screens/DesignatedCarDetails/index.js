@@ -42,7 +42,6 @@ const DesignatedCarDetails = ({ route }) => {
       }
       return "N/A";
     } catch (error) {
-      console.log("Date formatting error:", error);
       return "N/A";
     }
   };

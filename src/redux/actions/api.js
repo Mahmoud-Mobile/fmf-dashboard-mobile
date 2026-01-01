@@ -4,6 +4,7 @@ import {
   getEventById,
   flights,
   trips,
+  getTripsParticipants,
   getSubEvents,
   getSubEventById,
   getResources,
@@ -12,6 +13,8 @@ import {
   getAccommodationParticipants,
   markAccommodationCheckedIn,
   markAccommodationCheckedOut,
+  markTripParticipantNoShow,
+  markTripParticipantPickedUp,
 } from "../../webservice/apiConfig";
 
 import {
@@ -29,6 +32,8 @@ import {
   setSeatingPlans,
   setAccommodation,
   updateAccommodationItem,
+  setTripsParticipants,
+  updateTripParticipantItem,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -39,7 +44,6 @@ export const fetchProfile = (params) => async (dispatch) => {
     dispatch(setProfile(response));
   } catch (error) {
     dispatch(setError("Error fetching profile"));
-    console.log("Error fetching profile: ", error);
   }
 };
 
@@ -53,7 +57,6 @@ export const fetchEvents =
       dispatch(setEvents(response));
     } catch (error) {
       dispatch(setError("Error fetching events"));
-      console.log("Error fetching events: ", error);
     }
   };
 
@@ -68,7 +71,6 @@ export const fetchEventById =
       dispatch(setSelectedEvent(response));
     } catch (error) {
       dispatch(setError("Error fetching event details"));
-      console.log("Error fetching event details: ", error);
     }
   };
 
@@ -96,6 +98,49 @@ export const fetchTrips = (eventId, params) => async (dispatch) => {
     dispatch(setError("Error fetching trips"));
   }
 };
+
+// Fetch trips participants for an event
+export const fetchTripsParticipants = (eventId, params) => async (dispatch) => {
+  dispatch(setLoading());
+  try {
+    const response = await getTripsParticipants(eventId, params);
+    if (response) {
+      dispatch(setTripsParticipants(response));
+    }
+  } catch (error) {
+    dispatch(setError("Error fetching trips participants"));
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+// Mark trip participant as no-show
+export const markTripParticipantAsNoShow =
+  (eventId, tripId, participantId, reason = "") =>
+  async (dispatch) => {
+    try {
+      await markTripParticipantNoShow(eventId, tripId, participantId, {
+        noShow: true,
+        reason: reason,
+      });
+    } catch (error) {
+      dispatch(setError("Error marking participant as no-show"));
+      throw error;
+    }
+  };
+
+// Mark trip participant as picked up
+export const markTripParticipantAsPickedUp =
+  (eventId, tripId, participantId) => async (dispatch) => {
+    try {
+      await markTripParticipantPickedUp(eventId, tripId, participantId, {
+        pickedUp: true,
+      });
+    } catch (error) {
+      dispatch(setError("Error marking participant as picked up"));
+      throw error;
+    }
+  };
 
 // Fetch sub-events for an event
 export const fetchSubEvents = (eventId, params) => async (dispatch) => {

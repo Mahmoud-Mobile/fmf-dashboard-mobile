@@ -25,10 +25,10 @@ const CustomHeader = ({
       </TouchableOpacity>
 
       <View style={styles.centerOverlay}>
-        {!!title && (
+        {title && (
           <Text style={[styles.titleText, { color: textColor }]}>{title}</Text>
         )}
-        {!!subtitle && (
+        {subtitle && (
           <Text style={[styles.subtitleText, { color: textColor }]}>
             {subtitle}
           </Text>

@@ -22,12 +22,12 @@ const styles = StyleSheet.create({
   },
   centerOverlay: {},
   titleText: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: "center",
     fontFamily: Fonts.FONT_MEDIUM,
   },
   subtitleText: {
-    fontSize: 14,
+    fontSize: 11,
     textAlign: "center",
     fontFamily: Fonts.FONT_LIGHT,
     marginTop: 4,

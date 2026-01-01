@@ -34,7 +34,7 @@ const ActionButton = ({
 
   const isIconDisabled = iconId ? disabledIcons[iconId] : false;
 
-  const isDisabled = disabled || isIconDisabled;
+  const isDisabled = disabled !== undefined ? disabled : isIconDisabled;
 
   const handleSwipeSuccess = () => {
     if (iconId && !isIconDisabled) {

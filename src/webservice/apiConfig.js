@@ -37,6 +37,51 @@ const trips = async (eventId, data) => {
   return await Get(`events/${eventId}/transportation/trips`, data);
 };
 
+// Get trips participants
+const getTripsParticipants = async (eventId, data) => {
+  return await Get(`mobile/ops/events/${eventId}/transport/participants`, data);
+};
+
+// Mark trip participant as no-show
+const markTripParticipantNoShow = async (
+  eventId,
+  tripId,
+  participantId,
+  data
+) => {
+  return await Post(
+    `mobile/ops/events/${eventId}/transport/trips/${tripId}/participant/${participantId}/mark-no-show`,
+    data,
+    "POST",
+    true
+  );
+};
+
+// Mark trip participant as picked up
+const markTripParticipantPickedUp = async (
+  eventId,
+  tripId,
+  participantId,
+  data
+) => {
+  return await Post(
+    `mobile/ops/events/${eventId}/transport/trips/${tripId}/participant/${participantId}/mark-picked-up`,
+    data,
+    "POST",
+    true
+  );
+};
+
+// Mark trip as complete
+const markTripComplete = async (eventId, tripId, data) => {
+  return await Post(
+    `mobile/ops/events/${eventId}/transport/trips/${tripId}/mark-complete`,
+    data,
+    "POST",
+    true
+  );
+};
+
 // sub-events apis
 const getSubEvents = async (eventId, data) => {
   return await Get(`events/${eventId}/sub-events`, data);
@@ -194,6 +239,7 @@ export {
   getEventById,
   flights,
   trips,
+  getTripsParticipants,
   getSubEvents,
   getSubEventById,
   getResources,
@@ -212,4 +258,7 @@ export {
   getAccommodationParticipants,
   markAccommodationCheckedIn,
   markAccommodationCheckedOut,
+  markTripParticipantNoShow,
+  markTripParticipantPickedUp,
+  markTripComplete,
 };

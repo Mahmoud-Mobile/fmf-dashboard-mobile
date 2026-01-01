@@ -59,7 +59,7 @@ const CameraQRScanner = ({ onScanned }) => {
           mode === "checkout"
             ? await subEvent_Checkout(eventId, subEventId, payload)
             : await subEvent_Checkin(eventId, subEventId, payload);
-        console.log("response", response);
+        // console.log("response", response);
         setUserInfo(response);
         successModalRef.current?.open();
       } catch (error) {
