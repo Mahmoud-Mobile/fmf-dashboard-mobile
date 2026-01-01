@@ -62,19 +62,9 @@ const Hotels = () => {
       accommodation.participants.length > 0
     ) {
       const transformedData = accommodation.participants.map((item) => {
-        const acc = item.accommodation || {};
         return {
-          id: acc.id || "",
-          hotelId: acc.hotelId || "",
-          hotelName: acc.hotelName || "",
-          roomId: acc.roomId || "",
-          roomNumber: acc.roomNumber || " ",
-          checkInDate: acc.checkInDate || null,
-          checkOutDate: acc.checkOutDate || null,
-          status: acc.status || " ",
-          isCheckedIn: acc.isCheckedIn || false,
-          isCheckedOut: acc.isCheckedOut || false,
-          originalParticipant: item,
+          ...item,
+          id: item.accommodation?.id || "",
         };
       });
       setHotelsData(transformedData);
@@ -115,9 +105,13 @@ const Hotels = () => {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(
         (hotel) =>
-          hotel?.hotelName?.toLowerCase().includes(searchLower) ||
-          hotel?.roomNumber?.toLowerCase().includes(searchLower) ||
-          hotel?.status?.toLowerCase().includes(searchLower)
+          hotel?.accommodation?.hotelName
+            ?.toLowerCase()
+            .includes(searchLower) ||
+          hotel?.accommodation?.roomNumber
+            ?.toLowerCase()
+            .includes(searchLower) ||
+          hotel?.accommodation?.status?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -128,11 +122,11 @@ const Hotels = () => {
       }
 
       filtered = filtered.filter((hotel) => {
-        const checkInMoment = hotel?.checkInDate
-          ? moment(new Date(hotel.checkInDate)).startOf("day")
+        const checkInMoment = hotel?.accommodation?.checkInDate
+          ? moment(new Date(hotel.accommodation.checkInDate)).startOf("day")
           : null;
-        const checkOutMoment = hotel?.checkOutDate
-          ? moment(new Date(hotel.checkOutDate)).startOf("day")
+        const checkOutMoment = hotel?.accommodation?.checkOutDate
+          ? moment(new Date(hotel.accommodation.checkOutDate)).startOf("day")
           : null;
 
         if (
@@ -183,14 +177,14 @@ const Hotels = () => {
     try {
       const excelRows = filteredHotels.map((hotel) => {
         return {
-          "Hotel ID": hotel.id || " ",
-          "Hotel Name": hotel.hotelName || " ",
-          "Room Number": hotel.roomNumber || " ",
-          "Check In Date": formatDateTime(hotel.checkInDate),
-          "Check Out Date": formatDateTime(hotel.checkOutDate),
-          Status: hotel.status || " ",
-          "Checked In": hotel.isCheckedIn ? "Yes" : "No",
-          "Checked Out": hotel.isCheckedOut ? "Yes" : "No",
+          "Hotel ID": hotel.accommodation?.id || " ",
+          "Hotel Name": hotel.accommodation?.hotelName || " ",
+          "Room Number": hotel.accommodation?.roomNumber || " ",
+          "Check In Date": formatDateTime(hotel.accommodation?.checkInDate),
+          "Check Out Date": formatDateTime(hotel.accommodation?.checkOutDate),
+          Status: hotel.accommodation?.status || " ",
+          "Checked In": hotel.accommodation?.isCheckedIn ? "Yes" : "No",
+          "Checked Out": hotel.accommodation?.isCheckedOut ? "Yes" : "No",
         };
       });
 
@@ -230,9 +224,9 @@ const Hotels = () => {
 
   const getActionButtons = useCallback(
     (hotel) => {
-      const hotelId = hotel.id || "unknown";
-      const isCheckedIn = hotel.isCheckedIn || false;
-      const isCheckedOut = hotel.isCheckedOut || false;
+      const hotelId = hotel.accommodation?.id || "";
+      const isCheckedIn = hotel.accommodation?.isCheckedIn || false;
+      const isCheckedOut = hotel.accommodation?.isCheckedOut || false;
 
       return [
         {
@@ -244,15 +238,25 @@ const Hotels = () => {
           onPress: async () => {
             try {
               await dispatch(
-                markAccommodationAsCheckedIn(selectedEvent?.id, hotel.id)
+                markAccommodationAsCheckedIn(
+                  selectedEvent?.id,
+                  hotel.accommodation?.id || hotel.id
+                )
               );
               setHotelsData((prev) =>
                 prev.map((h) =>
-                  h.id === hotel.id ? { ...h, isCheckedIn: true } : h
+                  (h.accommodation?.id || h.id) === hotelId
+                    ? {
+                        ...h,
+                        accommodation: {
+                          ...h.accommodation,
+                          isCheckedIn: true,
+                        },
+                      }
+                    : h
                 )
               );
             } catch (error) {
-              console.log(error);
               Alert.alert(
                 "Check In Failed",
                 `Failed to check in: ${error.message || "Unknown error"}`,
@@ -270,11 +274,22 @@ const Hotels = () => {
           onPress: async () => {
             try {
               await dispatch(
-                markAccommodationAsCheckedOut(selectedEvent?.id, hotel.id)
+                markAccommodationAsCheckedOut(
+                  selectedEvent?.id,
+                  hotel.accommodation?.id || hotel.id
+                )
               );
               setHotelsData((prev) =>
                 prev.map((h) =>
-                  h.id === hotel.id ? { ...h, isCheckedOut: true } : h
+                  (h.accommodation?.id || h.id) === hotelId
+                    ? {
+                        ...h,
+                        accommodation: {
+                          ...h.accommodation,
+                          isCheckedOut: true,
+                        },
+                      }
+                    : h
                 )
               );
             } catch (error) {
@@ -294,7 +309,7 @@ const Hotels = () => {
   const handleHotelPress = useCallback(
     (item) => {
       navigation.navigate("HotelDetails", {
-        hotel: item.originalParticipant || item,
+        hotel: item,
       });
     },
     [navigation]
@@ -316,7 +331,11 @@ const Hotels = () => {
   );
 
   const listKeyExtractor = useCallback((item, index) => {
-    return item?.id?.toString() || index.toString();
+    return (
+      item?.accommodation?.id?.toString() ||
+      item?.id?.toString() ||
+      index.toString()
+    );
   }, []);
 
   return (

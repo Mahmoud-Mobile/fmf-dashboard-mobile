@@ -121,6 +121,19 @@ const styles = StyleSheet.create({
     color: Colors.Primary,
     marginBottom: 4,
   },
+  participantIconCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: Colors.Primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  participantInitial: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.White,
+  },
 });
 
 export default styles;

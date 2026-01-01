@@ -6,18 +6,14 @@ import { Colors } from "../../../Global/colors";
 import { ActionButtonGroup } from "../../../components/ActionButton";
 import styles from "./Styles";
 
-const userinfo = {
-  name: "John Doe",
-  email: "john.doe@example.com",
-  photo:
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-};
-
 const HotelCard = ({ item, onPress, width, actionButtons }) => {
-  const userPhoto = userinfo?.photo;
-  const userName = userinfo?.name || item?.hotelName || "Hotel";
-  const userEmail = userinfo?.email || "";
-  const userInitial = userName ? userName.charAt(0).toUpperCase() : "H";
+  const participant = item?.participant || {};
+  const firstName = participant?.firstName || "";
+  const lastName = participant?.lastName || "";
+  const fullName = `${firstName} ${lastName}`.trim() || "";
+  const userPhoto = participant?.profilePicture || null;
+  const userEmail = participant?.email || "";
+  const userInitial = fullName ? fullName.charAt(0).toUpperCase() : "H";
 
   return (
     <TouchableOpacity
@@ -40,31 +36,39 @@ const HotelCard = ({ item, onPress, width, actionButtons }) => {
               </View>
             )}
             <View style={styles.passengerDetails}>
-              <Text style={styles.userName}>{userName}</Text>
+              <Text style={styles.userName}>{fullName}</Text>
               {userEmail && <Text style={styles.userMobile}>{userEmail}</Text>}
             </View>
           </View>
-          {item?.roomNumber && (
-            <Text style={styles.userMobile}>Room: {item?.roomNumber}</Text>
+          <View style={styles.locationRow}>
+            <Text style={styles.locationLabel}>Hotel:</Text>
+            <Text style={styles.locationText}>
+              {item?.accommodation?.hotelName}
+            </Text>
+          </View>
+          {item?.accommodation?.roomNumber && (
+            <Text style={styles.userMobile}>
+              Room: {item?.accommodation?.roomNumber}
+            </Text>
           )}
           <View style={styles.locationRow}>
             <MaterialIcons name="event" size={16} color={Colors.Gray} />
             <Text style={styles.locationLabel}>Check In:</Text>
             <Text style={styles.locationText}>
-              {item?.checkInDate
-                ? moment(new Date(item.checkInDate)).format(
+              {item?.accommodation?.checkInDate
+                ? moment(new Date(item.accommodation.checkInDate)).format(
                     "MMM DD, YYYY, h:mm"
                   )
                 : ""}
             </Text>
           </View>
 
-          {item?.checkOutDate && (
+          {item?.accommodation?.checkOutDate && (
             <View style={styles.locationRow}>
               <MaterialIcons name="event" size={16} color={Colors.Gray} />
               <Text style={styles.locationLabel}>Check Out:</Text>
               <Text style={styles.locationText}>
-                {moment(new Date(item.checkOutDate)).format(
+                {moment(new Date(item.accommodation.checkOutDate)).format(
                   "MMM DD, YYYY, h:mm"
                 )}
               </Text>
@@ -74,32 +78,42 @@ const HotelCard = ({ item, onPress, width, actionButtons }) => {
         <View style={styles.rightColumn}>
           <View style={styles.detailRow}>
             <MaterialIcons name="info" size={14} color={Colors.Gray} />
-            <Text style={styles.detailText}>Status: {item?.status || ""}</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <MaterialIcons
-              name={
-                item?.isCheckedIn ? "check-circle" : "radio-button-unchecked"
-              }
-              size={14}
-              color={item?.isCheckedIn ? Colors.Primary : Colors.Gray}
-            />
             <Text style={styles.detailText}>
-              Checked In: {item?.isCheckedIn ? "Yes" : "No"}
+              Status: {item?.accommodation?.status || ""}
             </Text>
           </View>
 
           <View style={styles.detailRow}>
             <MaterialIcons
               name={
-                item?.isCheckedOut ? "check-circle" : "radio-button-unchecked"
+                item?.accommodation?.isCheckedIn
+                  ? "check-circle"
+                  : "radio-button-unchecked"
               }
               size={14}
-              color={item?.isCheckedOut ? Colors.Primary : Colors.Gray}
+              color={
+                item?.accommodation?.isCheckedIn ? Colors.Primary : Colors.Gray
+              }
             />
             <Text style={styles.detailText}>
-              Checked Out: {item?.isCheckedOut ? "Yes" : "No"}
+              Checked In: {item?.accommodation?.isCheckedIn ? "Yes" : "No"}
+            </Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <MaterialIcons
+              name={
+                item?.accommodation?.isCheckedOut
+                  ? "check-circle"
+                  : "radio-button-unchecked"
+              }
+              size={14}
+              color={
+                item?.accommodation?.isCheckedOut ? Colors.Primary : Colors.Gray
+              }
+            />
+            <Text style={styles.detailText}>
+              Checked Out: {item?.accommodation?.isCheckedOut ? "Yes" : "No"}
             </Text>
           </View>
         </View>

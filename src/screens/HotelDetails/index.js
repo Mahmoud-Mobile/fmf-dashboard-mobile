@@ -19,21 +19,20 @@ const HotelDetails = ({ route }) => {
   const { selectedEvent } = useSelector((state) => state.api);
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "";
     try {
       const nativeDate = new Date(dateString);
       if (!isNaN(nativeDate.getTime())) {
         return moment(nativeDate).format("MMM DD, YYYY, h:mm A");
       }
-      return "N/A";
+      return "";
     } catch (error) {
-      console.log("Date formatting error:", error);
-      return "N/A";
+      return "";
     }
   };
 
   const actionButtons = useMemo(() => {
-    const hotelId = acc.accommodation?.id || "unknown";
+    const hotelId = acc.accommodation?.id || " ";
     const isCheckedIn = acc.accommodation?.isCheckedIn || false;
     const isCheckedOut = acc.accommodation?.isCheckedOut || false;
 
@@ -58,7 +57,6 @@ const HotelDetails = ({ route }) => {
               [{ text: "OK", style: "default" }]
             );
           } catch (error) {
-            console.log(error);
             Alert.alert(
               "Check In Failed",
               `Failed to check in: ${error.message || "Unknown error"}`,
@@ -115,7 +113,6 @@ const HotelDetails = ({ route }) => {
         title={acc.accommodation?.hotelName || "Hotel Details"}
         onLeftButtonPress={() => navigation.goBack()}
       />
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
@@ -126,15 +123,20 @@ const HotelDetails = ({ route }) => {
             <View style={styles.flexOne}>
               <Text style={styles.sectionTitle}>Guest Information</Text>
               <View style={styles.participantContainer}>
-                <Image
-                  source={{
-                    uri:
-                      acc.participant?.photo ||
-                      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-                  }}
-                  style={styles.participantPhoto}
-                  resizeMode="cover"
-                />
+                {acc.participant?.photo ? (
+                  <Image
+                    source={{ uri: acc.participant?.photo }}
+                    style={styles.participantPhoto}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={styles.participantIconCircle}>
+                    <Text style={styles.participantInitial}>
+                      {acc.participant?.firstName?.charAt(0) || ""}
+                      {acc.participant?.lastName?.charAt(0) || ""}
+                    </Text>
+                  </View>
+                )}
                 <View style={styles.participantInfo}>
                   <Text style={styles.participantName}>
                     {acc.participant?.firstName || ""}{" "}
