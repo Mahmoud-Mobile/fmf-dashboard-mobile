@@ -90,14 +90,13 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await dispatch(login(body, true)); // showAlert=true to show 400 errors
-      // console.log("response", JSON.stringify(response, null, 2));
+      console.log("response", JSON.stringify(response, null, 2));
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
           index: 0,
           routes: [{ name: "MainEvent" }],
         });
       }
-      // Error alerts are handled in Gate.js when showAlert=true
       setLoading(false);
     } catch (error) {
       setLoading(false);

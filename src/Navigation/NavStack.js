@@ -29,6 +29,7 @@ import ContactUs from "../screens/ContactUs";
 import TripsDetails from "../screens/TripsDetails";
 import SubEventDetails from "../screens/SubEventDetails";
 import ResourceDetails from "../screens/ResourceDetails";
+import VisibilitySettings from "../screens/VisibilitySettings";
 import NetInfo from "@react-native-community/netinfo";
 import * as SecureStore from "expo-secure-store";
 import { logout } from "../redux/actions/authActions";
@@ -266,6 +267,13 @@ const NavStack = () => {
       <Stack.Screen
         name="ResourceDetails"
         component={ResourceDetails}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="VisibilitySettings"
+        component={VisibilitySettings}
         options={{
           headerShown: false,
         }}

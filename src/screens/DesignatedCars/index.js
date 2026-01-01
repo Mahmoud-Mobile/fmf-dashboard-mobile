@@ -281,9 +281,33 @@ const DesignatedCars = () => {
     [navigation]
   );
 
+  // Get action button visibility from Redux
+  const actionButtonVisibility =
+    useSelector((state) => state.ui?.actionButtonVisibility) || {};
+
+  // Helper function to filter action buttons
+  const filterActionButtons = useCallback(
+    (buttons) => {
+      if (!buttons || !Array.isArray(buttons)) return [];
+      return buttons.filter((button) => {
+        if (!button || !button.text) return true;
+        const storedValue = actionButtonVisibility[button.text];
+        const isVisible =
+          storedValue === undefined
+            ? true
+            : typeof storedValue === "string"
+            ? storedValue === "true"
+            : Boolean(storedValue);
+        return isVisible;
+      });
+    },
+    [actionButtonVisibility]
+  );
+
   const renderDesignatedCarCard = useCallback(
     ({ item }) => {
-      const actionButtons = getActionButtons(item);
+      const allActionButtons = getActionButtons(item);
+      const actionButtons = filterActionButtons(allActionButtons);
       return (
         <DesignatedCarCard
           item={item}
@@ -293,7 +317,7 @@ const DesignatedCars = () => {
         />
       );
     },
-    [cardWidth, getActionButtons, handleDesignatedCarPress]
+    [cardWidth, getActionButtons, handleDesignatedCarPress, filterActionButtons]
   );
 
   const listKeyExtractor = useCallback((item, index) => {

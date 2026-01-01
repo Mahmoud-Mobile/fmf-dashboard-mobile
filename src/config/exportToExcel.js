@@ -2,11 +2,6 @@ import * as FileSystem from "expo-file-system/legacy";
 import { shareAsync } from "expo-sharing";
 import XLSX from "xlsx";
 
-/**
- * Generic Excel export utility.
- * Pass an array of plain objects as rows, a fileName (e.g. 'report.xlsx'), and an optional sheetName.
- * Returns the created fileUri and the number of exported rows.
- */
 export async function exportToExcel({ rows, fileName, sheetName = "Sheet1" }) {
   if (!Array.isArray(rows)) {
     throw new Error("exportToExcel: 'rows' must be an array");

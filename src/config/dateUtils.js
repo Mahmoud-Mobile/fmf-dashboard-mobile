@@ -28,4 +28,3 @@ export const formatDateRange = (startDate, endDate) => {
 
   return end.format("DD MMMM, YYYY");
 };
-

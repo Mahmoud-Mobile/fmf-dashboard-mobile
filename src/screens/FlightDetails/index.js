@@ -333,14 +333,35 @@ const FlightDetails = ({ route }) => {
     ];
   }, [flight, selectedCategory, navigation]);
 
+  // Get action button visibility from Redux
+  const actionButtonVisibility =
+    useSelector((state) => state.ui?.actionButtonVisibility) || {};
+
+  // Filter action buttons based on visibility
+  const filteredActionButtons = useMemo(() => {
+    if (!actionButtons || !Array.isArray(actionButtons)) return [];
+    return actionButtons.filter((button) => {
+      if (!button || !button.text) return true;
+      const storedValue = actionButtonVisibility[button.text];
+      const isVisible =
+        storedValue === undefined
+          ? true
+          : typeof storedValue === "string"
+          ? storedValue === "true"
+          : Boolean(storedValue);
+      return isVisible;
+    });
+  }, [actionButtons, actionButtonVisibility]);
+
   const renderActions = () => {
-    if (!actionButtons || actionButtons.length === 0) return null;
-    if (actionButtons.length === 1) {
-      const button = actionButtons[0];
+    if (!filteredActionButtons || filteredActionButtons.length === 0)
+      return null;
+    if (filteredActionButtons.length === 1) {
+      const button = filteredActionButtons[0];
       return <ActionButton {...button} endPosition />;
     }
 
-    return <ActionButtonGroup buttons={actionButtons} />;
+    return <ActionButtonGroup buttons={filteredActionButtons} />;
   };
 
   // Get flight info based on flightType

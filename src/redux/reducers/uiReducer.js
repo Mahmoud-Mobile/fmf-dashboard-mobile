@@ -4,6 +4,7 @@ import { LOGOUT } from "../actions/actionTypes";
 const initialState = {
   sectionVisibility: {},
   tabVisibility: {},
+  actionButtonVisibility: {}, // Store action button visibility: { "buttonText": true/false }
   disabledIcons: {}, // Store disabled icon states: { "iconName-flightId": true }
 };
 
@@ -39,6 +40,25 @@ const uiSlice = createSlice({
     resetTabVisibility: (state) => {
       state.tabVisibility = {};
     },
+    setActionButtonVisibility: (state, action) => {
+      state.actionButtonVisibility = action.payload || {};
+    },
+    toggleActionButtonVisibility: (state, action) => {
+      const buttonText = action.payload;
+      const currentValue = state.actionButtonVisibility?.[buttonText];
+      state.actionButtonVisibility = {
+        ...state.actionButtonVisibility,
+        [buttonText]: !(currentValue ?? true),
+      };
+    },
+    resetActionButtonVisibility: (state) => {
+      state.actionButtonVisibility = {};
+    },
+    resetAllVisibilitySettings: (state) => {
+      state.sectionVisibility = {};
+      state.tabVisibility = {};
+      state.actionButtonVisibility = {};
+    },
     setIconDisabled: (state, action) => {
       const { iconId, disabled } = action.payload;
       // Ensure disabledIcons is initialized
@@ -69,8 +89,7 @@ const uiSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(LOGOUT, (state) => {
-      state.sectionVisibility = {};
-      state.tabVisibility = {};
+      // Keep visibility settings on logout - only reset disabledIcons
       state.disabledIcons = {};
     });
   },
@@ -83,10 +102,13 @@ export const {
   setTabVisibility,
   toggleTabVisibility,
   resetTabVisibility,
+  setActionButtonVisibility,
+  toggleActionButtonVisibility,
+  resetActionButtonVisibility,
+  resetAllVisibilitySettings,
   setIconDisabled,
   toggleIconDisabled,
   resetDisabledIcons,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;
-

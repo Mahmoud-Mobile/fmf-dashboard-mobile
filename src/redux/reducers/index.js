@@ -14,7 +14,12 @@ const authPersistConfig = {
 const uiPersistConfig = {
   key: "ui",
   storage: AsyncStorage,
-  whitelist: ["disabledIcons"], // Persist disabled icons state
+  whitelist: [
+    "disabledIcons",
+    "sectionVisibility",
+    "tabVisibility",
+    "actionButtonVisibility",
+  ], // Persist visibility settings and disabled icons state
 };
 
 export default combineReducers({
