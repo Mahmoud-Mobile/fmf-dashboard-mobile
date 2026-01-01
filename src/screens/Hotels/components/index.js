@@ -13,7 +13,7 @@ const HotelCard = ({ item, onPress, width, actionButtons }) => {
   const fullName = `${firstName} ${lastName}`.trim() || "";
   const userPhoto = participant?.profilePicture || null;
   const userEmail = participant?.email || "";
-  const userInitial = fullName ? fullName.charAt(0).toUpperCase() : "H";
+  const userInitial = fullName ? fullName.charAt(0).toUpperCase() : "";
 
   return (
     <TouchableOpacity

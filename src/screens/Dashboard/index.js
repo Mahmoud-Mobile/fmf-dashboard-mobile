@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import {
   View,
   Dimensions,
@@ -9,13 +9,14 @@ import {
 import styles from "./Styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import DataTableCard from "../../components/DataTableCard";
 import ChartCard from "../../components/ChartCard";
 import { Colors } from "../../Global/colors";
 import dummyData from "../../data/dummyData.json";
 import DashboardOverview from "./components/DashboardOverview";
 import CustomEventHeader from "../../components/CustomEventHeader";
+import { fetchDashboardSummary } from "../../redux/actions/dashboardActions";
 
 const SECTION_CONFIG = [
   { id: "dashboardOverview", label: "Dashboard Overview" },
@@ -31,10 +32,18 @@ const SECTION_CONFIG = [
 
 const Dashboard = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const { selectedEvent } = useSelector((state) => state.api) || {};
 
   const storedSectionVisibility =
     useSelector((state) => state.ui?.sectionVisibility) || {};
+
+  // Fetch dashboard summary when component mounts or event changes
+  useEffect(() => {
+    if (selectedEvent?.id) {
+      dispatch(fetchDashboardSummary(selectedEvent.id));
+    }
+  }, [selectedEvent?.id, dispatch]);
 
   const { width } = Dimensions.get("window");
   const isTablet = width >= 768;

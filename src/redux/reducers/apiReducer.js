@@ -112,7 +112,10 @@ const apiSlice = createSlice({
       const { id, updates } = action.payload;
       const index = state.accommodation.findIndex((item) => item.id === id);
       if (index !== -1) {
-        state.accommodation[index] = { ...state.accommodation[index], ...updates };
+        state.accommodation[index] = {
+          ...state.accommodation[index],
+          ...updates,
+        };
       }
     },
     setLoading: (state, action) => {

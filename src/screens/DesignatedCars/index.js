@@ -1,15 +1,31 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, FlatList, RefreshControl, Alert } from "react-native";
+import {
+  View,
+  FlatList,
+  RefreshControl,
+  Alert,
+  TextInput,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
+import Modal from "react-native-modal";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import SearchActionRow from "../../components/SearchActionRow";
 import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import DateSearchModal from "../../components/DateSearchModal";
+import CustomCategories from "../../components/CustomCategories";
 import DesignatedCarCard from "./components";
 import { Colors } from "../../Global/colors";
-import { fetchTrips } from "../../redux/actions/api";
+import {
+  fetchTripsParticipants,
+  markTripParticipantAsNoShow,
+  markTripParticipantAsPickedUp,
+} from "../../redux/actions/api";
+import { setIconDisabled } from "../../redux/reducers/uiReducer";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
 import { horizontalMargin } from "../../config/metrics";
 import {
@@ -22,13 +38,26 @@ import styles from "./Styles";
 const DesignatedCars = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { trips, loading, selectedEvent } = useSelector((state) => state.api);
+  const { tripsParticipants, loading, selectedEvent } = useSelector(
+    (state) => state.api
+  );
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [viewMode, setViewMode] = useState("list");
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [designatedCarsData, setDesignatedCarsData] = useState([]);
+  const [showNoShowModal, setShowNoShowModal] = useState(false);
+  const [noShowReason, setNoShowReason] = useState("");
+  const [selectedDesignatedCarForNoShow, setSelectedDesignatedCarForNoShow] = useState(null);
+
+  const categories = [
+    { id: "all", label: "All", key: "all" },
+    { id: "PICKUP", label: "Pickup", key: "PICKUP" },
+    { id: "DROP_OFF", label: "Drop off", key: "DROP_OFF" },
+  ];
 
   const { width: screenWidth } = getDeviceDimensions();
   const horizontalPadding = horizontalMargin * 2;
@@ -47,22 +76,69 @@ const DesignatedCars = () => {
     return { cardWidth: width };
   }, [numColumns, screenWidth, horizontalPadding]);
 
+  useEffect(() => {
+    if (
+      tripsParticipants &&
+      tripsParticipants.participants &&
+      tripsParticipants.participants.length > 0
+    ) {
+      const transformedData = tripsParticipants.participants.map((item) => {
+        return {
+          ...item,
+          id: item.trip?.id || "",
+        };
+      });
+      setDesignatedCarsData(transformedData);
+
+      // Clear disabled icons based on API response - if API says action is done, keep it disabled
+      // If API says action is not done, clear the Redux disabled state
+      transformedData.forEach((item) => {
+        const trip = item.trip || {};
+        const participant = item.participant || {};
+        const tripId = trip.id || "";
+        const participantId = participant.id || "";
+
+        // Clear picked up icon if API says not picked up
+        if (!trip.isPickedUp) {
+          dispatch(
+            setIconDisabled({
+              iconId: `picked-up-${tripId}-${participantId}`,
+              disabled: false,
+            })
+          );
+        }
+
+        // Clear no show icon if API says not no show
+        if (!trip.isNoShow) {
+          dispatch(
+            setIconDisabled({
+              iconId: `no-show-${tripId}-${participantId}`,
+              disabled: false,
+            })
+          );
+        }
+      });
+    } else {
+      setDesignatedCarsData([]);
+    }
+  }, [tripsParticipants, dispatch]);
+
   const fetchDesignatedCarsData = useCallback(() => {
     if (selectedEvent?.id) {
       const params = {
-        status: "SCHEDULED",
         page: 1,
         limit: 1000,
+        ...(selectedCategory !== "all" && { tripType: selectedCategory }),
       };
-      dispatch(fetchTrips(selectedEvent.id, params));
+      dispatch(fetchTripsParticipants(selectedEvent.id, params));
     }
-  }, [selectedEvent?.id, dispatch]);
+  }, [selectedEvent?.id, dispatch, selectedCategory]);
 
   useEffect(() => {
     if (selectedEvent?.id) {
       fetchDesignatedCarsData();
     }
-  }, [selectedEvent?.id, fetchDesignatedCarsData]);
+  }, [selectedEvent?.id, selectedCategory, fetchDesignatedCarsData]);
 
   useEffect(() => {
     if (!loading && refreshing) {
@@ -72,52 +148,56 @@ const DesignatedCars = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchDesignatedCarsData();
+    if (selectedEvent?.id) {
+      const params = {
+        page: 1,
+        limit: 1000,
+        ...(selectedCategory !== "all" && { tripType: selectedCategory }),
+      };
+      dispatch(fetchTripsParticipants(selectedEvent.id, params)).finally(() => {
+        setRefreshing(false);
+      });
+    }
   };
 
-  const designatedCarsList = useMemo(() => {
-    if (!trips) {
-      return [];
-    }
-    if (trips?.trips && Array.isArray(trips.trips)) {
-      return trips.trips;
-    }
-    if (Array.isArray(trips)) {
-      return trips;
-    }
-    return [];
-  }, [trips]);
-
   const filteredDesignatedCars = useMemo(() => {
-    let filtered = designatedCarsList;
+    let filtered = designatedCarsData;
 
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(
-        (designatedCar) =>
-          designatedCar?.title?.toLowerCase().includes(searchLower) ||
-          designatedCar?.pickupLocation?.toLowerCase().includes(searchLower) ||
-          designatedCar?.dropoffLocation?.toLowerCase().includes(searchLower) ||
-          designatedCar?.tripType?.toLowerCase().includes(searchLower) ||
-          designatedCar?.status?.toLowerCase().includes(searchLower)
+        (item) =>
+          item?.participant?.firstName?.toLowerCase().includes(searchLower) ||
+          item?.participant?.lastName?.toLowerCase().includes(searchLower) ||
+          item?.participant?.email?.toLowerCase().includes(searchLower) ||
+          item?.participant?.phone?.toLowerCase().includes(searchLower) ||
+          item?.trip?.pickupLocation?.toLowerCase().includes(searchLower) ||
+          item?.trip?.dropoffLocation?.toLowerCase().includes(searchLower) ||
+          item?.trip?.tripType?.toLowerCase().includes(searchLower) ||
+          item?.trip?.status?.toLowerCase().includes(searchLower)
       );
     }
 
     if (selectedDate) {
-      const selectedDateStr = selectedDate.toISOString().split("T")[0];
-      filtered = filtered.filter((designatedCar) => {
-        if (designatedCar?.scheduledPickup) {
-          const designatedCarDate = new Date(designatedCar.scheduledPickup)
-            .toISOString()
-            .split("T")[0];
-          return designatedCarDate >= selectedDateStr;
+      const selectedMoment = moment(new Date(selectedDate)).startOf("day");
+      if (!selectedMoment.isValid()) {
+        return filtered;
+      }
+
+      filtered = filtered.filter((item) => {
+        const scheduledPickup = item?.trip?.scheduledPickup;
+        if (scheduledPickup) {
+          const tripMoment = moment(new Date(scheduledPickup)).startOf("day");
+          if (tripMoment.isValid()) {
+            return tripMoment.isSameOrAfter(selectedMoment);
+          }
         }
         return false;
       });
     }
 
     return filtered;
-  }, [designatedCarsList, searchText, selectedDate]);
+  }, [designatedCarsData, searchText, selectedDate]);
 
   const handleSearchClear = () => {
     setSearchText("");
@@ -129,6 +209,47 @@ const DesignatedCars = () => {
 
   const handleDateModalClose = () => {
     setShowDateModal(false);
+  };
+
+  const handleNoShowSubmit = async () => {
+    if (!selectedDesignatedCarForNoShow) return;
+
+    const { tripId, participantId } = selectedDesignatedCarForNoShow;
+
+    try {
+      await dispatch(
+        markTripParticipantAsNoShow(
+          selectedEvent?.id,
+          tripId,
+          participantId,
+          noShowReason
+        )
+      );
+      // Clear the disabled icon state so button can be used again if needed
+      dispatch(
+        setIconDisabled({
+          iconId: `no-show-${tripId}-${participantId}`,
+          disabled: false,
+        })
+      );
+      // Refetch data to get updated values from API
+      fetchDesignatedCarsData();
+      setShowNoShowModal(false);
+      setNoShowReason("");
+      setSelectedDesignatedCarForNoShow(null);
+    } catch (error) {
+      Alert.alert(
+        "Mark No Show Failed",
+        `Failed to mark as no show: ${error.message || "Unknown error"}`,
+        [{ text: "OK", style: "default" }]
+      );
+    }
+  };
+
+  const handleNoShowModalClose = () => {
+    setShowNoShowModal(false);
+    setNoShowReason("");
+    setSelectedDesignatedCarForNoShow(null);
   };
 
   const printToFile = async () => {
@@ -144,40 +265,29 @@ const DesignatedCars = () => {
     setIsPrinting(true);
     try {
       // Transform designated cars data into Excel rows
-      const excelRows = filteredDesignatedCars.map((designatedCar) => {
-        const participantTrips = designatedCar.participantTrips || [];
-        const firstParticipant = participantTrips[0] || {};
-        const participant = firstParticipant.participant || {};
-        const driverShift = designatedCar.driverShift || {};
-        const driver = driverShift.driver || {};
-        const vehicle = designatedCar.vehicle || {};
+      const excelRows = filteredDesignatedCars.map((item) => {
+        const participant = item.participant || {};
+        const trip = item.trip || {};
 
-        const userName = participant?.name || participant?.fullName || "N/A";
-        const userMobile = participant?.mobile || participant?.phone || "N/A";
-        const driverName =
-          [driver?.firstName, driver?.lastName].filter(Boolean).join(" ") ||
-          "N/A";
-        const carModel = vehicle?.model || "N/A";
-        const carBrand = vehicle?.brand || "";
-        const plateNumber = vehicle?.vehicleNumber || "N/A";
-        const fullCarModel = carBrand ? `${carBrand} ${carModel}` : carModel;
+        const userName =
+          [participant?.firstName, participant?.lastName]
+            .filter(Boolean)
+            .join(" ") || "N/A";
+        const userMobile = participant?.phone || "N/A";
+        const userEmail = participant?.email || "N/A";
 
         return {
-          "Trip ID": designatedCar.id || designatedCar.tripId || "N/A",
-          Title: designatedCar.title || "N/A",
-          "Guest Name": userName,
-          "Guest Mobile": userMobile,
-          "Driver Name": driverName,
-          Vehicle: fullCarModel,
-          "Plate Number": plateNumber,
-          "Pickup Location": designatedCar.pickupLocation || "N/A",
-          "Drop-off Location": designatedCar.dropoffLocation || "N/A",
-          "Scheduled Pickup": formatDateTime(designatedCar.scheduledPickup),
-          "Trip Type": designatedCar.tripType || "N/A",
-          Status: designatedCar.status || "N/A",
-          "Vehicle Ready": designatedCar.isVehicleReady ? "Yes" : "No",
-          "Guest Picked Up": designatedCar.isGuestPickedUp ? "Yes" : "No",
-          "Trip Completed": designatedCar.isTripCompleted ? "Yes" : "No",
+          "Trip ID": trip.id || "N/A",
+          "Participant Name": userName,
+          "Participant Mobile": userMobile,
+          "Participant Email": userEmail,
+          "Pickup Location": trip.pickupLocation || "N/A",
+          "Drop-off Location": trip.dropoffLocation || "N/A",
+          "Scheduled Pickup": formatDateTime(trip.scheduledPickup),
+          "Trip Type": trip.tripType || "N/A",
+          Status: trip.status || "N/A",
+          "Picked Up": trip.isPickedUp ? "Yes" : "No",
+          "No Show": trip.isNoShow ? "Yes" : "No",
         };
       });
 
@@ -216,61 +326,69 @@ const DesignatedCars = () => {
     };
   }, [numColumns, viewMode]);
 
-  const getActionButtons = useCallback((designatedCar) => {
-    const isDisabled =
-      designatedCar.isVehicleReady === true ||
-      designatedCar.isGuestPickedUp === true ||
-      designatedCar.isTripCompleted === true;
+  const getActionButtons = useCallback(
+    (item) => {
+      const trip = item.trip || {};
+      const participant = item.participant || {};
+      const tripId = trip.id || "";
+      const participantId = participant.id || "";
 
-    const isSelected = !isDisabled;
-    const designatedCarId =
-      designatedCar.id || designatedCar.tripId || "unknown";
+      const isPickedUp = trip.isPickedUp || false;
+      const isNoShow = trip.isNoShow || false;
+      const isCompleted = trip.status === "COMPLETED" || false;
 
-    return [
-      {
-        icon: "directions-car",
-        text: "Vehicle Ready",
-        isSelected: isSelected,
-        disabled: isDisabled,
-        iconId: `vehicle-ready-${designatedCarId}`,
-        onPress: () => {
-          Alert.alert(
-            "Vehicle Ready",
-            `Vehicle is ready for designated car ${designatedCarId}!`,
-            [{ text: "OK", style: "default" }]
-          );
+      return [
+        {
+          icon: "person",
+          text: "Mark Picked Up",
+          isSelected: isPickedUp,
+          disabled: isPickedUp || isNoShow || isCompleted,
+          iconId: `picked-up-${tripId}-${participantId}`,
+          onPress: async () => {
+            try {
+              await dispatch(
+                markTripParticipantAsPickedUp(
+                  selectedEvent?.id,
+                  tripId,
+                  participantId
+                )
+              );
+              // Clear the disabled icon state so button can be used again if needed
+              dispatch(
+                setIconDisabled({
+                  iconId: `picked-up-${tripId}-${participantId}`,
+                  disabled: false,
+                })
+              );
+              // Refetch data to get updated values from API
+              fetchDesignatedCarsData();
+            } catch (error) {
+              Alert.alert(
+                "Mark Picked Up Failed",
+                `Failed to mark as picked up: ${
+                  error.message || "Unknown error"
+                }`,
+                [{ text: "OK", style: "default" }]
+              );
+            }
+          },
         },
-      },
-      {
-        icon: "person",
-        text: "Guest Picked up",
-        isSelected: isSelected,
-        disabled: isDisabled,
-        iconId: `guest-picked-up-${designatedCarId}`,
-        onPress: () => {
-          Alert.alert(
-            "Guest Picked up",
-            `Guest has been picked up for designated car ${designatedCarId}!`,
-            [{ text: "OK", style: "default" }]
-          );
+        {
+          icon: "cancel",
+          text: "Mark No Show",
+          isSelected: isNoShow,
+          disabled: isNoShow || isPickedUp || isCompleted,
+          iconId: `no-show-${tripId}-${participantId}`,
+          onPress: () => {
+            setSelectedDesignatedCarForNoShow({ tripId, participantId });
+            setNoShowReason("");
+            setShowNoShowModal(true);
+          },
         },
-      },
-      {
-        icon: "check-circle",
-        text: "Trip Completed",
-        isSelected: isSelected,
-        disabled: isDisabled,
-        iconId: `trip-completed-${designatedCarId}`,
-        onPress: () => {
-          Alert.alert(
-            "Trip Completed",
-            `Designated car ${designatedCarId} has been completed successfully!`,
-            [{ text: "OK", style: "default" }]
-          );
-        },
-      },
-    ];
-  }, []);
+      ];
+    },
+    [dispatch, selectedEvent?.id, fetchDesignatedCarsData]
+  );
 
   const handleDesignatedCarPress = useCallback(
     (item) => {
@@ -321,7 +439,11 @@ const DesignatedCars = () => {
   );
 
   const listKeyExtractor = useCallback((item, index) => {
-    return item?.id?.toString() || index.toString();
+    return (
+      `${item?.trip?.id}-${item?.participant?.id}` ||
+      item?.id?.toString() ||
+      index.toString()
+    );
   }, []);
 
   return (
@@ -344,6 +466,12 @@ const DesignatedCars = () => {
         onPressDate={() => setShowDateModal(true)}
         selectedDate={selectedDate}
         onClearDate={() => setSelectedDate(null)}
+      />
+
+      <CustomCategories
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategorySelect={setSelectedCategory}
       />
       {loading ? (
         <LoadingModal visible={loading} />
@@ -394,6 +522,89 @@ const DesignatedCars = () => {
         title="Filter Designated Cars by Date"
         placeholder="Select a date to show designated cars from that date onwards"
       />
+
+      <Modal
+        isVisible={showNoShowModal}
+        onBackdropPress={handleNoShowModalClose}
+        onBackButtonPress={handleNoShowModalClose}
+        style={{ justifyContent: "flex-end", margin: 0 }}
+      >
+        <View
+          style={{
+            backgroundColor: Colors.White,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            padding: 20,
+            paddingBottom: 40,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
+              marginBottom: 15,
+              color: Colors.Black,
+            }}
+          >
+            Mark as No Show
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              marginBottom: 10,
+              color: Colors.Gray,
+            }}
+          >
+            Please enter the reason for no show:
+          </Text>
+          <TextInput
+            style={{
+              borderWidth: 1,
+              borderColor: Colors.Gray,
+              borderRadius: 8,
+              padding: 12,
+              minHeight: 100,
+              textAlignVertical: "top",
+              marginBottom: 20,
+            }}
+            placeholder="Enter reason..."
+            placeholderTextColor="#828282"
+            value={noShowReason}
+            onChangeText={setNoShowReason}
+            multiline
+            numberOfLines={4}
+          />
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                backgroundColor: Colors.Gray || "#E0E0E0",
+                padding: 15,
+                borderRadius: 8,
+                marginRight: 10,
+                alignItems: "center",
+              }}
+              onPress={handleNoShowModalClose}
+            >
+              <Text style={{ color: Colors.White, fontSize: 16 }}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                backgroundColor: Colors.Primary,
+                padding: 15,
+                borderRadius: 8,
+                alignItems: "center",
+              }}
+              onPress={handleNoShowSubmit}
+            >
+              <Text style={{ color: Colors.White, fontSize: 16 }}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
