@@ -10,6 +10,15 @@ const TripCard = ({ item, onPress, width, actionButtons }) => {
   const participant = item?.participant || {};
   const trip = item?.trip || {};
 
+  // Static vehicle data
+  const vehicle = {
+    id: "4328bbfc-0a14-44d1-bdf8-05ae0e584c61",
+    vehicleNumber: "12345",
+    vehicleType: "CAR",
+    model: "Corolla ",
+    year: 2026,
+  };
+
   const firstName = participant?.firstName || "";
   const lastName = participant?.lastName || "";
   const userName = [firstName, lastName].filter(Boolean).join(" ") || "N/A";
@@ -99,6 +108,13 @@ const TripCard = ({ item, onPress, width, actionButtons }) => {
               <Text style={styles.detailText}>{userEmail}</Text>
             </View>
           )}
+
+          <View style={styles.detailRow}>
+            <MaterialIcons name="directions-car" size={14} color={Colors.Gray} />
+            <Text style={styles.detailText}>
+              {vehicle.model} ({vehicle.vehicleNumber})
+            </Text>
+          </View>
 
           {(isPickedUp || isNoShow) && (
             <View style={styles.detailRow}>

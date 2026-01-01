@@ -37,6 +37,15 @@ const TripsDetails = ({ route }) => {
   const participant = trip?.participant || {};
   const tripData = trip?.trip || trip || {};
 
+  // Static vehicle data
+  const vehicle = {
+    id: "4328bbfc-0a14-44d1-bdf8-05ae0e584c61",
+    vehicleNumber: "12345",
+    vehicleType: "CAR",
+    model: "Corolla ",
+    year: 2026,
+  };
+
   const firstName = participant?.firstName || "";
   const lastName = participant?.lastName || "";
   const userName = [firstName, lastName].filter(Boolean).join(" ") || "N/A";
@@ -316,6 +325,30 @@ const TripsDetails = ({ route }) => {
                   <Text style={styles.label}>Trip ID:</Text>
                   <Text style={styles.value}>{tripData?.id || "N/A"}</Text>
                 </View>
+              </View>
+            </View>
+
+            <View style={[styles.column, { marginTop: 16, width: "100%" }]}>
+              <Text style={styles.sectionTitle}>Vehicle Information</Text>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Vehicle ID:</Text>
+                <Text style={styles.value}>{vehicle.id || "N/A"}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Vehicle Number:</Text>
+                <Text style={styles.value}>{vehicle.vehicleNumber || "N/A"}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Vehicle Type:</Text>
+                <Text style={styles.value}>{vehicle.vehicleType || "N/A"}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Model:</Text>
+                <Text style={styles.value}>{vehicle.model || "N/A"}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Year:</Text>
+                <Text style={styles.value}>{vehicle.year || "N/A"}</Text>
               </View>
             </View>
           </View>
