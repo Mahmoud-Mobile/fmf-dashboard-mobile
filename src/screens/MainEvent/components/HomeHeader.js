@@ -69,13 +69,20 @@ const HomeHeader = () => {
             )}
           </View>
         </View>
-
-        <TouchableOpacity
-          style={styles.notificationContainer}
-          onPress={() => navigation.navigate("NotificationScreen")}
-        >
-          <Ionicons name="notifications-outline" size={20} color="white" />
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={styles.notificationContainer}
+            onPress={() => navigation.navigate("Ambassador")}
+          >
+            <Ionicons name="people-outline" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.notificationContainer}
+            onPress={() => navigation.navigate("NotificationScreen")}
+          >
+            <Ionicons name="notifications-outline" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );

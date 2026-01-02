@@ -4,22 +4,22 @@ import { Fonts } from "../../Global/fonts";
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 12,
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    height: 56,
+    minHeight: 36,
     backgroundColor: "#08AB04",
     shadowColor: "#08AB04",
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 2,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 11,
     fontFamily: Fonts.FONT_SEMI,
     color: Colors.White,
     fontWeight: "600",

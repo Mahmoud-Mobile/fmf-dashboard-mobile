@@ -61,12 +61,12 @@ const TopCountries = () => {
                 <Text style={styles.registrationText}>
                   {item.registration.toLocaleString()}
                 </Text>
-                <View style={styles.changeContainer}>
+                {/* <View style={styles.changeContainer}>
                   <Text style={styles.changeArrow}>↑</Text>
                   <Text style={styles.changeText}>
                     {Math.abs(item.change || 0)}%
                   </Text>
-                </View>
+                </View> */}
               </View>
             ),
           },

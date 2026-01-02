@@ -14,20 +14,22 @@ const CustomPressable = ({
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
-      style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }, style]}
+      disabled={disabled || isLoading}
+      style={({ pressed }) => [
+        { opacity: pressed ? 0.9 : 1 },
+        style,
+      ]}
     >
       <LinearGradient
         colors={Colors.PrimaryGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.button, { borderRadius: 10 }]}
+        style={[styles.button, style]}
       >
         {isLoading ? (
           <ActivityIndicator
             color={Colors.White}
             size="small"
-            style={{ paddingVertical: 20 }}
           />
         ) : (
           <Text
