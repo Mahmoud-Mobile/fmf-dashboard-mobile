@@ -239,59 +239,59 @@ const Flights = () => {
 
       // Prepare data for Excel
       const excelData = filteredFlights.map((flight) => {
-        let passengerName = "N/A";
-        let airlineName = "N/A";
-        let flightNumber = "N/A";
-        let status = "N/A";
-        let airportCode = "N/A";
-        let airportName = "N/A";
-        let date = "N/A";
+        let passengerName = "-";
+        let airlineName = "-";
+        let flightNumber = "-";
+        let status = "-";
+        let airportCode = "-";
+        let airportName = "-";
+        let date = "-";
 
         // Extract passenger name from participant data
         const participant = flight.participant || {};
         const firstName = participant.firstName || "";
         const lastName = participant.lastName || "";
-        passengerName = `${firstName} ${lastName}`.trim() || "N/A";
+        passengerName = `${firstName} ${lastName}`.trim() || "-";
 
         // Use flightType to determine which data to export
         if (flight.flightType === "ARRIVAL") {
-          airlineName = flight.arrivalAirlinesName || "N/A";
-          flightNumber = flight.arrivalFlightNumber || "N/A";
-          status = flight.arrivalFlightStatus || "N/A";
-          airportCode = flight.arrivalAirportCode || "N/A";
-          airportName = flight.arrivalAirport || "N/A";
+          airlineName = flight.arrivalAirlinesName || "-";
+          flightNumber = flight.arrivalFlightNumber || "-";
+          status = flight.arrivalFlightStatus || "-";
+          airportCode = flight.arrivalAirportCode || "-";
+          airportName = flight.arrivalAirport || "-";
           date = formatDateTime(flight.arrivalDate);
         } else if (flight.flightType === "DEPARTURE") {
           airlineName =
-            flight.returnAirlinesName || flight.returnAirlineName || "N/A";
-          flightNumber = flight.returnFlightNumber || "N/A";
-          status = flight.returnFlightStatus || "N/A";
-          airportCode = flight.returnAirportCode || "N/A";
-          airportName = flight.returnAirport || "N/A";
+            flight.returnAirlinesName || flight.returnAirlineName || "-";
+          flightNumber = flight.returnFlightNumber || "-";
+          status = flight.returnFlightStatus || "-";
+          airportCode = flight.returnAirportCode || "-";
+          airportName = flight.returnAirport || "-";
           date = formatDateTime(flight.returnDate);
         } else {
           // Fallback: use selectedCategory for backward compatibility
           if (selectedCategory === "arrival") {
-            airlineName = flight.arrivalAirlinesName || "N/A";
-            flightNumber = flight.arrivalFlightNumber || "N/A";
-            status = flight.arrivalFlightStatus || "N/A";
-            airportCode = flight.arrivalAirportCode || "N/A";
-            airportName = flight.arrivalAirport || "N/A";
+            airlineName = flight.arrivalAirlinesName || "-";
+            flightNumber = flight.arrivalFlightNumber || "-";
+            status = flight.arrivalFlightStatus || "-";
+            airportCode = flight.arrivalAirportCode || "-";
+            airportName = flight.arrivalAirport || "-";
             date = formatDateTime(flight.arrivalDate);
           } else if (selectedCategory === "return") {
             airlineName =
-              flight.returnAirlinesName || flight.returnAirlineName || "N/A";
-            flightNumber = flight.returnFlightNumber || "N/A";
-            status = flight.returnFlightStatus || "N/A";
-            airportCode = flight.returnAirportCode || "N/A";
-            airportName = flight.returnAirport || "N/A";
+              flight.returnAirlinesName || flight.returnAirlineName || "-";
+            flightNumber = flight.returnFlightNumber || "-";
+            status = flight.returnFlightStatus || "-";
+            airportCode = flight.returnAirportCode || "-";
+            airportName = flight.returnAirport || "-";
             date = formatDateTime(flight.returnDate);
           } else {
-            airlineName = flight.arrivalAirlinesName || "N/A";
-            flightNumber = flight.arrivalFlightNumber || "N/A";
-            status = flight.arrivalFlightStatus || "N/A";
-            airportCode = flight.arrivalAirportCode || "N/A";
-            airportName = flight.arrivalAirport || "N/A";
+            airlineName = flight.arrivalAirlinesName || "-";
+            flightNumber = flight.arrivalFlightNumber || "-";
+            status = flight.arrivalFlightStatus || "-";
+            airportCode = flight.arrivalAirportCode || "-";
+            airportName = flight.arrivalAirport || "-";
             date = formatDateTime(flight.arrivalDate);
           }
         }
@@ -335,8 +335,8 @@ const Flights = () => {
     const participant = flight.participant || {};
     const firstName = participant.firstName || "";
     const lastName = participant.lastName || "";
-    const userName = `${firstName} ${lastName}`.trim() || "N/A";
-    const userMobile = participant.phone || "N/A";
+    const userName = `${firstName} ${lastName}`.trim() || "-";
+    const userMobile = participant.phone || "-";
     const userPhoto = participant.photo || null;
     const participantType = participant?.dynamicParticipantType?.name || null;
 
@@ -369,11 +369,11 @@ const Flights = () => {
       // Show return/departure data for DEPARTURE flights
       flightData = {
         airlineName:
-          flight.returnAirlinesName || flight.returnAirlineName || "N/A",
+          flight.returnAirlinesName || flight.returnAirlineName || "-",
         flightNumber: flight.returnFlightNumber,
         status: flight.returnFlightStatus,
-        airportCode: flight.returnAirportCode || "N/A",
-        airportName: flight.returnAirport || "N/A",
+        airportCode: flight.returnAirportCode || "-",
+        airportName: flight.returnAirport || "-",
         ...passengerData,
       };
 
@@ -400,11 +400,11 @@ const Flights = () => {
       } else if (selectedCategory === "return") {
         flightData = {
           airlineName:
-            flight.returnAirlinesName || flight.returnAirlineName || "N/A",
+            flight.returnAirlinesName || flight.returnAirlineName || "-",
           flightNumber: flight.returnFlightNumber,
           status: flight.returnFlightStatus,
-          airportCode: flight.returnAirportCode || "N/A",
-          airportName: flight.returnAirport || "N/A",
+          airportCode: flight.returnAirportCode || "-",
+          airportName: flight.returnAirport || "-",
           ...passengerData,
         };
 
@@ -477,7 +477,7 @@ const Flights = () => {
                 participant.lastName || ""
               }`.trim() || "Participant";
             const flightNumber =
-              flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+              flight.returnFlightNumber || flight.arrivalFlightNumber || "-";
 
             // Send notification
             await sendNotification(
@@ -539,7 +539,7 @@ const Flights = () => {
             `${participant.firstName || ""} ${
               participant.lastName || ""
             }`.trim() || "Participant";
-          const flightNumber = flight.arrivalFlightNumber || "N/A";
+          const flightNumber = flight.arrivalFlightNumber || "-";
 
           // Send notification
           await sendNotification(
@@ -578,7 +578,7 @@ const Flights = () => {
             `${participant.firstName || ""} ${
               participant.lastName || ""
             }`.trim() || "Participant";
-          const flightNumber = flight.arrivalFlightNumber || "N/A";
+          const flightNumber = flight.arrivalFlightNumber || "-";
 
           // Send notification
           await sendNotification(
@@ -619,7 +619,7 @@ const Flights = () => {
             `${participant.firstName || ""} ${
               participant.lastName || ""
             }`.trim() || "Participant";
-          const flightNumber = flight.arrivalFlightNumber || "N/A";
+          const flightNumber = flight.arrivalFlightNumber || "-";
 
           // Send notification
           await sendNotification(

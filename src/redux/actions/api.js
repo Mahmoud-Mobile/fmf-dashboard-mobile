@@ -11,10 +11,6 @@ import {
   getResourceById,
   getSeatingPlans,
   getAccommodationParticipants,
-  markAccommodationCheckedIn,
-  markAccommodationCheckedOut,
-  markTripParticipantNoShow,
-  markTripParticipantPickedUp,
 } from "../../webservice/apiConfig";
 
 import {
@@ -31,9 +27,7 @@ import {
   setSelectedResource,
   setSeatingPlans,
   setAccommodation,
-  updateAccommodationItem,
   setTripsParticipants,
-  updateTripParticipantItem,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -113,34 +107,6 @@ export const fetchTripsParticipants = (eventId, params) => async (dispatch) => {
     dispatch(setLoading(false));
   }
 };
-
-// Mark trip participant as no-show
-export const markTripParticipantAsNoShow =
-  (eventId, tripId, participantId, reason = "") =>
-  async (dispatch) => {
-    try {
-      await markTripParticipantNoShow(eventId, tripId, participantId, {
-        noShow: true,
-        reason: reason,
-      });
-    } catch (error) {
-      dispatch(setError("Error marking participant as no-show"));
-      throw error;
-    }
-  };
-
-// Mark trip participant as picked up
-export const markTripParticipantAsPickedUp =
-  (eventId, tripId, participantId) => async (dispatch) => {
-    try {
-      await markTripParticipantPickedUp(eventId, tripId, participantId, {
-        pickedUp: true,
-      });
-    } catch (error) {
-      dispatch(setError("Error marking participant as picked up"));
-      throw error;
-    }
-  };
 
 // Fetch sub-events for an event
 export const fetchSubEvents = (eventId, params) => async (dispatch) => {
@@ -232,44 +198,6 @@ export const fetchAccommodationParticipants =
       dispatch(setError("Error fetching accommodation participants"));
     } finally {
       dispatch(setLoading(false));
-    }
-  };
-
-// Mark accommodation checked in
-export const markAccommodationAsCheckedIn =
-  (eventId, accommodationId) => async (dispatch) => {
-    try {
-      await markAccommodationCheckedIn(eventId, accommodationId, {
-        checkedIn: true,
-      });
-      dispatch(
-        updateAccommodationItem({
-          id: accommodationId,
-          updates: { isCheckedIn: true },
-        })
-      );
-    } catch (error) {
-      dispatch(setError("Error marking accommodation as checked in"));
-      throw error;
-    }
-  };
-
-// Mark accommodation checked out
-export const markAccommodationAsCheckedOut =
-  (eventId, accommodationId) => async (dispatch) => {
-    try {
-      await markAccommodationCheckedOut(eventId, accommodationId, {
-        checkedOut: true,
-      });
-      dispatch(
-        updateAccommodationItem({
-          id: accommodationId,
-          updates: { isCheckedOut: true },
-        })
-      );
-    } catch (error) {
-      dispatch(setError("Error marking accommodation as checked out"));
-      throw error;
     }
   };
 

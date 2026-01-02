@@ -132,6 +132,21 @@ const styles = StyleSheet.create({
   statusButtonTextCompleted: {
     color: Colors.White,
   },
+  previewButton: {
+    backgroundColor: Colors.Primary,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+  },
+  previewButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.White,
+    fontWeight: "600",
+  },
 });
 
 export default styles;

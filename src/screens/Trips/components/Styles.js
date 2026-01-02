@@ -61,6 +61,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.PrimaryText,
     fontWeight: "600",
+    flex: 1,
+    flexWrap: "wrap",
   },
   phoneRow: {
     flexDirection: "row",
@@ -71,12 +73,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.Gray,
+    flex: 1,
+    flexWrap: "wrap",
   },
   locationRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 4,
     marginTop: 4,
+    flexWrap: "wrap",
   },
   locationLabel: {
     fontSize: 12,
@@ -87,12 +92,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
+    flex: 1,
+    flexWrap: "wrap",
   },
   detailRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 6,
     width: "100%",
+    flexWrap: "wrap",
   },
   detailText: {
     fontSize: 12,
@@ -131,6 +139,21 @@ const styles = StyleSheet.create({
   },
   statusButtonTextCompleted: {
     color: Colors.White,
+  },
+  previewButton: {
+    backgroundColor: Colors.Primary,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+  },
+  previewButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.White,
+    fontWeight: "600",
   },
 });
 

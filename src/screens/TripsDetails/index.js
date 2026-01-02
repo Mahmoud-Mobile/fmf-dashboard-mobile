@@ -1,76 +1,90 @@
-import React, { useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  Alert,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import Modal from "react-native-modal";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
+import { ActionButton } from "../../components/ActionButton";
 import styles from "./Styles";
-import moment from "moment";
-import { ActionButton, ActionButtonGroup } from "../../components/ActionButton";
-import { horizontalMargin } from "../../config/metrics";
 import { Colors } from "../../Global/colors";
+import NoShowModal from "../Trips/components/NoShowModal";
+import { formatDate, getParticipantName } from "./utils/tripDetailsUtils";
 import {
-  markTripParticipantAsNoShow,
-  markTripParticipantAsPickedUp,
-  fetchTripsParticipants,
-} from "../../redux/actions/api";
-import { setIconDisabled } from "../../redux/reducers/uiReducer";
+  handleMarkNoShow,
+  handleMarkPickedUp,
+} from "./utils/tripDetailsActions";
 
 const TripsDetails = ({ route }) => {
-  const { trip } = route.params;
+  const { trip, allTrips, participant: routeParticipant } = route.params;
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { selectedEvent } = useSelector((state) => state.api);
 
   const [showNoShowModal, setShowNoShowModal] = useState(false);
   const [noShowReason, setNoShowReason] = useState("");
+  const [selectedTripForNoShow, setSelectedTripForNoShow] = useState(null);
 
   // Handle both old and new data structures
-  const participant = trip?.participant || {};
+  const participant = routeParticipant || trip?.participant || {};
   const tripData = trip?.trip || trip || {};
+  const vehicle = trip?.vehicle || {};
+  const participantTrip = trip?.participantTrip || {};
 
-  // Static vehicle data
-  const vehicle = {
-    id: "4328bbfc-0a14-44d1-bdf8-05ae0e584c61",
-    vehicleNumber: "12345",
-    vehicleType: "CAR",
-    model: "Corolla ",
-    year: 2026,
-  };
+  // Get all trips for this participant
+  const tripsList = allTrips || (trip ? [trip] : []);
 
-  const firstName = participant?.firstName || "";
-  const lastName = participant?.lastName || "";
-  const userName = [firstName, lastName].filter(Boolean).join(" ") || "N/A";
+  const userName = getParticipantName(participant);
   const userMobile = participant?.phone || "N/A";
   const userEmail = participant?.email || "";
   const userPhoto = participant?.profilePicture || null;
 
-  const pickupLocation = tripData?.pickupLocation || "N/A";
-  const dropoffLocation = tripData?.dropoffLocation || "N/A";
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    try {
-      const nativeDate = new Date(dateString);
-      if (!isNaN(nativeDate.getTime())) {
-        return moment(nativeDate).format("MMM DD, YYYY HH:mm");
-      }
-      return "N/A";
-    } catch (error) {
-      return "N/A";
-    }
+  const handleNoShowPress = (tripItem) => {
+    const trip = tripItem.trip || {};
+    const participantId = participant?.id || "";
+    setSelectedTripForNoShow({ tripId: trip.id, participantId });
+    setNoShowReason("");
+    setShowNoShowModal(true);
   };
 
   const handleNoShowSubmit = async () => {
-    const tripId = tripData?.id || "";
+    if (!selectedTripForNoShow) return;
+
+    const { tripId, participantId } = selectedTripForNoShow;
+    const tripItem = tripsList.find(
+      (t) => t.trip?.id === tripId || t.id === tripId
+    );
+    const trip = tripItem?.trip || tripItem || {};
+
+    if (!tripId || !participantId) {
+      Alert.alert("Error", "Missing trip or participant information");
+      return;
+    }
+
+    const success = await handleMarkNoShow(
+      selectedEvent?.id,
+      tripId,
+      participantId,
+      noShowReason,
+      userName,
+      trip,
+      dispatch,
+      setShowNoShowModal,
+      setNoShowReason
+    );
+    if (success) {
+      navigation.goBack();
+    }
+  };
+
+  const handleNoShowModalClose = () => {
+    setShowNoShowModal(false);
+    setNoShowReason("");
+    setSelectedTripForNoShow(null);
+  };
+
+  const handlePickedUpPress = async (tripItem) => {
+    const trip = tripItem.trip || tripItem || {};
+    const tripParticipantTrip = tripItem.participantTrip || {};
+    const tripId = trip.id || "";
     const participantId = participant?.id || "";
 
     if (!tripId || !participantId) {
@@ -78,147 +92,131 @@ const TripsDetails = ({ route }) => {
       return;
     }
 
-    try {
-      await dispatch(
-        markTripParticipantAsNoShow(
-          selectedEvent?.id,
-          tripId,
-          participantId,
-          noShowReason
-        )
-      );
-      // Clear the disabled icon state
-      dispatch(
-        setIconDisabled({
-          iconId: `no-show-${tripId}-${participantId}`,
-          disabled: false,
-        })
-      );
-      // Refetch data
-      if (selectedEvent?.id) {
-        dispatch(
-          fetchTripsParticipants(selectedEvent.id, {
-            page: 1,
-            limit: 1000,
-          })
-        );
-      }
-      setShowNoShowModal(false);
-      setNoShowReason("");
-      Alert.alert("Success", "Participant marked as no show");
-    } catch (error) {
-      Alert.alert(
-        "Mark No Show Failed",
-        `Failed to mark as no show: ${error.message || "Unknown error"}`
-      );
+    const success = await handleMarkPickedUp(
+      selectedEvent?.id,
+      tripId,
+      participantId,
+      userName,
+      trip,
+      dispatch
+    );
+
+    if (success) {
+      navigation.goBack();
     }
   };
 
-  const handleNoShowModalClose = () => {
-    setShowNoShowModal(false);
-    setNoShowReason("");
-  };
+  const renderTripCard = (tripItem, index) => {
+    const trip = tripItem.trip || tripItem || {};
+    const vehicle = tripItem.vehicle || {};
+    const tripParticipantTrip = tripItem.participantTrip || {};
+    const tripTitle = trip.title || `Trip ${index + 1}`;
+    const isFirstTrip = index === 0;
 
-  const actionButtons = useMemo(() => {
-    const tripId = tripData?.id || "";
-    const participantId = participant?.id || "";
+    return (
+      <View key={trip.id || index} style={styles.tripCard}>
+        <Text style={styles.tripTitle}>{tripTitle}</Text>
 
-    const isPickedUp = tripData?.isPickedUp || false;
-    const isNoShow = tripData?.isNoShow || false;
-    const isCompleted = tripData?.status === "COMPLETED" || false;
+        <View style={styles.tripDetails}>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Pickup Location:</Text>
+            <Text style={styles.value}>{trip.pickupLocation || "N/A"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Drop-off Location:</Text>
+            <Text style={styles.value}>{trip.dropoffLocation || "N/A"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Scheduled Pickup:</Text>
+            <Text style={styles.value}>{formatDate(trip.scheduledPickup)}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Trip Type:</Text>
+            <Text style={styles.value}>{trip.tripType || "N/A"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Status:</Text>
+            <Text style={[styles.value, styles.statusYes]}>
+              {trip.status || "N/A"}
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Picked Up:</Text>
+            <Text
+              style={[
+                styles.value,
+                tripParticipantTrip?.isPickedUp
+                  ? styles.statusYes
+                  : styles.statusNo,
+              ]}
+            >
+              {tripParticipantTrip?.isPickedUp ? "Yes" : "No"}
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>No Show:</Text>
+            <Text
+              style={[
+                styles.value,
+                tripParticipantTrip?.isNoShow
+                  ? styles.statusYes
+                  : styles.statusNo,
+              ]}
+            >
+              {tripParticipantTrip?.isNoShow ? "Yes" : "No"}
+            </Text>
+          </View>
+          {vehicle && (vehicle.model || vehicle.vehicleNumber) && (
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Vehicle:</Text>
+              <Text style={styles.value}>
+                {vehicle.model || "N/A"} ({vehicle.vehicleNumber || "N/A"})
+              </Text>
+            </View>
+          )}
+        </View>
 
-    return [
-      {
-        icon: "person",
-        text: "Mark Picked Up",
-        isSelected: isPickedUp,
-        disabled: isPickedUp || isNoShow || isCompleted,
-        iconId: `picked-up-${tripId}-${participantId}`,
-        onPress: async () => {
-          try {
-            await dispatch(
-              markTripParticipantAsPickedUp(
-                selectedEvent?.id,
-                tripId,
-                participantId
-              )
-            );
-            // Clear the disabled icon state
-            dispatch(
-              setIconDisabled({
-                iconId: `picked-up-${tripId}-${participantId}`,
-                disabled: false,
-              })
-            );
-            // Refetch data
-            if (selectedEvent?.id) {
-              dispatch(
-                fetchTripsParticipants(selectedEvent.id, {
-                  page: 1,
-                  limit: 1000,
-                })
-              );
+        <View style={styles.tripActions}>
+          <ActionButton
+            icon="arrow-forward"
+            text="Mark Picked Up"
+            swipeTitle="Swipe to Mark Picked Up"
+            disabled={
+              tripParticipantTrip?.isPickedUp || tripParticipantTrip?.isNoShow
             }
-            Alert.alert("Success", "Participant marked as picked up");
-          } catch (error) {
-            Alert.alert(
-              "Mark Picked Up Failed",
-              `Failed to mark as picked up: ${error.message || "Unknown error"}`
-            );
-          }
-        },
-      },
-      {
-        icon: "cancel",
-        text: "Mark No Show",
-        isSelected: isNoShow,
-        disabled: isNoShow || isPickedUp || isCompleted,
-        iconId: `no-show-${tripId}-${participantId}`,
-        onPress: () => {
-          setNoShowReason("");
-          setShowNoShowModal(true);
-        },
-      },
-    ];
-  }, [tripData, participant, dispatch, selectedEvent?.id]);
+            iconId={`picked-up-${trip.id}-${participant?.id}`}
+            onSwipeSuccess={() => handlePickedUpPress(tripItem)}
+            disabledText="Picked Up - Done"
+          />
 
-  // Get action button visibility from Redux
-  const actionButtonVisibility =
-    useSelector((state) => state.ui?.actionButtonVisibility) || {};
-
-  // Filter action buttons based on visibility
-  const filteredActionButtons = useMemo(() => {
-    if (!actionButtons || !Array.isArray(actionButtons)) return [];
-    return actionButtons.filter((button) => {
-      if (!button || !button.text) return true;
-      const storedValue = actionButtonVisibility[button.text];
-      const isVisible =
-        storedValue === undefined
-          ? true
-          : typeof storedValue === "string"
-          ? storedValue === "true"
-          : Boolean(storedValue);
-      return isVisible;
-    });
-  }, [actionButtons, actionButtonVisibility]);
-
-  const renderActions = () => {
-    if (!filteredActionButtons || filteredActionButtons.length === 0)
-      return null;
-    if (filteredActionButtons.length === 1) {
-      const button = filteredActionButtons[0];
-      return <ActionButton {...button} endPosition />;
-    }
-
-    return <ActionButtonGroup buttons={filteredActionButtons} />;
+          <ActionButton
+            icon="arrow-forward"
+            text="Mark No Show"
+            swipeTitle="Swipe to Mark No Show"
+            disabled={
+              tripParticipantTrip?.isNoShow || tripParticipantTrip?.isPickedUp
+            }
+            iconId={`no-show-${trip.id}-${participant?.id}`}
+            onSwipeSuccess={() => handleNoShowPress(tripItem)}
+            disabledText="No Show - Done"
+          />
+        </View>
+      </View>
+    );
   };
 
   return (
     <View style={styles.container}>
       <CustomHeader
         leftLabel="Trips"
-        title={tripData?.tripType || "Trip Details"}
-        subtitle={tripData?.status || "N/A"}
+        title={
+          tripsList.length > 1
+            ? `${tripsList.length} Trips`
+            : tripData?.tripType || "Trip Details"
+        }
+        subtitle={
+          tripsList.length > 1 ? "Multiple Trips" : tripData?.status || "N/A"
+        }
         onLeftButtonPress={() => navigation.goBack()}
       />
 
@@ -267,181 +265,19 @@ const TripsDetails = ({ route }) => {
                 </View>
               </View>
             </View>
-
-            <View style={styles.row}>
-              <View style={[styles.column, { marginRight: 8, marginTop: 16 }]}>
-                <Text style={styles.sectionTitle}>Trip Details</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Pickup Location:</Text>
-                  <Text style={styles.value}>{pickupLocation}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Drop-off Location:</Text>
-                  <Text style={styles.value}>{dropoffLocation}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Scheduled Pickup:</Text>
-                  <Text style={styles.value}>
-                    {formatDate(tripData.scheduledPickup)}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Trip Type:</Text>
-                  <Text style={styles.value}>{tripData.tripType || "N/A"}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Status:</Text>
-                  <Text style={[styles.value, styles.statusYes]}>
-                    {tripData.status || "N/A"}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={[styles.column, { marginTop: 16 }]}>
-                <Text style={styles.sectionTitle}>Trip Status</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Picked Up:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      tripData?.isPickedUp ? styles.statusYes : styles.statusNo,
-                    ]}
-                  >
-                    {tripData?.isPickedUp ? "Yes" : "No"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>No Show:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      tripData?.isNoShow ? styles.statusYes : styles.statusNo,
-                    ]}
-                  >
-                    {tripData?.isNoShow ? "Yes" : "No"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Trip ID:</Text>
-                  <Text style={styles.value}>{tripData?.id || "N/A"}</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={[styles.column, { marginTop: 16, width: "100%" }]}>
-              <Text style={styles.sectionTitle}>Vehicle Information</Text>
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>Vehicle ID:</Text>
-                <Text style={styles.value}>{vehicle.id || "N/A"}</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>Vehicle Number:</Text>
-                <Text style={styles.value}>{vehicle.vehicleNumber || "N/A"}</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>Vehicle Type:</Text>
-                <Text style={styles.value}>{vehicle.vehicleType || "N/A"}</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>Model:</Text>
-                <Text style={styles.value}>{vehicle.model || "N/A"}</Text>
-              </View>
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>Year:</Text>
-                <Text style={styles.value}>{vehicle.year || "N/A"}</Text>
-              </View>
-            </View>
-          </View>
-          <View
-            style={{ marginBottom: 50, marginHorizontal: horizontalMargin }}
-          >
-            {renderActions()}
           </View>
         </View>
+
+        {tripsList.map((tripItem, index) => renderTripCard(tripItem, index))}
       </ScrollView>
 
-      <Modal
-        isVisible={showNoShowModal}
-        onBackdropPress={handleNoShowModalClose}
-        onBackButtonPress={handleNoShowModalClose}
-        style={{ justifyContent: "flex-end", margin: 0 }}
-      >
-        <View
-          style={{
-            backgroundColor: Colors.White,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            padding: 20,
-            paddingBottom: 40,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              marginBottom: 15,
-              color: Colors.Black,
-            }}
-          >
-            Mark as No Show
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              marginBottom: 10,
-              color: Colors.Gray,
-            }}
-          >
-            Please enter the reason for no show:
-          </Text>
-          <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: Colors.Gray,
-              borderRadius: 8,
-              padding: 12,
-              minHeight: 100,
-              textAlignVertical: "top",
-              marginBottom: 20,
-            }}
-            placeholder="Enter reason..."
-            placeholderTextColor="#828282"
-            value={noShowReason}
-            onChangeText={setNoShowReason}
-            multiline
-            numberOfLines={4}
-          />
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <TouchableOpacity
-              style={{
-                flex: 1,
-                backgroundColor: Colors.Gray || "#E0E0E0",
-                padding: 15,
-                borderRadius: 8,
-                marginRight: 10,
-                alignItems: "center",
-              }}
-              onPress={handleNoShowModalClose}
-            >
-              <Text style={{ color: Colors.White, fontSize: 16 }}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                flex: 1,
-                backgroundColor: Colors.Primary,
-                padding: 15,
-                borderRadius: 8,
-                alignItems: "center",
-              }}
-              onPress={handleNoShowSubmit}
-            >
-              <Text style={{ color: Colors.White, fontSize: 16 }}>Submit</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <NoShowModal
+        visible={showNoShowModal}
+        noShowReason={noShowReason}
+        onReasonChange={setNoShowReason}
+        onSubmit={handleNoShowSubmit}
+        onClose={handleNoShowModalClose}
+      />
     </View>
   );
 };

@@ -20,8 +20,8 @@ const FlightCard = ({
   timeInfo = [],
   participantType = null,
 
-  userName = "N/A",
-  userMobile = "N/A",
+  userName = "-",
+  userMobile = "-",
   userPhoto = null,
   firstName = "",
   lastName = "",
@@ -32,7 +32,7 @@ const FlightCard = ({
   width,
 }) => {
   const formatDateTime = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "-";
     try {
       const nativeDate = new Date(dateString);
       if (!isNaN(nativeDate.getTime())) {
@@ -40,9 +40,9 @@ const FlightCard = ({
           nativeDate
         ).format("h:mm A")}`;
       }
-      return "N/A";
+      return "-";
     } catch (error) {
-      return "N/A";
+      return "-";
     }
   };
 
@@ -123,7 +123,7 @@ const FlightCard = ({
     if (timeInfo.length > 0 && timeInfo[0].date) {
       return formatDateTime(timeInfo[0].date);
     }
-    return "N/A";
+    return "-";
   };
 
   const renderActions = () => {
@@ -161,16 +161,16 @@ const FlightCard = ({
               <Text style={styles.userMobile}>{userMobile || " "}</Text>
             </View>
           </View>
-          <Text style={styles.flightTitle}>{flightNumber || "N/A"}</Text>
+          <Text style={styles.flightTitle}>{flightNumber || "-"}</Text>
           <Text style={styles.flightText}>
-            Airline Name: {airlineName || "N/A"}
+            Airline Name: {airlineName || "-"}
           </Text>
         </View>
         <View style={styles.detailsColumn}>
           <View style={styles.detailRow}>
             <MaterialIcons name="flight" size={14} color="#6B7280" />
             <Text style={styles.detailText}>
-              {airportName ? `${airportName} (${airportCode || ""})` : "N/A"}
+              {airportName ? `${airportName} (${airportCode || ""})` : "-"}
             </Text>
           </View>
 
@@ -187,7 +187,7 @@ const FlightCard = ({
         ]}
       >
         <Text style={[styles.statusText, { color: statusConfig.color }]}>
-          {status || "N/A"}
+          {status || "-"}
         </Text>
         {participantType && (
           <>

@@ -110,13 +110,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   participantName: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   participantMobile: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.Primary,
     marginBottom: 4,
@@ -128,9 +128,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.Primary,
     justifyContent: "center",
     alignItems: "center",
+    marginRight: 10,
   },
   participantInitial: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.White,
   },

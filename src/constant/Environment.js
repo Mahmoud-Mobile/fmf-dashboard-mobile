@@ -10,7 +10,8 @@ const ENV = {
   },
   dev: {
     fmf: {
-      apiUrl: "https://fmf-api.lead-360.co/api/v1/",
+      apiUrl: "https://dev-api.lead-360.co/api/v1/",
+      // apiUrl: "https://fmf-api.lead-360.co/api/v1/",
     },
     offerHome: {
       apiUrl: "https://api.lead-360.co/api/v1/",

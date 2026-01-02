@@ -121,6 +121,28 @@ const styles = StyleSheet.create({
     color: Colors.Primary,
     marginBottom: 4,
   },
+  tripCard: {
+    ...commonCardStyle,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    marginBottom: 16,
+    padding: 20,
+  },
+  tripTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.Primary,
+    marginBottom: 16,
+    fontWeight: "600",
+  },
+  tripDetails: {
+    marginBottom: 16,
+  },
+  tripActions: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 16,
+  },
 });
 
 export default styles;

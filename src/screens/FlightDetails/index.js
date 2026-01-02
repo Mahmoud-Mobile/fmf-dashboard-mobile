@@ -1,5 +1,6 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo } from "react";
 import { View, Text, ScrollView, Image, Alert } from "react-native";
+import { useSelector } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./Styles";
@@ -19,16 +20,16 @@ const FlightDetails = ({ route }) => {
   const navigation = useNavigation();
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "";
     try {
       const nativeDate = new Date(dateString);
       if (!isNaN(nativeDate.getTime())) {
         return moment(nativeDate).format("MMM DD, YYYY HH:mm");
       }
-      return "N/A";
+      return "";
     } catch (error) {
       console.log("Date formatting error:", error);
-      return "N/A";
+      return "";
     }
   };
 
@@ -60,7 +61,7 @@ const FlightDetails = ({ route }) => {
               participant.lastName || ""
             }`.trim() || "Participant";
           const flightNumber =
-            flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+            flight.returnFlightNumber || flight.arrivalFlightNumber || "-";
 
           // Send notification
           await sendNotification(
@@ -123,7 +124,7 @@ const FlightDetails = ({ route }) => {
               participant.lastName || ""
             }`.trim() || "Participant";
           const flightNumber =
-            flight.returnFlightNumber || flight.arrivalFlightNumber || "N/A";
+            flight.returnFlightNumber || flight.arrivalFlightNumber || "-";
 
           // Send notification
           await sendNotification(
@@ -189,7 +190,7 @@ const FlightDetails = ({ route }) => {
           `${participant.firstName || ""} ${
             participant.lastName || ""
           }`.trim() || "Participant";
-        const flightNumber = flight.arrivalFlightNumber || "N/A";
+        const flightNumber = flight.arrivalFlightNumber || "-";
 
         // Send notification
         await sendNotification(
@@ -230,7 +231,7 @@ const FlightDetails = ({ route }) => {
           `${participant.firstName || ""} ${
             participant.lastName || ""
           }`.trim() || "Participant";
-        const flightNumber = flight.arrivalFlightNumber || "N/A";
+        const flightNumber = flight.arrivalFlightNumber || "-";
 
         // Send notification
         await sendNotification(
@@ -275,7 +276,7 @@ const FlightDetails = ({ route }) => {
           `${participant.firstName || ""} ${
             participant.lastName || ""
           }`.trim() || "Participant";
-        const flightNumber = flight.arrivalFlightNumber || "N/A";
+        const flightNumber = flight.arrivalFlightNumber || "-";
 
         // Send notification
         await sendNotification(
@@ -368,15 +369,15 @@ const FlightDetails = ({ route }) => {
   const getFlightInfo = useMemo(() => {
     if (flight.flightType === "DEPARTURE") {
       return {
-        flightNumber: flight.returnFlightNumber || "N/A",
+        flightNumber: flight.returnFlightNumber || "-",
         airlineName:
-          flight.returnAirlinesName || flight.returnAirlineName || "N/A",
+          flight.returnAirlinesName || flight.returnAirlineName || "-",
       };
     }
     // Default to arrival data
     return {
-      flightNumber: flight.arrivalFlightNumber || "N/A",
-      airlineName: flight.arrivalAirlinesName || "N/A",
+      flightNumber: flight.arrivalFlightNumber || "-",
+      airlineName: flight.arrivalAirlinesName || "-",
     };
   }, [flight]);
 
@@ -408,8 +409,8 @@ const FlightDetails = ({ route }) => {
                   const participant = flight.participant || {};
                   const firstName = participant.firstName || "";
                   const lastName = participant.lastName || "";
-                  const userName = `${firstName} ${lastName}`.trim() || "N/A";
-                  const userMobile = participant.phone || "N/A";
+                  const userName = `${firstName} ${lastName}`.trim() || "-";
+                  const userMobile = participant.phone || "-";
                   const userPhoto = participant.photo || null;
                   const dynamicParticipantType =
                     participant.dynamicParticipantType?.name || null;
@@ -473,9 +474,7 @@ const FlightDetails = ({ route }) => {
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Flight Route:</Text>
-                  <Text style={styles.value}>
-                    {flight.flightRoute || "N/A"}
-                  </Text>
+                  <Text style={styles.value}>{flight.flightRoute || "-"}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>City:</Text>
@@ -501,13 +500,11 @@ const FlightDetails = ({ route }) => {
                 <Text style={styles.sectionTitle}> Booking Details</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Seat:</Text>
-                  <Text style={styles.value}>{flight.seatNumber || "N/A"}</Text>
+                  <Text style={styles.value}>{flight.seatNumber || "-"}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Class:</Text>
-                  <Text style={styles.value}>
-                    {flight.flightClass || "N/A"}
-                  </Text>
+                  <Text style={styles.value}>{flight.flightClass || "-"}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Type:</Text>
@@ -518,14 +515,12 @@ const FlightDetails = ({ route }) => {
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Booking Ref:</Text>
                   <Text style={styles.value}>
-                    {flight.bookingReference || "N/A"}
+                    {flight.bookingReference || "-"}
                   </Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Ticket No:</Text>
-                  <Text style={styles.value}>
-                    {flight.ticketNumber || "N/A"}
-                  </Text>
+                  <Text style={styles.value}>{flight.ticketNumber || "-"}</Text>
                 </View>
               </View>
             </View>

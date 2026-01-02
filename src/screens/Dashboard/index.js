@@ -332,7 +332,7 @@ const Dashboard = () => {
               </View>
             </>
           )}
-          {renderResponsiveCards()}
+          {/* {renderResponsiveCards()} */}
         </View>
         <TouchableOpacity
           onPress={() => navigation.navigate("VisibilitySettings")}

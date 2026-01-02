@@ -61,23 +61,6 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-    updateTripParticipantItem: (state, action) => {
-      const { tripId, participantId, updates } = action.payload;
-      if (state.tripsParticipants && state.tripsParticipants.participants) {
-        const participant = state.tripsParticipants.participants.find(
-          (p) =>
-            p.trip?.id === tripId &&
-            (participantId ? p.participant?.id === participantId : true)
-        );
-        if (participant) {
-          if (participant.trip) {
-            participant.trip = { ...participant.trip, ...updates };
-          } else {
-            participant.trip = updates;
-          }
-        }
-      }
-    },
     setSubEvents: (state, action) => {
       state.subEvents = action.payload;
       state.loading = false;
@@ -108,16 +91,6 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-    updateAccommodationItem: (state, action) => {
-      const { id, updates } = action.payload;
-      const index = state.accommodation.findIndex((item) => item.id === id);
-      if (index !== -1) {
-        state.accommodation[index] = {
-          ...state.accommodation[index],
-          ...updates,
-        };
-      }
-    },
     setLoading: (state, action) => {
       state.loading = action.payload !== undefined ? action.payload : true;
     },
@@ -143,9 +116,7 @@ export const {
   setSelectedResource,
   setSeatingPlans,
   setAccommodation,
-  updateAccommodationItem,
   setTripsParticipants,
-  updateTripParticipantItem,
   setLoading,
   setError,
 } = apiSlice.actions;
