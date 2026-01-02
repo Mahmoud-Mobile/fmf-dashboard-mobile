@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
@@ -121,9 +122,9 @@ const DashboardOverview = () => {
     ];
   }, [summary]);
 
-  const MetricCard = ({ item }) => {
+  const MetricCard = ({ item, cardWidth }) => {
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, { width: cardWidth }]}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>{item.title}</Text>
           <View style={styles.iconContainer}>
@@ -153,7 +154,7 @@ const DashboardOverview = () => {
   if (loading && !summary) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color={Colors.Primary} />
+        <ActivityIndicator size="small" color={Colors.Primary} />
       </View>
     );
   }
@@ -162,16 +163,22 @@ const DashboardOverview = () => {
     return null;
   }
 
+  const screenWidth = Dimensions.get("window").width;
+  const cardWidth = (screenWidth - horizontalMargin * 2 - 12) / 2;
+
   return (
     <View style={styles.container}>
       <FlatList
         data={dashboardData}
-        renderItem={({ item }) => <MetricCard item={item} />}
+        renderItem={({ item }) => (
+          <MetricCard item={item} cardWidth={cardWidth} />
+        )}
         keyExtractor={(item) => item.id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        columnWrapperStyle={styles.columnWrapper}
+        numColumns={2}
+        scrollEnabled={false}
       />
     </View>
   );
@@ -189,14 +196,14 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: horizontalMargin,
   },
-  separator: {
-    width: 12,
+  columnWrapper: {
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
   card: {
     backgroundColor: Colors.White,
     borderRadius: 12,
     padding: 16,
-    width: 210,
   },
   cardHeader: {
     flexDirection: "row",

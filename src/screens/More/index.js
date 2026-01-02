@@ -72,13 +72,13 @@ const More = () => {
       iconColor: "#374151",
       navigation: "ContactUs",
     },
-    {
-      id: 6,
-      title: "Visibility Settings",
-      icon: "Calendar_Icon",
-      iconColor: "#374151",
-      navigation: "VisibilitySettings",
-    },
+    // {
+    //   id: 6,
+    //   title: "Visibility Settings",
+    //   icon: "Calendar_Icon",
+    //   iconColor: "#374151",
+    //   navigation: "VisibilitySettings",
+    // },
     {
       id: 7,
       title: "Logout",

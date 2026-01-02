@@ -15,6 +15,7 @@ import ChartCard from "../../components/ChartCard";
 import { Colors } from "../../Global/colors";
 import dummyData from "../../data/dummyData.json";
 import DashboardOverview from "./components/DashboardOverview";
+import TopCountries from "./components/TopCountries";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import { fetchDashboardSummary } from "../../redux/actions/dashboardActions";
 
@@ -298,42 +299,7 @@ const Dashboard = () => {
         showsVerticalScrollIndicator={false}
       >
         {visibleSections.dashboardOverview && <DashboardOverview />}
-
-        <View style={styles.content}>
-          {visibleSections.eventAnalytics && (
-            <>
-              <Text style={styles.sectionTitle}>Event Analytics</Text>
-              <View style={styles.chartCardsContainer}>
-                <ChartCard
-                  key="arrival-guests-chart"
-                  title="Arrival Guests"
-                  data={arrivalGuestsChartData}
-                />
-                <ChartCard
-                  key="return-guests-chart"
-                  title="Return Guests"
-                  data={returnGuestsChartData}
-                />
-                <ChartCard
-                  key="age-distribution-chart"
-                  title="Age Distribution"
-                  data={ageDistributionChartData}
-                />
-                <ChartCard
-                  key="continent-chart"
-                  title="Continent"
-                  data={continentChartData}
-                />
-                <ChartCard
-                  key="gender-distribution-chart"
-                  title="Gender Distribution"
-                  data={genderDistributionChartData}
-                />
-              </View>
-            </>
-          )}
-          {/* {renderResponsiveCards()} */}
-        </View>
+        <TopCountries />
         <TouchableOpacity
           onPress={() => navigation.navigate("VisibilitySettings")}
           style={styles.visibleBtn}

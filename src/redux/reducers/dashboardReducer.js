@@ -6,6 +6,9 @@ const dashboardSlice = createSlice({
     summary: null,
     loading: false,
     error: null,
+    topCountries: [],
+    topCountriesLoading: false,
+    topCountriesError: null,
   },
   reducers: {
     setDashboardSummary: (state, action) => {
@@ -24,6 +27,22 @@ const dashboardSlice = createSlice({
       state.summary = null;
       state.error = null;
     },
+    setTopCountries: (state, action) => {
+      state.topCountries = action.payload;
+      state.topCountriesLoading = false;
+      state.topCountriesError = null;
+    },
+    setTopCountriesLoading: (state, action) => {
+      state.topCountriesLoading = action.payload !== undefined ? action.payload : true;
+    },
+    setTopCountriesError: (state, action) => {
+      state.topCountriesError = action.payload;
+      state.topCountriesLoading = false;
+    },
+    clearTopCountries: (state) => {
+      state.topCountries = [];
+      state.topCountriesError = null;
+    },
   },
 });
 
@@ -32,6 +51,10 @@ export const {
   setDashboardLoading,
   setDashboardError,
   clearDashboardSummary,
+  setTopCountries,
+  setTopCountriesLoading,
+  setTopCountriesError,
+  clearTopCountries,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
 

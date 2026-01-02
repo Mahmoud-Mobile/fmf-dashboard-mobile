@@ -26,14 +26,14 @@ import { Storage } from "expo-storage";
 
 const SECTION_CONFIG = [
   { id: "dashboardOverview", label: "Dashboard Overview" },
-  { id: "eventAnalytics", label: "Event Analytics" },
-  { id: "arrivalGuests", label: "Arrival Guests" },
-  { id: "returnGuests", label: "Return Guests" },
-  { id: "flights", label: "Flights" },
-  { id: "hotelOccupancy", label: "Hotel Occupancy" },
-  { id: "hotelDetails", label: "Hotel Details" },
-  { id: "tripList", label: "Trip List" },
-  { id: "tripsSummary", label: "Trips Summary" },
+  // { id: "eventAnalytics", label: "Event Analytics" },
+  // { id: "arrivalGuests", label: "Arrival Guests" },
+  // { id: "returnGuests", label: "Return Guests" },
+  // { id: "flights", label: "Flights" },
+  // { id: "hotelOccupancy", label: "Hotel Occupancy" },
+  // { id: "hotelDetails", label: "Hotel Details" },
+  // { id: "tripList", label: "Trip List" },
+  // { id: "tripsSummary", label: "Trips Summary" },
 ];
 
 const ACTION_BUTTON_CONFIG = [
