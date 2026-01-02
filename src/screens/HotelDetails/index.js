@@ -11,6 +11,7 @@ import { formatDate, getParticipantName } from "./utils/hotelDetailsUtils";
 
 const HotelDetails = ({ route }) => {
   const hotel = route.params?.hotel || {};
+
   const navigation = useNavigation();
   const { selectedEvent } = useSelector((state) => state.api);
 
@@ -34,7 +35,7 @@ const HotelDetails = ({ route }) => {
     <View style={styles.container}>
       <CustomHeader
         leftLabel="Hotels"
-        title={hotel.accommodation?.hotelName || "Hotel Details"}
+        title={hotel.accommodation?.hotel?.name || "Hotel Details"}
         onLeftButtonPress={() => navigation.goBack()}
       />
       <ScrollView
@@ -70,23 +71,155 @@ const HotelDetails = ({ route }) => {
                   </Text>
                 </View>
               </View>
+
+              {/* Participant Details */}
+              <View style={[styles.column, { marginTop: 16 }]}>
+                <Text style={styles.sectionTitle}>Participant Details</Text>
+                {hotel.participant?.phone && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Phone:</Text>
+                    <Text style={styles.value}>{hotel.participant.phone}</Text>
+                  </View>
+                )}
+                {hotel.participant?.participantCode && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Participant Code:</Text>
+                    <Text style={styles.value}>
+                      {hotel.participant.participantCode}
+                    </Text>
+                  </View>
+                )}
+                {hotel.participant?.qrCode && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>QR Code:</Text>
+                    <Text style={styles.value}>{hotel.participant.qrCode}</Text>
+                  </View>
+                )}
+                {hotel.participant?.nationality?.name && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Nationality:</Text>
+                    <Text style={styles.value}>
+                      {hotel.participant.nationality.name} (
+                      {hotel.participant.nationality.code})
+                    </Text>
+                  </View>
+                )}
+                {hotel.participant?.participantType?.name && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Participant Type:</Text>
+                    <Text style={styles.value}>
+                      {hotel.participant.participantType.name}
+                    </Text>
+                  </View>
+                )}
+                {hotel.participant?.position && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Position:</Text>
+                    <Text style={styles.value}>
+                      {hotel?.participant?.position}
+                    </Text>
+                  </View>
+                )}
+                {hotel.participant?.organization && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Organization:</Text>
+                    <Text style={styles.value}>
+                      {hotel?.participant?.organization}
+                    </Text>
+                  </View>
+                )}
+                {hotel.participant?.status && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Status:</Text>
+                    <Text style={styles.value}>
+                      {hotel?.participant?.status}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
 
             <View style={styles.row}>
               <View style={[styles.column, { marginRight: 8, marginTop: 16 }]}>
-                <Text style={styles.sectionTitle}>Hotel Details</Text>
+                <Text style={styles.sectionTitle}>Hotel Information</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Hotel Name:</Text>
                   <Text style={styles.value}>
-                    {hotel.accommodation?.hotelName || " "}
+                    {hotel.accommodation?.hotel?.name || " "}
                   </Text>
                 </View>
+                {hotel.accommodation?.hotel?.starRating && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Star Rating:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.hotel.starRating} ★
+                    </Text>
+                  </View>
+                )}
+                {hotel.accommodation?.hotel?.address && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Address:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.hotel.address}
+                    </Text>
+                  </View>
+                )}
+                {hotel.accommodation?.hotel?.city && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>City:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.hotel.city}
+                    </Text>
+                  </View>
+                )}
+                {hotel.accommodation?.hotel?.phone && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Hotel Phone:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.hotel.phone}
+                    </Text>
+                  </View>
+                )}
+                {hotel.accommodation?.hotel?.managementType && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Management Type:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.hotel.managementType}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              <View style={[styles.column, { marginTop: 16 }]}>
+                <Text style={styles.sectionTitle}>Room Information</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Room Number:</Text>
                   <Text style={styles.value}>
-                    {hotel.accommodation?.roomNumber || " "}
+                    {hotel.accommodation?.room?.roomNumber || " "}
                   </Text>
                 </View>
+                {hotel.accommodation?.room?.capacity && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Capacity:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.room.capacity} guests
+                    </Text>
+                  </View>
+                )}
+                {hotel.accommodation?.room?.isAccessible !== undefined && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Accessible:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.room.isAccessible ? "Yes" : "No"}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.row}>
+              <View style={[styles.column, { marginRight: 8, marginTop: 16 }]}>
+                <Text style={styles.sectionTitle}>Accommodation Details</Text>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Check In Date:</Text>
                   <Text style={styles.value}>
@@ -99,12 +232,49 @@ const HotelDetails = ({ route }) => {
                     {formatDate(hotel.accommodation?.checkOutDate)}
                   </Text>
                 </View>
+                {hotel.accommodation?.actualCheckIn && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Actual Check In:</Text>
+                    <Text style={styles.value}>
+                      {formatDate(hotel.accommodation.actualCheckIn)}
+                    </Text>
+                  </View>
+                )}
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Status:</Text>
                   <Text style={styles.value}>
-                    {hotel.accommodation?.status || " "}
+                    {hotel.accommodation?.status
+                      ? typeof hotel.accommodation.status === "object" &&
+                        hotel.accommodation.status?.name
+                        ? hotel.accommodation.status.name
+                        : hotel.accommodation.status
+                      : " "}
                   </Text>
                 </View>
+                {hotel.accommodation?.isCheckedIn !== undefined && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Checked In:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.isCheckedIn ? "Yes" : "No"}
+                    </Text>
+                  </View>
+                )}
+                {hotel.accommodation?.isCheckedOut !== undefined && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Checked Out:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.isCheckedOut ? "Yes" : "No"}
+                    </Text>
+                  </View>
+                )}
+                {hotel.accommodation?.bookedBy && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.label}>Booked By:</Text>
+                    <Text style={styles.value}>
+                      {hotel.accommodation.bookedBy}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>

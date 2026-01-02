@@ -32,21 +32,21 @@ const styles = StyleSheet.create({
   passengerInfo: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 6,
   },
   passengerDetails: {
     flex: 1,
-    gap: 4,
+    gap: 2,
   },
   userPhoto: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
   },
   userIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: Colors.Primary,
     justifyContent: "center",
     alignItems: "center",
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   userMobile: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.Gray,
   },

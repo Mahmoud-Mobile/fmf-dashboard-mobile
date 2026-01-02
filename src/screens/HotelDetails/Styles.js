@@ -69,16 +69,17 @@ const styles = StyleSheet.create({
     borderBottomColor: "#F0F0F0",
   },
   label: {
-    fontSize: 14,
+    fontSize: 11,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.SecondaryText,
     flex: 1,
   },
   value: {
-    fontSize: 14,
+    fontSize: 10,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
-    // flex: 2,
+    textAlign: "right",
+    width: "70%",
   },
   statusScheduled: {
     color: "#10B981",

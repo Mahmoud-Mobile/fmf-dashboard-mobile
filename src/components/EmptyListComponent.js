@@ -25,7 +25,7 @@ const styles = {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: "50%",
+    marginTop: "30%",
   },
   emptyTitle: {
     fontSize: 14,

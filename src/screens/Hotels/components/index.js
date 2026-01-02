@@ -43,12 +43,12 @@ const HotelCard = ({ item, onPress, width, actionButtons }) => {
           <View style={styles.locationRow}>
             <Text style={styles.locationLabel}>Hotel:</Text>
             <Text style={styles.locationText}>
-              {item?.accommodation?.hotelName}
+              {item?.accommodation?.hotel?.name}
             </Text>
           </View>
-          {item?.accommodation?.roomNumber && (
+          {item?.accommodation?.room?.roomNumber && (
             <Text style={styles.userMobile}>
-              Room: {item?.accommodation?.roomNumber}
+              Room: {item?.accommodation?.room?.roomNumber}
             </Text>
           )}
           <View style={styles.locationRow}>

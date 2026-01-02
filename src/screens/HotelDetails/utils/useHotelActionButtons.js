@@ -12,8 +12,8 @@ export const useHotelActionButtons = (hotel, selectedEvent, navigation) => {
   const isCheckedOut = hotel.accommodation?.isCheckedOut || false;
 
   const participantName = getParticipantName(hotel.participant);
-  const hotelName = hotel.accommodation?.hotelName || "Hotel";
-  const roomNumber = hotel.accommodation?.roomNumber || "";
+  const hotelName = hotel.accommodation?.hotel?.name || "Hotel";
+  const roomNumber = hotel.accommodation?.room?.roomNumber || "";
 
   const actionButtons = useMemo(() => {
     if (!hotelId) {
