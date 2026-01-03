@@ -1,10 +1,9 @@
 import React, { useMemo } from "react";
-import { View, Text, ScrollView, Image, Alert } from "react-native";
+import { View, Text, ScrollView, Alert } from "react-native";
 import { useSelector } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./Styles";
-import moment from "moment";
 import { ActionButton, ActionButtonGroup } from "../../components/ActionButton";
 import { horizontalMargin } from "../../config/metrics";
 import {
@@ -14,331 +13,167 @@ import {
   toggleLuggageReceived,
 } from "../../webservice/apiConfig";
 import { sendNotification } from "../../config/notificationUtils";
+import ParticipantInfoCard from "../../components/ParticipantInfoCard";
+import { formatDateTime } from "../../config/dateUtils";
 
 const FlightDetails = ({ route }) => {
   const { flight, selectedCategory } = route.params;
   const navigation = useNavigation();
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    try {
-      const nativeDate = new Date(dateString);
-      if (!isNaN(nativeDate.getTime())) {
-        return moment(nativeDate).format("MMM DD, YYYY HH:mm");
-      }
-      return "";
-    } catch (error) {
-      console.log("Date formatting error:", error);
-      return "";
+  const getParticipantName = (participant) => {
+    if (!participant) return "Participant";
+    const firstName = participant.firstName || "";
+    const lastName = participant.lastName || "";
+    return `${firstName} ${lastName}`.trim() || " ";
+  };
+
+  const getFlightNumber = (flightType) => {
+    if (flightType === "DEPARTURE") {
+      return flight.returnFlightNumber || flight.arrivalFlightNumber || "-";
     }
+    return flight.arrivalFlightNumber || "-";
+  };
+
+  const showAlert = (title, message, onSuccess) => {
+    Alert.alert(title, message, [
+      {
+        text: "OK",
+        style: "default",
+        onPress: onSuccess || (() => navigation.goBack()),
+      },
+    ]);
+  };
+
+  const createActionHandler = (
+    apiCall,
+    data,
+    notificationTitle,
+    getNotificationMessage,
+    notificationType,
+    successMessage,
+    errorMessage
+  ) => {
+    return async () => {
+      const flightId = flight.id;
+      const participantId = flight.participant?.id;
+
+      if (!flightId || !participantId) {
+        showAlert("Error", "Missing flight or participant information");
+        return;
+      }
+
+      try {
+        await apiCall(flightId, participantId, data);
+
+        const participantName = getParticipantName(flight.participant);
+        const flightNumber = getFlightNumber(flight.flightType);
+        const notificationMessage = getNotificationMessage(
+          participantName,
+          flightNumber
+        );
+
+        await sendNotification(notificationTitle, notificationMessage, {
+          type: notificationType,
+          flightId,
+          participantId,
+        });
+
+        showAlert("Success", successMessage);
+      } catch (error) {
+        showAlert("Error", errorMessage);
+      }
+    };
   };
 
   const actionButtons = useMemo(() => {
     const flightId = flight.id;
     const participantId = flight.participant?.id;
 
-    // Don't show buttons if flightId or participantId is missing
     if (!flightId || !participantId) {
       return [];
     }
 
-    // Handle DEPARTURE flight type - show only "Participant Departed" button
-    if (flight.flightType === "DEPARTURE") {
-      // Disable if isParticipantDeparted is true
-      const isParticipantDepartedDisabled =
-        flight.isParticipantDeparted === true;
-
-      const handleParticipantDeparted = async () => {
-        try {
-          await markFlightDeparted(flightId, participantId, {
-            departed: true,
-          });
-
-          // Get participant name for notification
-          const participant = flight.participant || {};
-          const participantName =
-            `${participant.firstName || ""} ${
-              participant.lastName || ""
-            }`.trim() || "Participant";
-          const flightNumber =
-            flight.returnFlightNumber || flight.arrivalFlightNumber || "-";
-
-          // Send notification
-          await sendNotification(
-            "Participant Departed",
-            `${participantName} has departed on flight ${flightNumber}`,
-            {
-              type: "flight_departed",
-              flightId: flightId,
-              participantId: participantId,
-            }
-          );
-
-          Alert.alert(
-            "Success",
-            "Participant departed status updated successfully!",
-            [
-              {
-                text: "OK",
-                style: "default",
-                onPress: () => navigation.goBack(),
-              },
-            ]
-          );
-        } catch (error) {
-          Alert.alert(
-            "Error",
-            "Failed to update participant departed status. Please try again.",
-            [{ text: "OK", style: "default" }]
-          );
-        }
-      };
+    if (flight.flightType === "DEPARTURE" || selectedCategory === "return") {
+      const isDisabled = flight.isParticipantDeparted === true;
 
       return [
         {
           icon: "flight-takeoff",
           text: "Participant Departed",
-          isSelected: !isParticipantDepartedDisabled,
-          disabled: isParticipantDepartedDisabled,
-          onPress: handleParticipantDeparted,
-        },
-      ];
-    }
-
-    // Handle return category (legacy support)
-    if (selectedCategory === "return") {
-      // Disable if isParticipantDeparted is true
-      const isParticipantDepartedDisabled =
-        flight.isParticipantDeparted === true;
-
-      const handleParticipantDeparted = async () => {
-        try {
-          await markFlightDeparted(flightId, participantId, {
-            departed: true,
-          });
-
-          // Get participant name for notification
-          const participant = flight.participant || {};
-          const participantName =
-            `${participant.firstName || ""} ${
-              participant.lastName || ""
-            }`.trim() || "Participant";
-          const flightNumber =
-            flight.returnFlightNumber || flight.arrivalFlightNumber || "-";
-
-          // Send notification
-          await sendNotification(
+          isSelected: !isDisabled,
+          disabled: isDisabled,
+          onPress: createActionHandler(
+            markFlightDeparted,
+            { departed: true },
             "Participant Departed",
-            `${participantName} has departed on flight ${flightNumber}`,
-            {
-              type: "flight_departed",
-              flightId: flightId,
-              participantId: participantId,
-            }
-          );
-
-          Alert.alert(
-            "Success",
+            (name, flightNum) => `${name} has departed on flight ${flightNum}`,
+            "flight_departed",
             "Participant departed status updated successfully!",
-            [
-              {
-                text: "OK",
-                style: "default",
-                onPress: () => navigation.goBack(),
-              },
-            ]
-          );
-        } catch (error) {
-          Alert.alert(
-            "Error",
-            "Failed to update participant departed status. Please try again.",
-            [{ text: "OK", style: "default" }]
-          );
-        }
-      };
-
-      return [
-        {
-          icon: "flight-takeoff",
-          text: "Participant Departed",
-          isSelected: !isParticipantDepartedDisabled,
-          disabled: isParticipantDepartedDisabled,
-          onPress: handleParticipantDeparted,
+            "Failed to update participant departed status. Please try again."
+          ),
         },
       ];
     }
 
-    // Handle arrival and officially categories
-    // Disable "Meet Done" if isMeetDone is true
-    const isMeetDoneDisabled = flight.isMeetDone === true;
+    const handleMeetDone = createActionHandler(
+      toggleMeetDone,
+      { meetDone: true },
+      "Meet Done",
+      (name, flightNum) => `Meet completed for ${name} on flight ${flightNum}`,
+      "flight_meet_done",
+      "Meet done status updated successfully!",
+      "Failed to update meet done status. Please try again."
+    );
 
-    // Disable "Luggage Received" if isLuggageReceived is true
-    const isLuggageReceivedDisabled = flight.isLuggageReceived === true;
+    const handleLuggageReceived = createActionHandler(
+      toggleLuggageReceived,
+      { luggageReceived: true },
+      "Luggage Received",
+      (name, flightNum) =>
+        `Luggage received for ${name} on flight ${flightNum}`,
+      "flight_luggage_received",
+      "Luggage received status updated successfully!",
+      "Failed to update luggage received status. Please try again."
+    );
 
-    // Disable "Participant Arrived" if isParticipantArrived is true
-    const isParticipantArrivedDisabled = flight.isParticipantArrived === true;
-
-    const handleMeetDone = async () => {
-      try {
-        await toggleMeetDone(flightId, participantId, {
-          meetDone: true,
-        });
-
-        // Get participant name for notification
-        const participant = flight.participant || {};
-        const participantName =
-          `${participant.firstName || ""} ${
-            participant.lastName || ""
-          }`.trim() || "Participant";
-        const flightNumber = flight.arrivalFlightNumber || "-";
-
-        // Send notification
-        await sendNotification(
-          "Meet Done",
-          `Meet completed for ${participantName} on flight ${flightNumber}`,
-          {
-            type: "flight_meet_done",
-            flightId: flightId,
-            participantId: participantId,
-          }
-        );
-
-        Alert.alert("Success", "Meet done status updated successfully!", [
-          {
-            text: "OK",
-            style: "default",
-            onPress: () => navigation.goBack(),
-          },
-        ]);
-      } catch (error) {
-        Alert.alert(
-          "Error",
-          "Failed to update meet done status. Please try again.",
-          [{ text: "OK", style: "default" }]
-        );
-      }
-    };
-
-    const handleLuggageReceived = async () => {
-      try {
-        await toggleLuggageReceived(flightId, participantId, {
-          luggageReceived: true,
-        });
-
-        // Get participant name for notification
-        const participant = flight.participant || {};
-        const participantName =
-          `${participant.firstName || ""} ${
-            participant.lastName || ""
-          }`.trim() || "Participant";
-        const flightNumber = flight.arrivalFlightNumber || "-";
-
-        // Send notification
-        await sendNotification(
-          "Luggage Received",
-          `Luggage received for ${participantName} on flight ${flightNumber}`,
-          {
-            type: "flight_luggage_received",
-            flightId: flightId,
-            participantId: participantId,
-          }
-        );
-
-        Alert.alert(
-          "Success",
-          "Luggage received status updated successfully!",
-          [
-            {
-              text: "OK",
-              style: "default",
-              onPress: () => navigation.goBack(),
-            },
-          ]
-        );
-      } catch (error) {
-        Alert.alert(
-          "Error",
-          "Failed to update luggage received status. Please try again.",
-          [{ text: "OK", style: "default" }]
-        );
-      }
-    };
-
-    const handleParticipantArrived = async () => {
-      try {
-        await markFlightArrived(flightId, participantId, {
-          arrived: true,
-        });
-
-        // Get participant name for notification
-        const participant = flight.participant || {};
-        const participantName =
-          `${participant.firstName || ""} ${
-            participant.lastName || ""
-          }`.trim() || "Participant";
-        const flightNumber = flight.arrivalFlightNumber || "-";
-
-        // Send notification
-        await sendNotification(
-          "Participant Arrived",
-          `${participantName} has arrived on flight ${flightNumber}`,
-          {
-            type: "flight_participant_arrived",
-            flightId: flightId,
-            participantId: participantId,
-          }
-        );
-
-        Alert.alert(
-          "Success",
-          "Participant arrived status updated successfully!",
-          [
-            {
-              text: "OK",
-              style: "default",
-              onPress: () => navigation.goBack(),
-            },
-          ]
-        );
-      } catch (error) {
-        Alert.alert(
-          "Error",
-          "Failed to update participant arrived status. Please try again.",
-          [{ text: "OK", style: "default" }]
-        );
-      }
-    };
+    const handleParticipantArrived = createActionHandler(
+      markFlightArrived,
+      { arrived: true },
+      "Participant Arrived",
+      (name, flightNum) => `${name} has arrived on flight ${flightNum}`,
+      "flight_participant_arrived",
+      "Participant arrived status updated successfully!",
+      "Failed to update participant arrived status. Please try again."
+    );
 
     return [
       {
         icon: "work",
         text: "Luggage Received",
-        isSelected: !isLuggageReceivedDisabled,
-        disabled: isLuggageReceivedDisabled,
+        isSelected: !flight.isLuggageReceived,
+        disabled: flight.isLuggageReceived === true,
         onPress: handleLuggageReceived,
       },
       {
         icon: "check-circle",
         text: "Meet Done",
-        isSelected: !isMeetDoneDisabled,
-        disabled: isMeetDoneDisabled,
+        isSelected: !flight.isMeetDone,
+        disabled: flight.isMeetDone === true,
         onPress: handleMeetDone,
       },
       {
         icon: "person",
         text: "Participant Arrived",
-        isSelected: !isParticipantArrivedDisabled,
-        disabled: isParticipantArrivedDisabled,
+        isSelected: !flight.isParticipantArrived,
+        disabled: flight.isParticipantArrived === true,
         onPress: handleParticipantArrived,
       },
     ];
   }, [flight, selectedCategory, navigation]);
 
-  // Get action button visibility from Redux
   const actionButtonVisibility =
     useSelector((state) => state.ui?.actionButtonVisibility) || {};
 
-  // Filter action buttons based on visibility
   const filteredActionButtons = useMemo(() => {
     if (!actionButtons || !Array.isArray(actionButtons)) return [];
     return actionButtons.filter((button) => {
@@ -361,12 +196,10 @@ const FlightDetails = ({ route }) => {
       const button = filteredActionButtons[0];
       return <ActionButton {...button} endPosition />;
     }
-
     return <ActionButtonGroup buttons={filteredActionButtons} />;
   };
 
-  // Get flight info based on flightType
-  const getFlightInfo = useMemo(() => {
+  const flightInfo = useMemo(() => {
     if (flight.flightType === "DEPARTURE") {
       return {
         flightNumber: flight.returnFlightNumber || "-",
@@ -374,7 +207,6 @@ const FlightDetails = ({ route }) => {
           flight.returnAirlinesName || flight.returnAirlineName || "-",
       };
     }
-    // Default to arrival data
     return {
       flightNumber: flight.arrivalFlightNumber || "-",
       airlineName: flight.arrivalAirlinesName || "-",
@@ -382,16 +214,29 @@ const FlightDetails = ({ route }) => {
   }, [flight]);
 
   const participant = flight.participant || {};
-  const firstName = participant.firstName || "";
-  const lastName = participant.lastName || "";
-  const name = `${firstName} ${lastName}`.trim() || "";
+  const participantName = getParticipantName(participant);
+
+  const InfoRow = ({ label, value, valueStyle }) => (
+    <View style={styles.infoRow}>
+      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.value, valueStyle]}>{value || "-"}</Text>
+    </View>
+  );
+
+  const StatusRow = ({ label, value }) => (
+    <InfoRow
+      label={label}
+      value={value ? "Yes" : "No"}
+      valueStyle={value ? styles.statusYes : styles.statusNo}
+    />
+  );
 
   return (
     <View style={styles.container}>
       <CustomHeader
-        leftLabel={name ?? ""}
-        title={getFlightInfo.flightNumber}
-        subtitle={getFlightInfo.airlineName}
+        leftLabel={participantName}
+        title={flightInfo.flightNumber}
+        subtitle={flightInfo.airlineName}
         onLeftButtonPress={() => navigation.goBack()}
       />
 
@@ -404,224 +249,145 @@ const FlightDetails = ({ route }) => {
           <View style={styles.cardContent}>
             <View style={styles.flexOne}>
               <Text style={styles.sectionTitle}>Participant Information</Text>
-              <View style={styles.participantContainer}>
-                {(() => {
-                  const participant = flight.participant || {};
-                  const firstName = participant.firstName || "";
-                  const lastName = participant.lastName || "";
-                  const userName = `${firstName} ${lastName}`.trim() || "-";
-                  const userMobile = participant.phone || "-";
-                  const userPhoto = participant.photo || null;
-                  const dynamicParticipantType =
-                    participant.dynamicParticipantType?.name || null;
-                  const firstInitial = firstName
-                    ? firstName.charAt(0).toUpperCase()
-                    : "";
-                  const lastInitial = lastName
-                    ? lastName.charAt(0).toUpperCase()
-                    : "";
-                  const userInitials =
-                    firstInitial && lastInitial
-                      ? `${firstInitial}${lastInitial}`
-                      : userName
-                      ? userName.charAt(0).toUpperCase()
-                      : "";
+              <ParticipantInfoCard
+                participant={participant}
+                fields={[
+                  {
+                    key: "participantCode",
+                    icon: "badge",
+                    iconType: "MaterialIcons",
+                    label: "Participant Code",
+                    value: participant.participantCode,
+                  },
+                  {
+                    key: "phone",
+                    icon: "phone",
+                    iconType: "MaterialIcons",
+                    label: "Phone",
+                    value: participant.phone,
+                  },
+                  {
+                    key: "email",
+                    icon: "email",
+                    iconType: "MaterialIcons",
+                    label: "Email",
+                    value: participant.email,
+                  },
+                  {
+                    key: "nationality",
+                    icon: "flag",
+                    iconType: "Ionicons",
+                    label: "Nationality",
+                    value: participant.nationality
+                      ? `${participant.nationality.name} (${participant.nationality.code})`
+                      : null,
+                  },
+                ]}
+              />
+            </View>
 
-                  return (
-                    <>
-                      {userPhoto ? (
-                        <Image
-                          source={{ uri: userPhoto }}
-                          style={styles.participantPhoto}
-                          resizeMode="cover"
-                        />
-                      ) : (
-                        <View style={styles.participantIconCircle}>
-                          <Text style={styles.participantInitial}>
-                            {userInitials}
-                          </Text>
-                        </View>
-                      )}
-                      <View style={styles.participantInfo}>
-                        <Text style={styles.participantName}>{userName}</Text>
-                        <Text style={styles.participantMobile}>
-                          {userMobile}
-                        </Text>
-                        {dynamicParticipantType && (
-                          <View style={styles.participantTypeContainer}>
-                            <Text style={styles.participantType}>
-                              {dynamicParticipantType}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                    </>
-                  );
-                })()}
+            <View style={styles.row}>
+              <View style={[styles.column, { marginRight: 8 }]}>
+                <Text style={styles.sectionTitle}>Arrival Details</Text>
+                <InfoRow label="Airport:" value={flight.arrivalAirport} />
+                <InfoRow
+                  label="Flight Code:"
+                  value={flight.arrivalAirportCode}
+                />
+                <InfoRow label="Flight Route:" value={flight.flightRoute} />
+                <InfoRow
+                  label="City:"
+                  value={
+                    flight.arrivalCity && flight.arrivalCountry
+                      ? `${flight.arrivalCity}, ${flight.arrivalCountry}`
+                      : null
+                  }
+                />
+                <InfoRow
+                  label="Date & Time:"
+                  value={formatDateTime(flight.arrivalDate, flight.arrivalTime)}
+                />
+                <InfoRow
+                  label="Status:"
+                  value={flight.arrivalFlightStatus}
+                  valueStyle={styles.statusYes}
+                />
+              </View>
+
+              <View style={[styles.column, { marginRight: 8 }]}>
+                <Text style={styles.sectionTitle}>Booking Details</Text>
+                <InfoRow label="Seat:" value={flight.seatNumber} />
+                <InfoRow label="Class:" value={flight.flightClass} />
+                <InfoRow label="Type:" value={flight.flightType || "Arrival"} />
+                <InfoRow label="Aircraft Type:" value={flight.aircraftType} />
+                <InfoRow label="Booking Ref:" value={flight.bookingReference} />
+                <InfoRow label="Ticket No:" value={flight.ticketNumber} />
               </View>
             </View>
 
             <View style={styles.row}>
               <View style={[styles.column, { marginRight: 8 }]}>
-                <Text style={styles.sectionTitle}> Arrival Details</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Airport:</Text>
-                  <Text style={styles.value}>{flight.arrivalAirport}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Flight Code:</Text>
-                  <Text style={styles.value}>{flight.arrivalAirportCode}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Flight Route:</Text>
-                  <Text style={styles.value}>{flight.flightRoute || "-"}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>City:</Text>
-                  <Text style={styles.value}>
-                    {flight.arrivalCity}, {flight.arrivalCountry}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Date & Time:</Text>
-                  <Text style={styles.value}>
-                    {formatDate(flight.arrivalDate)}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Status:</Text>
-                  <Text style={[styles.value, styles.statusYes]}>
-                    {flight.arrivalFlightStatus}
-                  </Text>
-                </View>
+                <Text style={styles.sectionTitle}>Return Details</Text>
+                <InfoRow label="Airport:" value={flight.returnAirport} />
+                <InfoRow
+                  label="Flight Code:"
+                  value={flight.returnAirportCode}
+                />
+                <InfoRow
+                  label="Flight Route:"
+                  value={flight.returnRoute || "Riyadh (RUH) → Dubai (DXB)"}
+                />
+                <InfoRow
+                  label="City:"
+                  value={
+                    flight.returnCity && flight.returnCountry
+                      ? `${flight.returnCity}, ${flight.returnCountry}`
+                      : null
+                  }
+                />
+                <InfoRow
+                  label="Date & Time:"
+                  value={formatDateTime(flight.returnDate, flight.returnTime)}
+                />
+                <InfoRow
+                  label="Status:"
+                  value={flight.returnFlightStatus}
+                  valueStyle={styles.statusScheduled}
+                />
               </View>
 
               <View style={[styles.column, { marginRight: 8 }]}>
-                <Text style={styles.sectionTitle}> Booking Details</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Seat:</Text>
-                  <Text style={styles.value}>{flight.seatNumber || "-"}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Class:</Text>
-                  <Text style={styles.value}>{flight.flightClass || "-"}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Type:</Text>
-                  <Text style={styles.value}>
-                    {flight.flightType || "Arrival"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Booking Ref:</Text>
-                  <Text style={styles.value}>
-                    {flight.bookingReference || "-"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Ticket No:</Text>
-                  <Text style={styles.value}>{flight.ticketNumber || "-"}</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.row}>
-              <View style={[styles.column, { marginRight: 8 }]}>
-                <Text style={styles.sectionTitle}> Return Details</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Airport:</Text>
-                  <Text style={styles.value}>{flight.returnAirport}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Flight Code:</Text>
-                  <Text style={styles.value}>{flight.returnAirportCode}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Flight Route:</Text>
-                  <Text style={styles.value}>
-                    {flight.returnRoute || "Riyadh (RUH) → Dubai (DXB)"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>City:</Text>
-                  <Text style={styles.value}>
-                    {flight.returnCity}, {flight.returnCountry}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Date & Time:</Text>
-                  <Text style={styles.value}>
-                    {formatDate(flight.returnDate)}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Status:</Text>
-                  <Text style={[styles.value, styles.statusScheduled]}>
-                    {flight.returnFlightStatus}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={[styles.column, { marginRight: 8 }]}>
-                <Text style={styles.sectionTitle}> Status</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Luggage Received:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      flight.isLuggageReceived
-                        ? styles.statusYes
-                        : styles.statusNo,
-                    ]}
-                  >
-                    {flight.isLuggageReceived ? "Yes" : "No"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Guest Meet:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      flight.isMeetDone ? styles.statusYes : styles.statusNo,
-                    ]}
-                  >
-                    {flight.isMeetDone ? "Yes" : "No"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Guest Arrived:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      flight.isParticipantArrived
-                        ? styles.statusYes
-                        : styles.statusNo,
-                    ]}
-                  >
-                    {flight.isParticipantArrived ? "Yes" : "No"}
-                  </Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Guest Departed:</Text>
-                  <Text
-                    style={[
-                      styles.value,
-                      flight.isParticipantDeparted
-                        ? styles.statusYes
-                        : styles.statusNo,
-                    ]}
-                  >
-                    {flight.isParticipantDeparted ? "Yes" : "No"}
-                  </Text>
-                </View>
+                <Text style={styles.sectionTitle}>Status</Text>
+                <StatusRow
+                  label="Luggage Received:"
+                  value={flight.isLuggageReceived}
+                />
+                <StatusRow label="Guest Meet:" value={flight.isMeetDone} />
+                <StatusRow
+                  label="Guest Arrived:"
+                  value={flight.isParticipantArrived}
+                />
+                <StatusRow
+                  label="Guest Departed:"
+                  value={flight.isParticipantDeparted}
+                />
+                <StatusRow
+                  label="Wheelchair Required:"
+                  value={flight.wheelchairRequired}
+                />
+                <StatusRow
+                  label="Mobility Assistance:"
+                  value={flight.mobilityAssistance}
+                />
+                <StatusRow label="Visa Required:" value={flight.visaRequired} />
+                <InfoRow label="Visa Status:" value={flight.visaStatus} />
               </View>
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}> Special Request</Text>
+              <Text style={styles.sectionTitle}>Special Request</Text>
               <Text style={styles.value}>
-                {flight.specialRequest &&
-                flight.specialRequest.trim().length > 0
+                {flight.specialRequest?.trim()
                   ? flight.specialRequest
                   : "No special requests"}
               </Text>

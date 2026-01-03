@@ -1,13 +1,14 @@
 import React from "react";
-import { View, Text, ScrollView, Image } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { useSelector } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
+import ParticipantInfoCard from "../../components/ParticipantInfoCard";
 import styles from "./Styles";
 import { ActionButton, ActionButtonGroup } from "../../components/ActionButton";
 import { horizontalMargin } from "../../config/metrics";
 import { useHotelActionButtons } from "./utils/useHotelActionButtons";
-import { formatDate, getParticipantName } from "./utils/hotelDetailsUtils";
+import { formatDate } from "./utils/hotelDetailsUtils";
 
 const HotelDetails = ({ route }) => {
   const hotel = route.params?.hotel || {};
@@ -47,96 +48,76 @@ const HotelDetails = ({ route }) => {
           <View style={styles.cardContent}>
             <View style={styles.flexOne}>
               <Text style={styles.sectionTitle}>Guest Information</Text>
-              <View style={styles.participantContainer}>
-                {hotel.participant?.photo ? (
-                  <Image
-                    source={{ uri: hotel.participant?.photo }}
-                    style={styles.participantPhoto}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View style={styles.participantIconCircle}>
-                    <Text style={styles.participantInitial}>
-                      {hotel.participant?.firstName?.charAt(0) || ""}
-                      {hotel.participant?.lastName?.charAt(0) || ""}
-                    </Text>
-                  </View>
-                )}
-                <View style={styles.participantInfo}>
-                  <Text style={styles.participantName}>
-                    {getParticipantName(hotel.participant)}
-                  </Text>
-                  <Text style={styles.participantMobile}>
-                    {hotel.participant?.email || " "}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Participant Details */}
-              <View style={[styles.column, { marginTop: 16 }]}>
-                <Text style={styles.sectionTitle}>Participant Details</Text>
-                {hotel.participant?.phone && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.label}>Phone:</Text>
-                    <Text style={styles.value}>{hotel.participant.phone}</Text>
-                  </View>
-                )}
-                {hotel.participant?.participantCode && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.label}>Participant Code:</Text>
-                    <Text style={styles.value}>
-                      {hotel.participant.participantCode}
-                    </Text>
-                  </View>
-                )}
-                {hotel.participant?.qrCode && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.label}>QR Code:</Text>
-                    <Text style={styles.value}>{hotel.participant.qrCode}</Text>
-                  </View>
-                )}
-                {hotel.participant?.nationality?.name && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.label}>Nationality:</Text>
-                    <Text style={styles.value}>
-                      {hotel.participant.nationality.name} (
-                      {hotel.participant.nationality.code})
-                    </Text>
-                  </View>
-                )}
-                {hotel.participant?.participantType?.name && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.label}>Participant Type:</Text>
-                    <Text style={styles.value}>
-                      {hotel.participant.participantType.name}
-                    </Text>
-                  </View>
-                )}
-                {hotel.participant?.position && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.label}>Position:</Text>
-                    <Text style={styles.value}>
-                      {hotel?.participant?.position}
-                    </Text>
-                  </View>
-                )}
-                {hotel.participant?.organization && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.label}>Organization:</Text>
-                    <Text style={styles.value}>
-                      {hotel?.participant?.organization}
-                    </Text>
-                  </View>
-                )}
-                {hotel.participant?.status && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.label}>Status:</Text>
-                    <Text style={styles.value}>
-                      {hotel?.participant?.status}
-                    </Text>
-                  </View>
-                )}
-              </View>
+              <ParticipantInfoCard
+                participant={hotel.participant}
+                fields={[
+                  {
+                    key: "phone",
+                    icon: "phone",
+                    iconType: "MaterialIcons",
+                    label: "Phone",
+                    value: hotel.participant?.phone,
+                  },
+                  {
+                    key: "email",
+                    icon: "email",
+                    iconType: "MaterialIcons",
+                    label: "Email",
+                    value: hotel.participant?.email,
+                  },
+                  {
+                    key: "participantCode",
+                    icon: "badge",
+                    iconType: "MaterialIcons",
+                    label: "Participant Code",
+                    value: hotel.participant?.participantCode,
+                  },
+                  {
+                    key: "qrCode",
+                    icon: "qr-code",
+                    iconType: "MaterialIcons",
+                    label: "QR Code",
+                    value: hotel.participant?.qrCode,
+                  },
+                  {
+                    key: "nationality",
+                    icon: "flag",
+                    iconType: "Ionicons",
+                    label: "Nationality",
+                    value: hotel.participant?.nationality
+                      ? `${hotel.participant.nationality.name} (${hotel.participant.nationality.code})`
+                      : null,
+                  },
+                  {
+                    key: "participantType",
+                    icon: "person",
+                    iconType: "MaterialIcons",
+                    label: "Participant Type",
+                    value: hotel.participant?.participantType?.name,
+                  },
+                  {
+                    key: "position",
+                    icon: "work",
+                    iconType: "MaterialIcons",
+                    label: "Position",
+                    value: hotel.participant?.position,
+                  },
+                  {
+                    key: "organization",
+                    icon: "business",
+                    iconType: "MaterialIcons",
+                    label: "Organization",
+                    value: hotel.participant?.organization,
+                  },
+                  {
+                    key: "status",
+                    icon: "info",
+                    iconType: "MaterialIcons",
+                    label: "Status",
+                    value: hotel.participant?.status,
+                  },
+                ]}
+              />
             </View>
 
             <View style={styles.row}>

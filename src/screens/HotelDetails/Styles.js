@@ -93,49 +93,6 @@ const styles = StyleSheet.create({
     color: "#EF4444",
     fontFamily: Fonts.FONT_REGULAR,
   },
-  participantContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F8F9FA",
-    borderRadius: 16,
-    padding: 10,
-    marginTop: 8,
-  },
-  participantPhoto: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginRight: 10,
-  },
-  participantInfo: {
-    flex: 1,
-  },
-  participantName: {
-    fontSize: 12,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.PrimaryText,
-    marginBottom: 4,
-  },
-  participantMobile: {
-    fontSize: 12,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.Primary,
-    marginBottom: 4,
-  },
-  participantIconCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: Colors.Primary,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 10,
-  },
-  participantInitial: {
-    fontSize: 12,
-    fontFamily: Fonts.FONT_MEDIUM,
-    color: Colors.White,
-  },
 });
 
 export default styles;

@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     gap: 16,
     marginBottom: 16,
+    marginTop: 10,
   },
   leftColumn: {
     flex: 1,
@@ -154,6 +155,25 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.White,
     fontWeight: "600",
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    height: 22,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    borderBottomLeftRadius: 8,
+    gap: 4,
+    color: Colors.Primary,
+    backgroundColor: "#E3F2FD",
+  },
+  statusText: {
+    fontSize: 12,
+    fontFamily: Fonts.FONT_MEDIUM,
+    textTransform: "uppercase",
+    color: Colors.Primary,
   },
 });
 

@@ -19,6 +19,7 @@ export const ENVIRONMENT_TABS = {
       titleText: "Dashboard",
       priority: 1,
       defaultVisible: true,
+      alwaysVisible: true,
     },
     {
       route: "Flights",

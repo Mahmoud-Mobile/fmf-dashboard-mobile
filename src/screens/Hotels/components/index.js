@@ -14,6 +14,7 @@ const HotelCard = ({ item, onPress, width, actionButtons }) => {
   const userPhoto = participant?.profilePicture || null;
   const userEmail = participant?.email || "";
   const userInitial = fullName ? fullName.charAt(0).toUpperCase() : "";
+  const participantType = participant?.participantType?.name || "";
 
   return (
     <TouchableOpacity
@@ -118,6 +119,11 @@ const HotelCard = ({ item, onPress, width, actionButtons }) => {
           </View>
         </View>
       </View>
+      {participantType && (
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>{participantType}</Text>
+        </View>
+      )}
       {actionButtons && actionButtons.length > 0 && (
         <ActionButtonGroup buttons={actionButtons} />
       )}

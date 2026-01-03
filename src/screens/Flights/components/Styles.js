@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
     marginBottom: 16,
+    marginTop: 10,
   },
   flexRow: {
     flexDirection: "row",
@@ -88,19 +89,20 @@ const styles = StyleSheet.create({
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 8,
-    // height: 22,
+    paddingHorizontal: 12,
+    height: 22,
     position: "absolute",
     top: 0,
     right: 0,
     borderBottomLeftRadius: 8,
     gap: 4,
-    paddingVertical: 1,
+    backgroundColor: "#E3F2FD",
   },
   statusText: {
-    fontSize: 8,
+    fontSize: 12,
     fontFamily: Fonts.FONT_MEDIUM,
     textTransform: "uppercase",
+    color: Colors.Primary,
   },
 });
 

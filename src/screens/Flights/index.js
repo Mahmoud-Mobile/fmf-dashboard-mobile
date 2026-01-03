@@ -8,25 +8,21 @@ import DateSearchModal from "../../components/DateSearchModal";
 import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import { fetchFlights } from "../../redux/actions/api";
-import {
-  markFlightArrived,
-  markFlightDeparted,
-  toggleMeetDone,
-  toggleLuggageReceived,
-} from "../../webservice/apiConfig";
 import styles from "./Styles";
-
 import FlightCard from "./components";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalMargin } from "../../config/metrics";
 import SearchActionRow from "../../components/SearchActionRow";
 import { getDeviceDimensions } from "../../constant/deviceUtils";
+import { exportToExcel, formatStamp } from "../../config/exportToExcel";
 import {
-  exportToExcel,
-  formatDateTime,
-  formatStamp,
-} from "../../config/exportToExcel";
-import { sendNotification } from "../../config/notificationUtils";
+  prepareFlightCardData,
+  filterFlightsBySearch,
+  filterFlightsByDate,
+  filterFlightsByType,
+} from "./utils/flightDataUtils";
+import { prepareFlightExportData } from "./utils/flightExportUtils";
+import { useFlightActions } from "./hooks/useFlightActions";
 
 const Flights = () => {
   const dispatch = useDispatch();
@@ -74,93 +70,10 @@ const Flights = () => {
   const filteredFlights = useMemo(() => {
     let filtered = flights?.flights || [];
 
-    // Filter by search text
-    if (searchText.trim()) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter((flight) => {
-        const flightNumber = (
-          flight.arrivalFlightNumber ||
-          flight.returnFlightNumber ||
-          ""
-        ).toLowerCase();
-        const airportCode = (
-          flight.arrivalAirportCode ||
-          flight.returnAirportCode ||
-          ""
-        ).toLowerCase();
-        const airportName = (
-          flight.arrivalAirport ||
-          flight.returnAirport ||
-          ""
-        ).toLowerCase();
-        const flightType = (flight.flightType || "").toLowerCase();
-        const status = (
-          flight.arrivalFlightStatus ||
-          flight.returnFlightStatus ||
-          ""
-        ).toLowerCase();
-
-        // Extract participant userName
-        const participant = flight.participant || {};
-        const firstName = (participant.firstName || "").toLowerCase();
-        const lastName = (participant.lastName || "").toLowerCase();
-        const userName = `${firstName} ${lastName}`.trim().toLowerCase();
-        const firstNameOnly = firstName;
-        const lastNameOnly = lastName;
-
-        return (
-          flightNumber.includes(searchLower) ||
-          airportCode.includes(searchLower) ||
-          airportName.includes(searchLower) ||
-          flightType.includes(searchLower) ||
-          status.includes(searchLower) ||
-          userName.includes(searchLower) ||
-          firstNameOnly.includes(searchLower) ||
-          lastNameOnly.includes(searchLower)
-        );
-      });
-    }
-
-    if (selectedDate) {
-      const selectedMoment = moment(selectedDate);
-      const selectedDateStr = selectedMoment.isValid()
-        ? selectedMoment.format("YYYY-MM-DD")
-        : null;
-
-      if (!selectedDateStr) {
-        return filtered;
-      }
-
-      filtered = filtered.filter((flight) => {
-        const arrivalMoment = flight.arrivalDate
-          ? moment(flight.arrivalDate)
-          : null;
-        const returnMoment = flight.returnDate
-          ? moment(flight.returnDate)
-          : null;
-
-        const arrivalDate =
-          arrivalMoment && arrivalMoment.isValid()
-            ? arrivalMoment.format("YYYY-MM-DD")
-            : null;
-        const returnDate =
-          returnMoment && returnMoment.isValid()
-            ? returnMoment.format("YYYY-MM-DD")
-            : null;
-
-        return (
-          (arrivalDate && arrivalDate >= selectedDateStr) ||
-          (returnDate && returnDate >= selectedDateStr)
-        );
-      });
-    }
-
-    // Filter by flight type
-    if (selectedFlightType) {
-      filtered = filtered.filter((flight) => {
-        return flight.flightType === selectedFlightType;
-      });
-    }
+    // Apply filters in sequence
+    filtered = filterFlightsBySearch(filtered, searchText);
+    filtered = filterFlightsByDate(filtered, selectedDate, moment);
+    filtered = filterFlightsByType(filtered, selectedFlightType);
 
     return filtered;
   }, [flights, searchText, selectedDate, selectedFlightType]);
@@ -235,77 +148,10 @@ const Flights = () => {
         return;
       }
 
-      // date helpers are imported from config/exportToExcel
-
       // Prepare data for Excel
-      const excelData = filteredFlights.map((flight) => {
-        let passengerName = "-";
-        let airlineName = "-";
-        let flightNumber = "-";
-        let status = "-";
-        let airportCode = "-";
-        let airportName = "-";
-        let date = "-";
-
-        // Extract passenger name from participant data
-        const participant = flight.participant || {};
-        const firstName = participant.firstName || "";
-        const lastName = participant.lastName || "";
-        passengerName = `${firstName} ${lastName}`.trim() || "-";
-
-        // Use flightType to determine which data to export
-        if (flight.flightType === "ARRIVAL") {
-          airlineName = flight.arrivalAirlinesName || "-";
-          flightNumber = flight.arrivalFlightNumber || "-";
-          status = flight.arrivalFlightStatus || "-";
-          airportCode = flight.arrivalAirportCode || "-";
-          airportName = flight.arrivalAirport || "-";
-          date = formatDateTime(flight.arrivalDate);
-        } else if (flight.flightType === "DEPARTURE") {
-          airlineName =
-            flight.returnAirlinesName || flight.returnAirlineName || "-";
-          flightNumber = flight.returnFlightNumber || "-";
-          status = flight.returnFlightStatus || "-";
-          airportCode = flight.returnAirportCode || "-";
-          airportName = flight.returnAirport || "-";
-          date = formatDateTime(flight.returnDate);
-        } else {
-          // Fallback: use selectedCategory for backward compatibility
-          if (selectedCategory === "arrival") {
-            airlineName = flight.arrivalAirlinesName || "-";
-            flightNumber = flight.arrivalFlightNumber || "-";
-            status = flight.arrivalFlightStatus || "-";
-            airportCode = flight.arrivalAirportCode || "-";
-            airportName = flight.arrivalAirport || "-";
-            date = formatDateTime(flight.arrivalDate);
-          } else if (selectedCategory === "return") {
-            airlineName =
-              flight.returnAirlinesName || flight.returnAirlineName || "-";
-            flightNumber = flight.returnFlightNumber || "-";
-            status = flight.returnFlightStatus || "-";
-            airportCode = flight.returnAirportCode || "-";
-            airportName = flight.returnAirport || "-";
-            date = formatDateTime(flight.returnDate);
-          } else {
-            airlineName = flight.arrivalAirlinesName || "-";
-            flightNumber = flight.arrivalFlightNumber || "-";
-            status = flight.arrivalFlightStatus || "-";
-            airportCode = flight.arrivalAirportCode || "-";
-            airportName = flight.arrivalAirport || "-";
-            date = formatDateTime(flight.arrivalDate);
-          }
-        }
-
-        return {
-          "Passenger Name": passengerName,
-          "Airline Name": airlineName,
-          "Flight Number": flightNumber,
-          Status: status,
-          "Airport Code": airportCode,
-          "Airport Name": airportName,
-          Date: date,
-        };
-      });
+      const excelData = filteredFlights.map((flight) =>
+        prepareFlightExportData(flight, selectedCategory)
+      );
 
       const fileName = `flights_${formatStamp(new Date())}.xlsx`;
       await exportToExcel({
@@ -327,114 +173,11 @@ const Flights = () => {
     }
   };
 
-  const prepareFlightCardData = (flight) => {
-    let flightData = {};
-    let timeInfo = [];
-
-    // Extract participant data from flight object
-    const participant = flight.participant || {};
-    const firstName = participant.firstName || "";
-    const lastName = participant.lastName || "";
-    const userName = `${firstName} ${lastName}`.trim() || "-";
-    const userMobile = participant.phone || "-";
-    const userPhoto = participant.photo || null;
-    const participantType = participant?.dynamicParticipantType?.name || null;
-
-    const passengerData = {
-      userName,
-      userMobile,
-      userPhoto,
-      firstName,
-      lastName,
-      participantType,
-    };
-
-    // Use flightType to determine which data to show
-    if (flight.flightType === "ARRIVAL") {
-      // Show arrival data for ARRIVAL flights
-      flightData = {
-        airlineName: flight.arrivalAirlinesName,
-        flightNumber: flight.arrivalFlightNumber,
-        status: flight.arrivalFlightStatus,
-        airportCode: flight.arrivalAirportCode,
-        airportName: flight.arrivalAirport,
-        ...passengerData,
-      };
-
-      timeInfo.push({
-        label: "Arrival",
-        date: flight.arrivalDate,
-      });
-    } else if (flight.flightType === "DEPARTURE") {
-      // Show return/departure data for DEPARTURE flights
-      flightData = {
-        airlineName:
-          flight.returnAirlinesName || flight.returnAirlineName || "-",
-        flightNumber: flight.returnFlightNumber,
-        status: flight.returnFlightStatus,
-        airportCode: flight.returnAirportCode || "-",
-        airportName: flight.returnAirport || "-",
-        ...passengerData,
-      };
-
-      timeInfo.push({
-        label: "Departure",
-        date: flight.returnDate,
-      });
-    } else {
-      // Fallback: use selectedCategory for backward compatibility
-      if (selectedCategory === "arrival") {
-        flightData = {
-          airlineName: flight.arrivalAirlinesName,
-          flightNumber: flight.arrivalFlightNumber,
-          status: flight.arrivalFlightStatus,
-          airportCode: flight.arrivalAirportCode,
-          airportName: flight.arrivalAirport,
-          ...passengerData,
-        };
-
-        timeInfo.push({
-          label: "Arrival",
-          date: flight.arrivalDate,
-        });
-      } else if (selectedCategory === "return") {
-        flightData = {
-          airlineName:
-            flight.returnAirlinesName || flight.returnAirlineName || "-",
-          flightNumber: flight.returnFlightNumber,
-          status: flight.returnFlightStatus,
-          airportCode: flight.returnAirportCode || "-",
-          airportName: flight.returnAirport || "-",
-          ...passengerData,
-        };
-
-        timeInfo.push({
-          label: "Return",
-          date: flight.returnDate,
-        });
-      } else {
-        // Default to arrival data
-        flightData = {
-          airlineName: flight.arrivalAirlinesName,
-          flightNumber: flight.arrivalFlightNumber,
-          status: flight.arrivalFlightStatus,
-          airportCode: flight.arrivalAirportCode,
-          airportName: flight.arrivalAirport,
-          ...passengerData,
-        };
-
-        timeInfo.push({
-          label: "Arrival",
-          date: flight.arrivalDate,
-        });
-      }
-    }
-
-    return {
-      ...flightData,
-      timeInfo,
-    };
-  };
+  // Use custom hook for flight actions
+  const { getActionButtons } = useFlightActions(
+    fetchFlightsData,
+    selectedCategory
+  );
 
   const cardSettings = useMemo(() => {
     const isGrid = viewMode === "grid" && numColumns > 1;
@@ -447,233 +190,6 @@ const Flights = () => {
       columnWrapper: isGrid ? styles.columnWrapper : undefined,
     };
   }, [cardWidth, numColumns, viewMode]);
-
-  const getActionButtons = useCallback(
-    (flight) => {
-      const flightId = flight.id;
-      const participantId = flight.participant?.id;
-
-      // Don't show buttons if flightId or participantId is missing
-      if (!flightId || !participantId) {
-        return [];
-      }
-
-      // Handle DEPARTURE flight type - show only "Participant Departed" button
-      if (flight.flightType === "DEPARTURE") {
-        // Disable if isParticipantDeparted is true
-        const isParticipantDepartedDisabled =
-          flight.isParticipantDeparted === true;
-
-        const handleParticipantDeparted = async () => {
-          try {
-            await markFlightDeparted(flightId, participantId, {
-              departed: true,
-            });
-
-            // Get participant name for notification
-            const participant = flight.participant || {};
-            const participantName =
-              `${participant.firstName || ""} ${
-                participant.lastName || ""
-              }`.trim() || "Participant";
-            const flightNumber =
-              flight.returnFlightNumber || flight.arrivalFlightNumber || "-";
-
-            // Send notification
-            await sendNotification(
-              "Participant Departed",
-              `${participantName} has departed on flight ${flightNumber}`,
-              {
-                type: "flight_departed",
-                flightId: flightId,
-                participantId: participantId,
-              }
-            );
-
-            Alert.alert(
-              "Success",
-              "Participant departed status updated successfully!",
-              [{ text: "OK", style: "default" }]
-            );
-            // Refresh flights data
-            fetchFlightsData();
-          } catch (error) {
-            Alert.alert(
-              "Error",
-              "Failed to update participant departed status. Please try again.",
-              [{ text: "OK", style: "default" }]
-            );
-          }
-        };
-
-        return [
-          {
-            icon: "flight-takeoff",
-            text: "Participant Departed",
-            isSelected: !isParticipantDepartedDisabled,
-            disabled: isParticipantDepartedDisabled,
-            onPress: handleParticipantDeparted,
-          },
-        ];
-      }
-
-      // Handle arrival and officially categories
-      // Disable "Meet Done" if isMeetDone is true
-      const isMeetDoneDisabled = flight.isMeetDone === true;
-
-      // Disable "Luggage Received" if isLuggageReceived is true
-      const isLuggageReceivedDisabled = flight.isLuggageReceived === true;
-
-      // Disable "Participant Arrived" if isParticipantArrived is true
-      const isParticipantArrivedDisabled = flight.isParticipantArrived === true;
-
-      const handleMeetDone = async () => {
-        try {
-          await toggleMeetDone(flightId, participantId, {
-            meetDone: true,
-          });
-
-          // Get participant name for notification
-          const participant = flight.participant || {};
-          const participantName =
-            `${participant.firstName || ""} ${
-              participant.lastName || ""
-            }`.trim() || "Participant";
-          const flightNumber = flight.arrivalFlightNumber || "-";
-
-          // Send notification
-          await sendNotification(
-            "Meet Done",
-            `Meet completed for ${participantName} on flight ${flightNumber}`,
-            {
-              type: "flight_meet_done",
-              flightId: flightId,
-              participantId: participantId,
-            }
-          );
-
-          Alert.alert("Success", "Meet done status updated successfully!", [
-            { text: "OK", style: "default" },
-          ]);
-          // Refresh flights data
-          fetchFlightsData();
-        } catch (error) {
-          Alert.alert(
-            "Error",
-            "Failed to update meet done status. Please try again.",
-            [{ text: "OK", style: "default" }]
-          );
-        }
-      };
-
-      const handleLuggageReceived = async () => {
-        try {
-          await toggleLuggageReceived(flightId, participantId, {
-            luggageReceived: true,
-          });
-
-          // Get participant name for notification
-          const participant = flight.participant || {};
-          const participantName =
-            `${participant.firstName || ""} ${
-              participant.lastName || ""
-            }`.trim() || "Participant";
-          const flightNumber = flight.arrivalFlightNumber || "-";
-
-          // Send notification
-          await sendNotification(
-            "Luggage Received",
-            `Luggage received for ${participantName} on flight ${flightNumber}`,
-            {
-              type: "flight_luggage_received",
-              flightId: flightId,
-              participantId: participantId,
-            }
-          );
-
-          Alert.alert(
-            "Success",
-            "Luggage received status updated successfully!",
-            [{ text: "OK", style: "default" }]
-          );
-          // Refresh flights data
-          fetchFlightsData();
-        } catch (error) {
-          Alert.alert(
-            "Error",
-            "Failed to update luggage received status. Please try again.",
-            [{ text: "OK", style: "default" }]
-          );
-        }
-      };
-
-      const handleParticipantArrived = async () => {
-        try {
-          await markFlightArrived(flightId, participantId, {
-            arrived: true,
-          });
-
-          // Get participant name for notification
-          const participant = flight.participant || {};
-          const participantName =
-            `${participant.firstName || ""} ${
-              participant.lastName || ""
-            }`.trim() || "Participant";
-          const flightNumber = flight.arrivalFlightNumber || "-";
-
-          // Send notification
-          await sendNotification(
-            "Participant Arrived",
-            `${participantName} has arrived on flight ${flightNumber}`,
-            {
-              type: "flight_participant_arrived",
-              flightId: flightId,
-              participantId: participantId,
-            }
-          );
-
-          Alert.alert(
-            "Success",
-            "Participant arrived status updated successfully!",
-            [{ text: "OK", style: "default" }]
-          );
-          // Refresh flights data
-          fetchFlightsData();
-        } catch (error) {
-          Alert.alert(
-            "Error",
-            "Failed to update participant arrived status. Please try again.",
-            [{ text: "OK", style: "default" }]
-          );
-        }
-      };
-
-      return [
-        {
-          icon: "work",
-          text: "Luggage Received",
-          isSelected: !isLuggageReceivedDisabled,
-          disabled: isLuggageReceivedDisabled,
-          onPress: handleLuggageReceived,
-        },
-        {
-          icon: "check-circle",
-          text: "Meet Done",
-          isSelected: !isMeetDoneDisabled,
-          disabled: isMeetDoneDisabled,
-          onPress: handleMeetDone,
-        },
-        {
-          icon: "person",
-          text: "Participant Arrived",
-          isSelected: !isParticipantArrivedDisabled,
-          disabled: isParticipantArrivedDisabled,
-          onPress: handleParticipantArrived,
-        },
-      ];
-    },
-    [selectedCategory, fetchFlightsData]
-  );
 
   // Get action button visibility from Redux
   const actionButtonVisibility =
@@ -700,7 +216,7 @@ const Flights = () => {
 
   const renderFlightItem = useCallback(
     ({ item }) => {
-      const cardData = prepareFlightCardData(item);
+      const cardData = prepareFlightCardData(item, selectedCategory);
       const CardComponent = cardSettings.component;
       const allActionButtons = getActionButtons(item);
       const actionButtons = filterActionButtons(allActionButtons);
@@ -713,7 +229,13 @@ const Flights = () => {
         />
       );
     },
-    [cardSettings, handleFlightPress, getActionButtons, filterActionButtons]
+    [
+      cardSettings,
+      handleFlightPress,
+      getActionButtons,
+      filterActionButtons,
+      selectedCategory,
+    ]
   );
 
   const renderEmptyComponent = () => <EmptyListComponent />;

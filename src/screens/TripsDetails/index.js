@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Image, Alert } from "react-native";
+import { View, Text, ScrollView, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import { ActionButton } from "../../components/ActionButton";
+import ParticipantInfoCard from "../../components/ParticipantInfoCard";
 import styles from "./Styles";
-import { Colors } from "../../Global/colors";
 import NoShowModal from "../Trips/components/NoShowModal";
 import { formatDate, getParticipantName } from "./utils/tripDetailsUtils";
 import {
@@ -23,19 +23,12 @@ const TripsDetails = ({ route }) => {
   const [noShowReason, setNoShowReason] = useState("");
   const [selectedTripForNoShow, setSelectedTripForNoShow] = useState(null);
 
-  // Handle both old and new data structures
   const participant = routeParticipant || trip?.participant || {};
   const tripData = trip?.trip || trip || {};
-  const vehicle = trip?.vehicle || {};
-  const participantTrip = trip?.participantTrip || {};
 
-  // Get all trips for this participant
   const tripsList = allTrips || (trip ? [trip] : []);
 
   const userName = getParticipantName(participant);
-  const userMobile = participant?.phone || "N/A";
-  const userEmail = participant?.email || "";
-  const userPhoto = participant?.profilePicture || null;
 
   const handleNoShowPress = (tripItem) => {
     const trip = tripItem.trip || {};
@@ -83,7 +76,6 @@ const TripsDetails = ({ route }) => {
 
   const handlePickedUpPress = async (tripItem) => {
     const trip = tripItem.trip || tripItem || {};
-    const tripParticipantTrip = tripItem.participantTrip || {};
     const tripId = trip.id || "";
     const participantId = participant?.id || "";
 
@@ -111,7 +103,6 @@ const TripsDetails = ({ route }) => {
     const vehicle = tripItem.vehicle || {};
     const tripParticipantTrip = tripItem.participantTrip || {};
     const tripTitle = trip.title || `Trip ${index + 1}`;
-    const isFirstTrip = index === 0;
 
     return (
       <View key={trip.id || index} style={styles.tripCard}>
@@ -120,11 +111,11 @@ const TripsDetails = ({ route }) => {
         <View style={styles.tripDetails}>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Pickup Location:</Text>
-            <Text style={styles.value}>{trip.pickupLocation || "N/A"}</Text>
+            <Text style={styles.value}>{trip.pickupLocation || "-"}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Drop-off Location:</Text>
-            <Text style={styles.value}>{trip.dropoffLocation || "N/A"}</Text>
+            <Text style={styles.value}>{trip.dropoffLocation || "-"}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Scheduled Pickup:</Text>
@@ -132,12 +123,12 @@ const TripsDetails = ({ route }) => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Trip Type:</Text>
-            <Text style={styles.value}>{trip.tripType || "N/A"}</Text>
+            <Text style={styles.value}>{trip.tripType || "-"}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Status:</Text>
             <Text style={[styles.value, styles.statusYes]}>
-              {trip.status || "N/A"}
+              {trip.status || "-"}
             </Text>
           </View>
           <View style={styles.infoRow}>
@@ -170,7 +161,7 @@ const TripsDetails = ({ route }) => {
             <View style={styles.infoRow}>
               <Text style={styles.label}>Vehicle:</Text>
               <Text style={styles.value}>
-                {vehicle.model || "N/A"} ({vehicle.vehicleNumber || "N/A"})
+                {vehicle.model || "-"} ({vehicle.vehicleNumber || "-"})
               </Text>
             </View>
           )}
@@ -215,7 +206,7 @@ const TripsDetails = ({ route }) => {
             : tripData?.tripType || "Trip Details"
         }
         subtitle={
-          tripsList.length > 1 ? "Multiple Trips" : tripData?.status || "N/A"
+          tripsList.length > 1 ? "Multiple Trips" : tripData?.status || "-"
         }
         onLeftButtonPress={() => navigation.goBack()}
       />
@@ -229,41 +220,41 @@ const TripsDetails = ({ route }) => {
           <View style={styles.cardContent}>
             <View style={styles.flexOne}>
               <Text style={styles.sectionTitle}>Participant Information</Text>
-              <View style={styles.participantContainer}>
-                {userPhoto ? (
-                  <Image
-                    source={{
-                      uri: userPhoto,
-                    }}
-                    style={styles.participantPhoto}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View
-                    style={[
-                      styles.participantPhoto,
-                      {
-                        backgroundColor: Colors.Primary,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      },
-                    ]}
-                  >
-                    <Text style={{ color: Colors.White, fontSize: 24 }}>
-                      {userName.charAt(0).toUpperCase()}
-                    </Text>
-                  </View>
-                )}
-                <View style={styles.participantInfo}>
-                  <Text style={styles.participantName}>{userName}</Text>
-                  <Text style={styles.participantMobile}>{userMobile}</Text>
-                  {userEmail && (
-                    <Text style={[styles.participantMobile, { marginTop: 4 }]}>
-                      {userEmail}
-                    </Text>
-                  )}
-                </View>
-              </View>
+              <ParticipantInfoCard
+                participant={participant}
+                fields={[
+                  {
+                    key: "participantCode",
+                    icon: "badge",
+                    iconType: "MaterialIcons",
+                    label: "Participant Code",
+                    value: participant.participantCode,
+                  },
+                  {
+                    key: "phone",
+                    icon: "phone",
+                    iconType: "MaterialIcons",
+                    label: "Phone",
+                    value: participant.phone,
+                  },
+                  {
+                    key: "email",
+                    icon: "email",
+                    iconType: "MaterialIcons",
+                    label: "Email",
+                    value: participant.email,
+                  },
+                  {
+                    key: "nationality",
+                    icon: "flag",
+                    iconType: "Ionicons",
+                    label: "Nationality",
+                    value: participant.nationality
+                      ? `${participant.nationality.name} (${participant.nationality.code})`
+                      : null,
+                  },
+                ]}
+              />
             </View>
           </View>
         </View>

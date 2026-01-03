@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import moment from "moment";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../../Global/colors";
 import {
   ActionButtonGroup,
   ActionButton,
 } from "../../../components/ActionButton";
+import { formatDateTime } from "../../../config/dateUtils";
 import styles from "./Styles";
 
 const FlightCard = ({
@@ -17,7 +17,8 @@ const FlightCard = ({
   airportCode,
   airportName,
 
-  timeInfo = [],
+  date,
+  time,
   participantType = null,
 
   userName = "-",
@@ -31,21 +32,6 @@ const FlightCard = ({
   onPress,
   width,
 }) => {
-  const formatDateTime = (dateString) => {
-    if (!dateString) return "-";
-    try {
-      const nativeDate = new Date(dateString);
-      if (!isNaN(nativeDate.getTime())) {
-        return `${moment(nativeDate).format("MMM DD, YYYY")} - ${moment(
-          nativeDate
-        ).format("h:mm A")}`;
-      }
-      return "-";
-    } catch (error) {
-      return "-";
-    }
-  };
-
   const getStatusConfig = () => {
     const statusUpper = (status || "").toUpperCase().trim();
 
@@ -106,24 +92,19 @@ const FlightCard = ({
 
   const statusConfig = getStatusConfig();
 
-  // Get initials: first char of firstName and first char of lastName
   const getInitials = () => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : "";
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : "";
     if (firstInitial && lastInitial) {
       return `${firstInitial}${lastInitial}`;
     }
-    // Fallback to first char of userName if firstName/lastName not available
     return userName ? userName.charAt(0).toUpperCase() : "";
   };
 
   const userInitials = getInitials();
 
   const getArrivalDateTime = () => {
-    if (timeInfo.length > 0 && timeInfo[0].date) {
-      return formatDateTime(timeInfo[0].date);
-    }
-    return "-";
+    return formatDateTime(date, time);
   };
 
   const renderActions = () => {
@@ -180,26 +161,11 @@ const FlightCard = ({
           </View>
         </View>
       </View>
-      <View
-        style={[
-          styles.statusBadge,
-          { backgroundColor: statusConfig.backgroundColor },
-        ]}
-      >
-        <Text style={[styles.statusText, { color: statusConfig.color }]}>
-          {status || "-"}
-        </Text>
-        {participantType && (
-          <>
-            <Text style={[styles.statusText, { color: statusConfig.color }]}>
-              {" • "}
-            </Text>
-            <Text style={[styles.statusText, { color: statusConfig.color }]}>
-              {participantType}
-            </Text>
-          </>
-        )}
-      </View>
+      {participantType && (
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>{participantType}</Text>
+        </View>
+      )}
       {renderActions()}
     </TouchableOpacity>
   );

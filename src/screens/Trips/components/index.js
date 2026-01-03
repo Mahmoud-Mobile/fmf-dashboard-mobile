@@ -20,6 +20,10 @@ const TripCard = ({ item, onPress, width, actionButtons }) => {
   const userMobile = participant?.phone || "-";
   const userEmail = participant?.email || "";
   const userPhoto = participant?.profilePicture || null;
+  const participantType =
+    participant?.participantType?.name ||
+    participant?.dynamicParticipantType?.name ||
+    null;
 
   const pickupLocation = trip?.pickupLocation || "-";
   const dropoffLocation = trip?.dropoffLocation || "-";
@@ -147,6 +151,11 @@ const TripCard = ({ item, onPress, width, actionButtons }) => {
           )}
         </View>
       </View>
+      {participantType && (
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>{participantType}</Text>
+        </View>
+      )}
       {hasMultipleTrips ? (
         <TouchableOpacity
           style={styles.previewButton}
@@ -158,7 +167,8 @@ const TripCard = ({ item, onPress, width, actionButtons }) => {
           </Text>
         </TouchableOpacity>
       ) : (
-        actionButtons && actionButtons.length > 0 && (
+        actionButtons &&
+        actionButtons.length > 0 && (
           <ActionButtonGroup buttons={actionButtons} />
         )
       )}
