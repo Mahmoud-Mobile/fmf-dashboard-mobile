@@ -8,11 +8,11 @@ import styles from "./Styles";
 
 const DesignatedCarCard = ({ item, onPress, width, actionButtons }) => {
   const participant = item?.participant || {};
-  const trip = item?.trip || {};
+  const car = item?.car || {};
   const vehicle = item?.vehicle || {};
-  const participantTrip = item?.participantTrip || {};
-  const hasMultipleTrips = item?.hasMultipleTrips || false;
-  const allTrips = item?.allTrips || [];
+  const participantCar = item?.participantCar || {};
+  const hasMultipleCars = item?.hasMultipleCars || false;
+  const allCars = item?.allCars || [];
 
   const firstName = participant?.firstName || "";
   const lastName = participant?.lastName || "";
@@ -20,25 +20,29 @@ const DesignatedCarCard = ({ item, onPress, width, actionButtons }) => {
   const userMobile = participant?.phone || "-";
   const userEmail = participant?.email || "";
   const userPhoto = participant?.profilePicture || null;
+  const participantType =
+    participant?.participantType?.name ||
+    participant?.dynamicParticipantType?.name ||
+    null;
 
-  const pickupLocation = trip?.pickupLocation || "-";
-  const dropoffLocation = trip?.dropoffLocation || "-";
-  const scheduledPickup = trip?.scheduledPickup;
-  const tripType = trip?.tripType || "-";
-  const status = trip?.status || "-";
-  const isPickedUp = participantTrip?.isPickedUp || false;
-  const isNoShow = participantTrip?.isNoShow || false;
+  const pickupLocation = car?.pickupLocation || "-";
+  const dropoffLocation = car?.dropoffLocation || "-";
+  const scheduledPickup = car?.scheduledPickup;
+  const carType = car?.carType || car?.tripType || "-";
+  const status = car?.status || "-";
+  const isPickedUp = participantCar?.isPickedUp || false;
+  const isNoShow = participantCar?.isNoShow || false;
 
-  const tripDateTime = (() => {
-    if (!scheduledPickup) return "N/A";
+  const carDateTime = (() => {
+    if (!scheduledPickup) return "-";
     try {
       const nativeDate = new Date(scheduledPickup);
       if (!isNaN(nativeDate.getTime())) {
         return moment(nativeDate).format("MMM DD, YYYY HH:mm");
       }
-      return "N/A";
+      return "-";
     } catch (error) {
-      return "N/A";
+      return "-";
     }
   })();
   const userInitial = userName ? userName.charAt(0).toUpperCase() : "A";
@@ -64,43 +68,59 @@ const DesignatedCarCard = ({ item, onPress, width, actionButtons }) => {
               </View>
             )}
             <View style={styles.passengerDetails}>
-              <Text style={styles.userName}>{userName}</Text>
-              <Text style={styles.userMobile}>{userMobile}</Text>
+              <Text style={styles.userName} numberOfLines={2}>
+                {userName}
+              </Text>
+              <Text style={styles.userMobile} numberOfLines={1}>
+                {userMobile}
+              </Text>
             </View>
           </View>
 
           <View style={styles.locationRow}>
             <MaterialIcons name="location-on" size={16} color={Colors.Gray} />
             <Text style={styles.locationLabel}>Pickup:</Text>
-            <Text style={styles.locationText}>{pickupLocation}</Text>
+            <Text style={styles.locationText} numberOfLines={2}>
+              {pickupLocation}
+            </Text>
           </View>
 
           <View style={styles.locationRow}>
             <MaterialIcons name="location-on" size={16} color={Colors.Gray} />
             <Text style={styles.locationLabel}>Drop-off:</Text>
-            <Text style={styles.locationText}>{dropoffLocation}</Text>
+            <Text style={styles.locationText} numberOfLines={2}>
+              {dropoffLocation}
+            </Text>
           </View>
         </View>
         <View style={styles.rightColumn}>
           <View style={styles.detailRow}>
             <MaterialIcons name="event" size={14} color={Colors.Gray} />
-            <Text style={styles.detailText}>Trip Date: {tripDateTime}</Text>
+            <Text style={styles.detailText} numberOfLines={2}>
+              Car Date: {carDateTime}
+            </Text>
           </View>
 
           <View style={styles.detailRow}>
             <MaterialIcons name="swap-horiz" size={14} color={Colors.Gray} />
-            <Text style={styles.detailText}>Trip Type: {tripType}</Text>
+            <Text style={styles.detailText} numberOfLines={1}>
+              Car Type: {carType}
+            </Text>
           </View>
 
           <View style={styles.detailRow}>
             <MaterialIcons name="info" size={14} color={Colors.Gray} />
-            <Text style={styles.detailText}>Status: {status}</Text>
+            <Text style={styles.detailText} numberOfLines={1}>
+              Status: {status}
+            </Text>
           </View>
 
           {userEmail && (
             <View style={styles.detailRow}>
               <MaterialIcons name="email" size={14} color={Colors.Gray} />
-              <Text style={styles.detailText}>{userEmail}</Text>
+              <Text style={styles.detailText} numberOfLines={1}>
+                {userEmail}
+              </Text>
             </View>
           )}
 
@@ -111,7 +131,7 @@ const DesignatedCarCard = ({ item, onPress, width, actionButtons }) => {
                 size={14}
                 color={Colors.Gray}
               />
-              <Text style={styles.detailText}>
+              <Text style={styles.detailText} numberOfLines={1}>
                 {vehicle.model || "-"} ({vehicle.vehicleNumber || "-"})
               </Text>
             </View>
@@ -122,27 +142,33 @@ const DesignatedCarCard = ({ item, onPress, width, actionButtons }) => {
               <MaterialIcons
                 name={isPickedUp ? "check-circle" : "cancel"}
                 size={14}
-                color={isPickedUp ? Colors.Primary : Colors.Error}
+                color={isPickedUp ? Colors.Primary : Colors.Red}
               />
-              <Text style={styles.detailText}>
+              <Text style={styles.detailText} numberOfLines={1}>
                 {isPickedUp ? "Picked Up" : "No Show"}
               </Text>
             </View>
           )}
         </View>
       </View>
-      {hasMultipleTrips ? (
+      {participantType && (
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>{participantType}</Text>
+        </View>
+      )}
+      {hasMultipleCars ? (
         <TouchableOpacity
           style={styles.previewButton}
           onPress={onPress}
           activeOpacity={0.7}
         >
           <Text style={styles.previewButtonText}>
-            Preview Trips ({allTrips.length})
+            Preview Cars ({allCars.length})
           </Text>
         </TouchableOpacity>
       ) : (
-        actionButtons && actionButtons.length > 0 && (
+        actionButtons &&
+        actionButtons.length > 0 && (
           <ActionButtonGroup buttons={actionButtons} />
         )
       )}
@@ -151,3 +177,4 @@ const DesignatedCarCard = ({ item, onPress, width, actionButtons }) => {
 };
 
 export default DesignatedCarCard;
+

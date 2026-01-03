@@ -1,8 +1,17 @@
 import { Get, Post } from "./Gate";
+import { Platform } from "react-native";
 
 // login apis
 const login = async (data, showAlert = true) => {
-  return await Post("mobile/ops/auth/login", data, "POST", true, showAlert);
+  const platform = Platform.OS === "ios" ? "IOS" : "Android";
+  return await Post(
+    "mobile/ops/auth/login",
+    data,
+    "POST",
+    true,
+    showAlert,
+    platform
+  );
 };
 
 // profile apis

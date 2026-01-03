@@ -21,8 +21,6 @@ export const login =
         await SecureStore.setItemAsync("accessToken", token);
         await SecureStore.setItemAsync("userInfo", JSON.stringify(response));
 
-        // Extract and store rolePermission
-        // API returns roles as an array, so we'll store the first role or the array
         const rolePermission =
           response?.user?.roles?.[0] || response?.user?.role || null;
         dispatch({ type: LOGIN_SUCCESS, payload: response });

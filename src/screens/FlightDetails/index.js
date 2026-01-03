@@ -18,6 +18,7 @@ import { formatDateTime } from "../../config/dateUtils";
 
 const FlightDetails = ({ route }) => {
   const { flight, selectedCategory } = route.params;
+  console.log(flight?.returnCity);
   const navigation = useNavigation();
 
   const getParticipantName = (participant) => {
@@ -286,76 +287,89 @@ const FlightDetails = ({ route }) => {
               />
             </View>
 
+            {flight.flightType === "ARRIVAL" ? (
+              <View style={styles.row}>
+                <View style={[styles.column, { marginRight: 8 }]}>
+                  <Text style={styles.sectionTitle}>Arrival Details</Text>
+                  <InfoRow label="Airport:" value={flight.arrivalAirport} />
+                  <InfoRow
+                    label="Flight Code:"
+                    value={flight.arrivalAirportCode}
+                  />
+                  <InfoRow
+                    label="City:"
+                    value={
+                      flight.arrivalCity && flight.arrivalCountry
+                        ? `${flight.arrivalCity}, ${flight.arrivalCountry}`
+                        : flight.arrivalCity || null
+                    }
+                  />
+                  <InfoRow
+                    label="Date & Time:"
+                    value={formatDateTime(
+                      flight.arrivalDate,
+                      flight.arrivalTime
+                    )}
+                  />
+                  <InfoRow
+                    label="Status:"
+                    value={flight.arrivalFlightStatus}
+                    valueStyle={styles.statusYes}
+                  />
+                </View>
+
+                <View style={[styles.column, { marginRight: 8 }]}>
+                  <Text style={styles.sectionTitle}>Booking Details</Text>
+                  {flight.seatNumber && (
+                    <InfoRow label="Seat:" value={flight.seatNumber} />
+                  )}
+                  <InfoRow label="Class:" value={flight.flightClass} />
+                  <InfoRow label="Type:" value={flight.flightType || "-"} />
+                  <InfoRow label="Aircraft Type:" value={flight.aircraftType} />
+                  <InfoRow label="Ticket No:" value={flight.ticketNumber} />
+                </View>
+              </View>
+            ) : (
+              <View style={styles.row}>
+                <View style={[styles.column, { marginRight: 8 }]}>
+                  <Text style={styles.sectionTitle}>
+                    Return/Departure Details
+                  </Text>
+                  <InfoRow label="Airport:" value={flight.returnAirport} />
+                  <InfoRow
+                    label="Flight Code:"
+                    value={flight.returnAirportCode}
+                  />
+                  <InfoRow
+                    label="City:"
+                    value={flight?.returnCity ? `${flight.returnCity}` : null}
+                  />
+                  <InfoRow
+                    label="Date & Time:"
+                    value={formatDateTime(flight.returnDate, flight.returnTime)}
+                  />
+                  <InfoRow
+                    label="Status:"
+                    value={flight.returnFlightStatus}
+                    valueStyle={styles.statusScheduled}
+                  />
+                </View>
+
+                <View style={[styles.column, { marginRight: 8 }]}>
+                  <Text style={styles.sectionTitle}>Booking Details</Text>
+                  <InfoRow label="Seat:" value={flight.seatNumber} />
+                  <InfoRow label="Class:" value={flight.flightClass} />
+                  <InfoRow
+                    label="Type:"
+                    value={flight.flightType || "Departure"}
+                  />
+                  <InfoRow label="Aircraft Type:" value={flight.aircraftType} />
+                  <InfoRow label="Ticket No:" value={flight.ticketNumber} />
+                </View>
+              </View>
+            )}
+
             <View style={styles.row}>
-              <View style={[styles.column, { marginRight: 8 }]}>
-                <Text style={styles.sectionTitle}>Arrival Details</Text>
-                <InfoRow label="Airport:" value={flight.arrivalAirport} />
-                <InfoRow
-                  label="Flight Code:"
-                  value={flight.arrivalAirportCode}
-                />
-                <InfoRow label="Flight Route:" value={flight.flightRoute} />
-                <InfoRow
-                  label="City:"
-                  value={
-                    flight.arrivalCity && flight.arrivalCountry
-                      ? `${flight.arrivalCity}, ${flight.arrivalCountry}`
-                      : null
-                  }
-                />
-                <InfoRow
-                  label="Date & Time:"
-                  value={formatDateTime(flight.arrivalDate, flight.arrivalTime)}
-                />
-                <InfoRow
-                  label="Status:"
-                  value={flight.arrivalFlightStatus}
-                  valueStyle={styles.statusYes}
-                />
-              </View>
-
-              <View style={[styles.column, { marginRight: 8 }]}>
-                <Text style={styles.sectionTitle}>Booking Details</Text>
-                <InfoRow label="Seat:" value={flight.seatNumber} />
-                <InfoRow label="Class:" value={flight.flightClass} />
-                <InfoRow label="Type:" value={flight.flightType || "Arrival"} />
-                <InfoRow label="Aircraft Type:" value={flight.aircraftType} />
-                <InfoRow label="Booking Ref:" value={flight.bookingReference} />
-                <InfoRow label="Ticket No:" value={flight.ticketNumber} />
-              </View>
-            </View>
-
-            <View style={styles.row}>
-              <View style={[styles.column, { marginRight: 8 }]}>
-                <Text style={styles.sectionTitle}>Return Details</Text>
-                <InfoRow label="Airport:" value={flight.returnAirport} />
-                <InfoRow
-                  label="Flight Code:"
-                  value={flight.returnAirportCode}
-                />
-                <InfoRow
-                  label="Flight Route:"
-                  value={flight.returnRoute || "Riyadh (RUH) → Dubai (DXB)"}
-                />
-                <InfoRow
-                  label="City:"
-                  value={
-                    flight.returnCity && flight.returnCountry
-                      ? `${flight.returnCity}, ${flight.returnCountry}`
-                      : null
-                  }
-                />
-                <InfoRow
-                  label="Date & Time:"
-                  value={formatDateTime(flight.returnDate, flight.returnTime)}
-                />
-                <InfoRow
-                  label="Status:"
-                  value={flight.returnFlightStatus}
-                  valueStyle={styles.statusScheduled}
-                />
-              </View>
-
               <View style={[styles.column, { marginRight: 8 }]}>
                 <Text style={styles.sectionTitle}>Status</Text>
                 <StatusRow
@@ -384,14 +398,16 @@ const FlightDetails = ({ route }) => {
               </View>
             </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Special Request</Text>
-              <Text style={styles.value}>
-                {flight.specialRequest?.trim()
-                  ? flight.specialRequest
-                  : "No special requests"}
-              </Text>
-            </View>
+            {flight.specialRequest && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Special Request</Text>
+                <Text style={styles.value}>
+                  {flight.specialRequest?.trim()
+                    ? flight.specialRequest
+                    : " - "}
+                </Text>
+              </View>
+            )}
           </View>
           <View
             style={{ marginBottom: 100, marginHorizontal: horizontalMargin }}

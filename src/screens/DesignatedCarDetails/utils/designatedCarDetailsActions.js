@@ -1,103 +1,102 @@
 import { Alert } from "react-native";
-import {
-  markTripParticipantNoShow,
-  markTripParticipantPickedUp,
-} from "../../../webservice/apiConfig";
-import { setIconDisabled } from "../../../redux/reducers/uiReducer";
+import { markTripParticipantNoShow } from "../../../webservice/apiConfig";
+import { markTripParticipantPickedUp } from "../../../webservice/apiConfig";
 import { sendNotification } from "../../../config/notificationUtils";
 
-export const handleMarkPickedUp = async (
+export const handleMarkNoShow = async (
   selectedEventId,
-  tripId,
+  carId,
   participantId,
+  noShowReason,
   userName,
-  tripData,
-  dispatch
+  car,
+  dispatch,
+  setShowNoShowModal,
+  setNoShowReason
 ) => {
+  if (!carId || !participantId) {
+    Alert.alert("Error", "Missing car or participant information");
+    return false;
+  }
+
   try {
-    await markTripParticipantPickedUp(selectedEventId, tripId, participantId, {
-      pickedUp: true,
+    await markTripParticipantNoShow(selectedEventId, carId, participantId, {
+      noShow: true,
+      reason: noShowReason,
     });
 
-    const tripType = tripData?.tripType || "Trip";
-    const pickupLocation = tripData?.pickupLocation || "";
+    const carType = car?.carType || car?.tripType || "Car";
 
     await sendNotification(
-      "Participant Picked Up",
-      `${userName} has been picked up for ${tripType}${
-        pickupLocation ? ` from ${pickupLocation}` : ""
+      "Participant No Show",
+      `${userName} marked as no show for ${carType}${
+        noShowReason ? `: ${noShowReason}` : ""
       }`,
       {
-        type: "trip_picked_up",
-        tripId: tripId,
+        type: "car_no_show",
+        carId: carId,
         participantId: participantId,
       }
     );
 
-    dispatch(
-      setIconDisabled({
-        iconId: `picked-up-${tripId}-${participantId}`,
-        disabled: false,
-      })
-    );
-
-    Alert.alert("Success", "Participant marked as picked up");
+    Alert.alert("Success", "Participant marked as no show successfully!", [
+      { text: "OK", style: "default" },
+    ]);
+    setShowNoShowModal(false);
+    setNoShowReason("");
     return true;
   } catch (error) {
     Alert.alert(
-      "Mark Picked Up Failed",
-      `Failed to mark as picked up: ${error.message || "Unknown error"}`
+      "Error",
+      "Failed to mark participant as no show. Please try again.",
+      [{ text: "OK", style: "default" }]
     );
     return false;
   }
 };
 
-export const handleMarkNoShow = async (
+export const handleMarkPickedUp = async (
   selectedEventId,
-  tripId,
+  carId,
   participantId,
-  noShowReason,
   userName,
-  tripData,
-  dispatch,
-  setShowNoShowModal,
-  setNoShowReason
+  car,
+  dispatch
 ) => {
+  if (!carId || !participantId) {
+    Alert.alert("Error", "Missing car or participant information");
+    return false;
+  }
+
   try {
-    await markTripParticipantNoShow(selectedEventId, tripId, participantId, {
-      noShow: true,
-      reason: noShowReason,
+    await markTripParticipantPickedUp(selectedEventId, carId, participantId, {
+      pickedUp: true,
     });
 
-    const tripType = tripData?.tripType || "Trip";
+    const carType = car?.carType || car?.tripType || "Car";
+    const pickupLocation = car?.pickupLocation || "";
 
     await sendNotification(
-      "Participant No Show",
-      `${userName} marked as no show for ${tripType}${
-        noShowReason ? `: ${noShowReason}` : ""
+      "Participant Picked Up",
+      `${userName} has been picked up for ${carType}${
+        pickupLocation ? ` from ${pickupLocation}` : ""
       }`,
       {
-        type: "trip_no_show",
-        tripId: tripId,
+        type: "car_picked_up",
+        carId: carId,
         participantId: participantId,
       }
     );
 
-    dispatch(
-      setIconDisabled({
-        iconId: `no-show-${tripId}-${participantId}`,
-        disabled: false,
-      })
-    );
-
-    setShowNoShowModal(false);
-    setNoShowReason("");
-    Alert.alert("Success", "Participant marked as no show");
+    Alert.alert("Success", "Participant marked as picked up successfully!", [
+      { text: "OK", style: "default" },
+    ]);
     return true;
   } catch (error) {
     Alert.alert(
-      "Mark No Show Failed",
-      `Failed to mark as no show: ${error.message || "Unknown error"}`
+      "Error",
+      "Failed to mark participant as picked up. Please try again.",
+      [{ text: "OK", style: "default" }]
     );
     return false;
   }

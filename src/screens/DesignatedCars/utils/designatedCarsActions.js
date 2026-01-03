@@ -10,15 +10,14 @@ export const createDesignatedCarsActionButtons = (
   onNoShowPress,
   dispatch
 ) => {
-  const trip = item.trip || {};
+  const car = item.car || {};
   const participant = item.participant || {};
-  const participantTrip = item.participantTrip || {};
-  const tripId = trip.id || "";
+  const participantCar = item.participantCar || {};
+  const carId = car.id || "";
   const participantId = participant.id || "";
-
-  const isPickedUp = participantTrip.isPickedUp || false;
-  const isNoShow = participantTrip.isNoShow || false;
-  const isCompleted = trip.status === "COMPLETED" || false;
+  const isPickedUp = participantCar.isPickedUp || false;
+  const isNoShow = participantCar.isNoShow || false;
+  const isCompleted = car.status === "COMPLETED" || false;
 
   return [
     {
@@ -27,12 +26,12 @@ export const createDesignatedCarsActionButtons = (
       swipeTitle: "Swipe to Mark Picked Up",
       isSelected: isPickedUp,
       disabled: isPickedUp || isNoShow || isCompleted,
-      iconId: `picked-up-${tripId}-${participantId}`,
+      iconId: `picked-up-${carId}-${participantId}`,
       onSwipeSuccess: async () => {
         try {
           await markTripParticipantPickedUp(
             selectedEventId,
-            tripId,
+            carId,
             participantId,
             { pickedUp: true }
           );
@@ -43,24 +42,24 @@ export const createDesignatedCarsActionButtons = (
               : item?.participant?.firstName ||
                 item?.participant?.lastName ||
                 "Participant";
-          const tripType = item?.trip?.tripType || "Trip";
-          const pickupLocation = item?.trip?.pickupLocation || "";
+          const carType = item?.car?.carType || item?.car?.tripType || "Car";
+          const pickupLocation = item?.car?.pickupLocation || "";
 
           await sendNotification(
             "Participant Picked Up",
-            `${participantName} has been picked up for ${tripType}${
+            `${participantName} has been picked up for ${carType}${
               pickupLocation ? ` from ${pickupLocation}` : ""
             }`,
             {
-              type: "trip_picked_up",
-              tripId: tripId,
+              type: "car_picked_up",
+              carId: carId,
               participantId: participantId,
             }
           );
 
           dispatch(
             setIconDisabled({
-              iconId: `picked-up-${tripId}-${participantId}`,
+              iconId: `picked-up-${carId}-${participantId}`,
               disabled: false,
             })
           );
@@ -81,9 +80,9 @@ export const createDesignatedCarsActionButtons = (
       swipeTitle: "Swipe to Mark No Show",
       isSelected: isNoShow,
       disabled: isNoShow || isPickedUp || isCompleted,
-      iconId: `no-show-${tripId}-${participantId}`,
+      iconId: `no-show-${carId}-${participantId}`,
       onSwipeSuccess: () => {
-        onNoShowPress({ tripId, participantId });
+        onNoShowPress({ carId, participantId });
       },
       disabledText: "No Show - Done",
     },

@@ -22,7 +22,8 @@ export const exportDesignatedCarsToExcel = async (
   try {
     const excelRows = filteredDesignatedCars.map((item) => {
       const participant = item.participant || {};
-      const trip = item.trip || {};
+      const car = item.car || {};
+      const participantCar = item.participantCar || {};
 
       const userName =
         [participant?.firstName, participant?.lastName]
@@ -32,17 +33,17 @@ export const exportDesignatedCarsToExcel = async (
       const userEmail = participant?.email || "N/A";
 
       return {
-        "Trip ID": trip.id || "N/A",
+        "Car ID": car.id || "N/A",
         "Participant Name": userName,
         "Participant Mobile": userMobile,
         "Participant Email": userEmail,
-        "Pickup Location": trip.pickupLocation || "N/A",
-        "Drop-off Location": trip.dropoffLocation || "N/A",
-        "Scheduled Pickup": formatDateTime(trip.scheduledPickup),
-        "Trip Type": trip.tripType || "N/A",
-        Status: trip.status || "N/A",
-        "Picked Up": trip.isPickedUp ? "Yes" : "No",
-        "No Show": trip.isNoShow ? "Yes" : "No",
+        "Pickup Location": car.pickupLocation || "N/A",
+        "Drop-off Location": car.dropoffLocation || "N/A",
+        "Scheduled Pickup": formatDateTime(car.scheduledPickup),
+        "Car Type": car.carType || car.tripType || "N/A",
+        Status: car.status || "N/A",
+        "Picked Up": participantCar.isPickedUp ? "Yes" : "No",
+        "No Show": participantCar.isNoShow ? "Yes" : "No",
       };
     });
 

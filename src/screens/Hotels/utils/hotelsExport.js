@@ -19,9 +19,9 @@ export const exportHotelsToExcel = async (filteredHotels, setIsPrinting) => {
   try {
     const excelRows = filteredHotels.map((hotel) => {
       return {
-        "Hotel ID": hotel.accommodation?.id || " ",
-        "Hotel Name": hotel.accommodation?.hotelName || " ",
-        "Room Number": hotel.accommodation?.roomNumber || " ",
+        "Hotel ID": hotel.accommodation?.hotel?.id || " ",
+        "Hotel Name": hotel.accommodation?.hotel?.name || " ",
+        "Room Number": hotel.accommodation?.room?.roomNumber || " ",
         "Check In Date": formatDateTime(hotel.accommodation?.checkInDate),
         "Check Out Date": formatDateTime(hotel.accommodation?.checkOutDate),
         Status: hotel.accommodation?.status || " ",

@@ -11,15 +11,22 @@ export const setLogoutHandler = (handler) => {
   logoutHandler = handler;
 };
 
-async function createHeaders(jsonPayload) {
+async function createHeaders(jsonPayload, platform = null) {
   const accessToken = await SecureStore.getItemAsync("accessToken");
   // console.log("accessToken", accessToken);
-  return {
+  const headers = {
     "Content-Type": jsonPayload ? "application/json" : "multipart/form-data",
     Authorization: `Bearer ${accessToken}`,
     Accept: "application/json",
     "correlation-id": generateCorrelationId(),
   };
+
+  // Add X-Platform header only if platform is provided (for login only)
+  if (platform) {
+    headers["X-Platform"] = platform;
+  }
+
+  return headers;
 }
 
 function generateCorrelationId() {
@@ -166,7 +173,8 @@ async function Post(
   data = {},
   method = "POST",
   jsonPayload = false,
-  showAlert = false
+  showAlert = false,
+  platform = null
 ) {
   const baseURL = await getEnvVars("apiUrl");
   const fullUrl = baseURL + url;
@@ -182,7 +190,7 @@ async function Post(
     formData = buildFormData(data);
   }
 
-  const headers = await createHeaders(jsonPayload);
+  const headers = await createHeaders(jsonPayload, platform);
 
   try {
     const response = await axios.request({

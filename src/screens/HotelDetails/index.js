@@ -93,7 +93,10 @@ const HotelDetails = ({ route }) => {
                     icon: "person",
                     iconType: "MaterialIcons",
                     label: "Participant Type",
-                    value: hotel.participant?.participantType?.name,
+                    value:
+                      hotel.participant?.participantType?.name ||
+                      hotel.participant?.dynamicParticipantType?.name ||
+                      null,
                   },
                   {
                     key: "position",

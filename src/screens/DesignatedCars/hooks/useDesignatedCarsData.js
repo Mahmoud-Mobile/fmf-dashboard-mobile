@@ -17,57 +17,57 @@ export const useDesignatedCarsData = (selectedCategory) => {
       tripsParticipants.participants &&
       tripsParticipants.participants.length > 0
     ) {
-      // Flatten the nested structure: each participant can have multiple trips
+      // Flatten the nested structure: each participant can have multiple cars
       const transformedData = [];
       tripsParticipants.participants.forEach((participantItem) => {
         const participant = participantItem.participant || {};
-        const trips = participantItem.trips || [];
-        const hasMultipleTrips = trips.length > 1;
+        const cars = participantItem.trips || []; // Using trips structure for now
+        const hasMultipleCars = cars.length > 1;
 
-        // Create a separate entry for each trip, but include all trips info
-        trips.forEach((tripItem) => {
-          const trip = tripItem.trip || {};
-          const vehicle = tripItem.vehicle || {};
-          const driver = tripItem.driver || null;
-          const driverShift = tripItem.driverShift || null;
-          const participantTrip = tripItem.participantTrip || {};
+        // Create a separate entry for each car, but include all cars info
+        cars.forEach((carItem) => {
+          const car = carItem.trip || {}; // Using trip structure for now
+          const vehicle = carItem.vehicle || {};
+          const driver = carItem.driver || null;
+          const driverShift = carItem.driverShift || null;
+          const participantCar = carItem.participantTrip || {}; // Using participantTrip structure
 
           transformedData.push({
             participant,
-            trip,
+            car,
             vehicle,
             driver,
             driverShift,
-            participantTrip,
-            id: trip.id || "",
-            hasMultipleTrips,
-            allTrips: trips, // Store all trips for this participant
+            participantCar,
+            id: car.id || "",
+            hasMultipleCars,
+            allCars: cars, // Store all cars for this participant
           });
         });
       });
-      
+
       setDesignatedCarsData(transformedData);
 
       transformedData.forEach((item) => {
-        const trip = item.trip || {};
+        const car = item.car || {};
         const participant = item.participant || {};
-        const participantTrip = item.participantTrip || {};
-        const tripId = trip.id || "";
+        const participantCar = item.participantCar || {};
+        const carId = car.id || "";
         const participantId = participant.id || "";
 
-        if (!participantTrip.isPickedUp) {
+        if (!participantCar.isPickedUp) {
           dispatch(
             setIconDisabled({
-              iconId: `picked-up-${tripId}-${participantId}`,
+              iconId: `picked-up-${carId}-${participantId}`,
               disabled: false,
             })
           );
         }
 
-        if (!participantTrip.isNoShow) {
+        if (!participantCar.isNoShow) {
           dispatch(
             setIconDisabled({
-              iconId: `no-show-${tripId}-${participantId}`,
+              iconId: `no-show-${carId}-${participantId}`,
               disabled: false,
             })
           );

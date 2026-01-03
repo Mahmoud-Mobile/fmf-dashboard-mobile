@@ -17,10 +17,10 @@ export const useDesignatedCarsFilters = (
           item?.participant?.lastName?.toLowerCase().includes(searchLower) ||
           item?.participant?.email?.toLowerCase().includes(searchLower) ||
           item?.participant?.phone?.toLowerCase().includes(searchLower) ||
-          item?.trip?.pickupLocation?.toLowerCase().includes(searchLower) ||
-          item?.trip?.dropoffLocation?.toLowerCase().includes(searchLower) ||
-          item?.trip?.tripType?.toLowerCase().includes(searchLower) ||
-          item?.trip?.status?.toLowerCase().includes(searchLower)
+          item?.car?.pickupLocation?.toLowerCase().includes(searchLower) ||
+          item?.car?.dropoffLocation?.toLowerCase().includes(searchLower) ||
+          item?.car?.carType?.toLowerCase().includes(searchLower) ||
+          item?.car?.status?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -31,11 +31,11 @@ export const useDesignatedCarsFilters = (
       }
 
       filtered = filtered.filter((item) => {
-        const scheduledPickup = item?.trip?.scheduledPickup;
+        const scheduledPickup = item?.car?.scheduledPickup;
         if (scheduledPickup) {
-          const tripMoment = moment(new Date(scheduledPickup)).startOf("day");
-          if (tripMoment.isValid()) {
-            return tripMoment.isSameOrAfter(selectedMoment);
+          const carMoment = moment(new Date(scheduledPickup)).startOf("day");
+          if (carMoment.isValid()) {
+            return carMoment.isSameOrAfter(selectedMoment);
           }
         }
         return false;

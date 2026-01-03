@@ -4,7 +4,7 @@ import { setIconDisabled } from "../../../redux/reducers/uiReducer";
 import { sendNotification } from "../../../config/notificationUtils";
 
 export const handleNoShowSubmit = async (
-  selectedDesignatedCarForNoShow,
+  selectedCarForNoShow,
   noShowReason,
   selectedEventId,
   designatedCarsData,
@@ -12,20 +12,20 @@ export const handleNoShowSubmit = async (
   fetchDesignatedCarsData,
   setShowNoShowModal,
   setNoShowReason,
-  setSelectedDesignatedCarForNoShow
+  setSelectedCarForNoShow
 ) => {
-  if (!selectedDesignatedCarForNoShow) return;
+  if (!selectedCarForNoShow) return;
 
-  const { tripId, participantId } = selectedDesignatedCarForNoShow;
+  const { carId, participantId } = selectedCarForNoShow;
 
   try {
-    await markTripParticipantNoShow(selectedEventId, tripId, participantId, {
+    await markTripParticipantNoShow(selectedEventId, carId, participantId, {
       noShow: true,
       reason: noShowReason,
     });
 
     const item = designatedCarsData.find(
-      (d) => d.trip?.id === tripId && d.participant?.id === participantId
+      (d) => d.car?.id === carId && d.participant?.id === participantId
     );
     const participantName =
       item?.participant?.firstName && item?.participant?.lastName
@@ -33,30 +33,30 @@ export const handleNoShowSubmit = async (
         : item?.participant?.firstName ||
           item?.participant?.lastName ||
           "Participant";
-    const tripType = item?.trip?.tripType || "Trip";
+    const carType = item?.car?.carType || item?.car?.tripType || "Car";
 
     await sendNotification(
       "Participant No Show",
-      `${participantName} marked as no show for ${tripType}${
+      `${participantName} marked as no show for ${carType}${
         noShowReason ? `: ${noShowReason}` : ""
       }`,
       {
-        type: "trip_no_show",
-        tripId: tripId,
+        type: "car_no_show",
+        carId: carId,
         participantId: participantId,
       }
     );
 
     dispatch(
       setIconDisabled({
-        iconId: `no-show-${tripId}-${participantId}`,
+        iconId: `no-show-${carId}-${participantId}`,
         disabled: false,
       })
     );
     fetchDesignatedCarsData();
     setShowNoShowModal(false);
     setNoShowReason("");
-    setSelectedDesignatedCarForNoShow(null);
+    setSelectedCarForNoShow(null);
   } catch (error) {
     Alert.alert(
       "Mark No Show Failed",

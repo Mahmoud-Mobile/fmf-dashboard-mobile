@@ -48,7 +48,6 @@ export const prepareFlightCardData = (flight, selectedCategory = "all") => {
     date = flight.returnDate;
     time = flight.returnTime;
   } else {
-    // Fallback: use selectedCategory for backward compatibility
     if (selectedCategory === "arrival") {
       flightData = {
         airlineName: flight.arrivalAirlinesName,
@@ -75,7 +74,6 @@ export const prepareFlightCardData = (flight, selectedCategory = "all") => {
       date = flight.returnDate;
       time = flight.returnTime;
     } else {
-      // Default to arrival data
       flightData = {
         airlineName: flight.arrivalAirlinesName,
         flightNumber: flight.arrivalFlightNumber,
@@ -94,6 +92,8 @@ export const prepareFlightCardData = (flight, selectedCategory = "all") => {
     ...flightData,
     date,
     time,
+    returnDate: flight.returnDate || null,
+    returnTime: flight.returnTime || null,
   };
 };
 
@@ -138,7 +138,8 @@ export const filterFlightsBySearch = (flights, searchText) => {
       status.includes(searchLower) ||
       userName.includes(searchLower) ||
       firstName.includes(searchLower) ||
-      lastName.includes(searchLower)
+      lastName.includes(searchLower) ||
+      participant?.arrivalAirportCode?.includes(searchLower)
     );
   });
 };
@@ -154,19 +155,12 @@ export const filterFlightsByDate = (flights, selectedDate, moment) => {
   if (!selectedDateStr) return flights;
 
   return flights.filter((flight) => {
-    const arrivalMoment = flight.arrivalDate
-      ? moment(flight.arrivalDate)
+    const arrivalDate = flight.arrivalDate
+      ? flight.arrivalDate.split("T")[0]
       : null;
-    const returnMoment = flight.returnDate ? moment(flight.returnDate) : null;
-
-    const arrivalDate =
-      arrivalMoment && arrivalMoment.isValid()
-        ? arrivalMoment.format("YYYY-MM-DD")
-        : null;
-    const returnDate =
-      returnMoment && returnMoment.isValid()
-        ? returnMoment.format("YYYY-MM-DD")
-        : null;
+    const returnDate = flight.returnDate
+      ? flight.returnDate.split("T")[0]
+      : null;
 
     return (
       (arrivalDate && arrivalDate >= selectedDateStr) ||
@@ -176,7 +170,9 @@ export const filterFlightsByDate = (flights, selectedDate, moment) => {
 };
 
 export const filterFlightsByType = (flights, selectedFlightType) => {
-  if (!selectedFlightType) return flights;
+  if (!selectedFlightType || !flights || flights.length === 0) {
+    return flights || [];
+  }
 
   return flights.filter((flight) => {
     return flight.flightType === selectedFlightType;

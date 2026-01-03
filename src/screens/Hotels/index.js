@@ -103,7 +103,7 @@ const Hotels = () => {
         onRightButtonPress={() => navigation.navigate("NotificationScreen")}
       />
       <SearchActionRow
-        searchPlaceholder="Search hotels..."
+        searchPlaceholder="Search by participant name, hotel name, room number..."
         searchValue={searchText}
         onSearchChange={setSearchText}
         onSearchClear={handleSearchClear}

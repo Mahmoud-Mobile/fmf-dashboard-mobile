@@ -100,7 +100,6 @@ const Login = () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      // Additional error handling if needed (when showAlert=false)
       if (!error?.response && error?.status === 400) {
         Alert.alert(
           "Login Failed",
@@ -115,13 +114,12 @@ const Login = () => {
       // dispatch(setEmail("fmf@lead-360.co"));
       // dispatch(setPassword("password123"));
     } else if (selectedCategory === "offerHome") {
-      dispatch(setEmail("demo@lead-360.co"));
-      dispatch(setPassword("password123"));
+      // dispatch(setEmail("demo@lead-360.co"));
+      // dispatch(setPassword("password123"));
     }
   }, [selectedCategory]);
 
   useEffect(() => {
-    // Get device token on component mount
     const getDeviceToken = async () => {
       try {
         const { status: existingStatus } =

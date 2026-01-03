@@ -65,6 +65,12 @@ const ParticipantInfoCard = ({ participant, fields = [] }) => {
         {fields.map((field, index) => {
           if (!field.value) return null;
 
+          // Convert value to string safely
+          const valueString =
+            typeof field.value === "object"
+              ? field.value?.name || JSON.stringify(field.value)
+              : String(field.value);
+
           return (
             <View key={field.key || index} style={styles.detailItem}>
               <View style={styles.detailIconContainer}>
@@ -72,7 +78,7 @@ const ParticipantInfoCard = ({ participant, fields = [] }) => {
               </View>
               <View style={styles.detailContent}>
                 <Text style={styles.detailLabel}>{field.label}</Text>
-                <Text style={styles.detailValue}>{field.value}</Text>
+                <Text style={styles.detailValue}>{valueString}</Text>
               </View>
             </View>
           );

@@ -1,71 +1,64 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Image, Alert } from "react-native";
+import { View, Text, ScrollView, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 import { ActionButton } from "../../components/ActionButton";
+import ParticipantInfoCard from "../../components/ParticipantInfoCard";
 import styles from "./Styles";
-import { Colors } from "../../Global/colors";
+import NoShowModal from "../DesignatedCars/components/NoShowModal";
 import { formatDate, getParticipantName } from "./utils/designatedCarDetailsUtils";
 import {
   handleMarkNoShow,
   handleMarkPickedUp,
 } from "./utils/designatedCarDetailsActions";
-import NoShowModal from "../Trips/components/NoShowModal";
 
 const DesignatedCarDetails = ({ route }) => {
-  const { trip, allTrips, participant: routeParticipant } = route.params;
+  const { car, allCars, participant: routeParticipant } = route.params;
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { selectedEvent } = useSelector((state) => state.api);
 
   const [showNoShowModal, setShowNoShowModal] = useState(false);
   const [noShowReason, setNoShowReason] = useState("");
-  const [selectedTripForNoShow, setSelectedTripForNoShow] = useState(null);
+  const [selectedCarForNoShow, setSelectedCarForNoShow] = useState(null);
 
-  // Handle both old and new data structures
-  const participant = routeParticipant || trip?.participant || {};
-  const tripData = trip?.trip || trip || {};
-  const vehicle = trip?.vehicle || {};
-  const participantTrip = trip?.participantTrip || {};
+  const participant = routeParticipant || car?.participant || {};
+  const carData = car?.car || car || {};
 
-  // Get all trips for this participant
-  const tripsList = allTrips || (trip ? [trip] : []);
+  const carsList = allCars || (car ? [car] : []);
 
   const userName = getParticipantName(participant);
-  const userMobile = participant?.phone || "N/A";
-  const userEmail = participant?.email || "";
-  const userPhoto = participant?.profilePicture || null;
 
-  const handleNoShowPress = (tripItem) => {
-    const trip = tripItem.trip || {};
+  const handleNoShowPress = (carItem) => {
+    const car = carItem.car || {};
     const participantId = participant?.id || "";
-    setSelectedTripForNoShow({ tripId: trip.id, participantId });
+    setSelectedCarForNoShow({ carId: car.id, participantId });
     setNoShowReason("");
     setShowNoShowModal(true);
   };
 
   const handleNoShowSubmit = async () => {
-    if (!selectedTripForNoShow) return;
+    if (!selectedCarForNoShow) return;
 
-    const { tripId, participantId } = selectedTripForNoShow;
-    const tripItem = tripsList.find(
-      (t) => t.trip?.id === tripId || t.id === tripId
+    const { carId, participantId } = selectedCarForNoShow;
+    const carItem = carsList.find(
+      (c) => c.car?.id === carId || c.id === carId
     );
-    const trip = tripItem?.trip || tripItem || {};
+    const car = carItem?.car || carItem || {};
 
-    if (!tripId || !participantId) {
-      Alert.alert("Error", "Missing trip or participant information");
+    if (!carId || !participantId) {
+      Alert.alert("Error", "Missing car or participant information");
       return;
     }
 
     const success = await handleMarkNoShow(
       selectedEvent?.id,
-      tripId,
+      carId,
       participantId,
       noShowReason,
       userName,
-      trip,
+      car,
       dispatch,
       setShowNoShowModal,
       setNoShowReason
@@ -78,26 +71,25 @@ const DesignatedCarDetails = ({ route }) => {
   const handleNoShowModalClose = () => {
     setShowNoShowModal(false);
     setNoShowReason("");
-    setSelectedTripForNoShow(null);
+    setSelectedCarForNoShow(null);
   };
 
-  const handlePickedUpPress = async (tripItem) => {
-    const trip = tripItem.trip || tripItem || {};
-    const tripParticipantTrip = tripItem.participantTrip || {};
-    const tripId = trip.id || "";
+  const handlePickedUpPress = async (carItem) => {
+    const car = carItem.car || carItem || {};
+    const carId = car.id || "";
     const participantId = participant?.id || "";
 
-    if (!tripId || !participantId) {
-      Alert.alert("Error", "Missing trip or participant information");
+    if (!carId || !participantId) {
+      Alert.alert("Error", "Missing car or participant information");
       return;
     }
 
     const success = await handleMarkPickedUp(
       selectedEvent?.id,
-      tripId,
+      carId,
       participantId,
       userName,
-      trip,
+      car,
       dispatch
     );
 
@@ -106,37 +98,37 @@ const DesignatedCarDetails = ({ route }) => {
     }
   };
 
-  const renderTripCard = (tripItem, index) => {
-    const trip = tripItem.trip || tripItem || {};
-    const vehicle = tripItem.vehicle || {};
-    const tripParticipantTrip = tripItem.participantTrip || {};
-    const tripTitle = trip.title || `Trip ${index + 1}`;
+  const renderCarCard = (carItem, index) => {
+    const car = carItem.car || carItem || {};
+    const vehicle = carItem.vehicle || {};
+    const carParticipantCar = carItem.participantCar || {};
+    const carTitle = car.title || `Car ${index + 1}`;
 
     return (
-      <View key={trip.id || index} style={styles.tripCard}>
-        <Text style={styles.tripTitle}>{tripTitle}</Text>
+      <View key={car.id || index} style={styles.carCard}>
+        <Text style={styles.carTitle}>{carTitle}</Text>
 
-        <View style={styles.tripDetails}>
+        <View style={styles.carDetails}>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Pickup Location:</Text>
-            <Text style={styles.value}>{trip.pickupLocation || "N/A"}</Text>
+            <Text style={styles.value}>{car.pickupLocation || "-"}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Drop-off Location:</Text>
-            <Text style={styles.value}>{trip.dropoffLocation || "N/A"}</Text>
+            <Text style={styles.value}>{car.dropoffLocation || "-"}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Scheduled Pickup:</Text>
-            <Text style={styles.value}>{formatDate(trip.scheduledPickup)}</Text>
+            <Text style={styles.value}>{formatDate(car.scheduledPickup)}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Trip Type:</Text>
-            <Text style={styles.value}>{trip.tripType || "N/A"}</Text>
+            <Text style={styles.label}>Car Type:</Text>
+            <Text style={styles.value}>{car.carType || car.tripType || "-"}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Status:</Text>
             <Text style={[styles.value, styles.statusYes]}>
-              {trip.status || "N/A"}
+              {car.status || "-"}
             </Text>
           </View>
           <View style={styles.infoRow}>
@@ -144,12 +136,12 @@ const DesignatedCarDetails = ({ route }) => {
             <Text
               style={[
                 styles.value,
-                tripParticipantTrip?.isPickedUp
+                carParticipantCar?.isPickedUp
                   ? styles.statusYes
                   : styles.statusNo,
               ]}
             >
-              {tripParticipantTrip?.isPickedUp ? "Yes" : "No"}
+              {carParticipantCar?.isPickedUp ? "Yes" : "No"}
             </Text>
           </View>
           <View style={styles.infoRow}>
@@ -157,34 +149,34 @@ const DesignatedCarDetails = ({ route }) => {
             <Text
               style={[
                 styles.value,
-                tripParticipantTrip?.isNoShow
+                carParticipantCar?.isNoShow
                   ? styles.statusYes
                   : styles.statusNo,
               ]}
             >
-              {tripParticipantTrip?.isNoShow ? "Yes" : "No"}
+              {carParticipantCar?.isNoShow ? "Yes" : "No"}
             </Text>
           </View>
           {vehicle && (vehicle.model || vehicle.vehicleNumber) && (
             <View style={styles.infoRow}>
               <Text style={styles.label}>Vehicle:</Text>
               <Text style={styles.value}>
-                {vehicle.model || "N/A"} ({vehicle.vehicleNumber || "N/A"})
+                {vehicle.model || "-"} ({vehicle.vehicleNumber || "-"})
               </Text>
             </View>
           )}
         </View>
 
-        <View style={styles.tripActions}>
+        <View style={styles.carActions}>
           <ActionButton
             icon="arrow-forward"
             text="Mark Picked Up"
             swipeTitle="Swipe to Mark Picked Up"
             disabled={
-              tripParticipantTrip?.isPickedUp || tripParticipantTrip?.isNoShow
+              carParticipantCar?.isPickedUp || carParticipantCar?.isNoShow
             }
-            iconId={`picked-up-${trip.id}-${participant?.id}`}
-            onSwipeSuccess={() => handlePickedUpPress(tripItem)}
+            iconId={`picked-up-${car.id}-${participant?.id}`}
+            onSwipeSuccess={() => handlePickedUpPress(carItem)}
             disabledText="Picked Up - Done"
           />
 
@@ -193,10 +185,10 @@ const DesignatedCarDetails = ({ route }) => {
             text="Mark No Show"
             swipeTitle="Swipe to Mark No Show"
             disabled={
-              tripParticipantTrip?.isNoShow || tripParticipantTrip?.isPickedUp
+              carParticipantCar?.isNoShow || carParticipantCar?.isPickedUp
             }
-            iconId={`no-show-${trip.id}-${participant?.id}`}
-            onSwipeSuccess={() => handleNoShowPress(tripItem)}
+            iconId={`no-show-${car.id}-${participant?.id}`}
+            onSwipeSuccess={() => handleNoShowPress(carItem)}
             disabledText="No Show - Done"
           />
         </View>
@@ -209,12 +201,12 @@ const DesignatedCarDetails = ({ route }) => {
       <CustomHeader
         leftLabel="Designated Cars"
         title={
-          tripsList.length > 1
-            ? `${tripsList.length} Trips`
-            : tripData?.tripType || "Designated Car Details"
+          carsList.length > 1
+            ? `${carsList.length} Cars`
+            : carData?.carType || carData?.tripType || "Car Details"
         }
         subtitle={
-          tripsList.length > 1 ? "Multiple Trips" : tripData?.status || "N/A"
+          carsList.length > 1 ? "Multiple Cars" : carData?.status || "-"
         }
         onLeftButtonPress={() => navigation.goBack()}
       />
@@ -228,46 +220,46 @@ const DesignatedCarDetails = ({ route }) => {
           <View style={styles.cardContent}>
             <View style={styles.flexOne}>
               <Text style={styles.sectionTitle}>Participant Information</Text>
-              <View style={styles.participantContainer}>
-                {userPhoto ? (
-                  <Image
-                    source={{
-                      uri: userPhoto,
-                    }}
-                    style={styles.participantPhoto}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View
-                    style={[
-                      styles.participantPhoto,
-                      {
-                        backgroundColor: Colors.Primary,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      },
-                    ]}
-                  >
-                    <Text style={{ color: Colors.White, fontSize: 24 }}>
-                      {userName.charAt(0).toUpperCase()}
-                    </Text>
-                  </View>
-                )}
-                <View style={styles.participantInfo}>
-                  <Text style={styles.participantName}>{userName}</Text>
-                  <Text style={styles.participantMobile}>{userMobile}</Text>
-                  {userEmail && (
-                    <Text style={[styles.participantMobile, { marginTop: 4 }]}>
-                      {userEmail}
-                    </Text>
-                  )}
-                </View>
-              </View>
+              <ParticipantInfoCard
+                participant={participant}
+                fields={[
+                  {
+                    key: "participantCode",
+                    icon: "badge",
+                    iconType: "MaterialIcons",
+                    label: "Participant Code",
+                    value: participant.participantCode,
+                  },
+                  {
+                    key: "phone",
+                    icon: "phone",
+                    iconType: "MaterialIcons",
+                    label: "Phone",
+                    value: participant.phone,
+                  },
+                  {
+                    key: "email",
+                    icon: "email",
+                    iconType: "MaterialIcons",
+                    label: "Email",
+                    value: participant.email,
+                  },
+                  {
+                    key: "nationality",
+                    icon: "flag",
+                    iconType: "Ionicons",
+                    label: "Nationality",
+                    value: participant.nationality
+                      ? `${participant.nationality.name} (${participant.nationality.code})`
+                      : null,
+                  },
+                ]}
+              />
             </View>
           </View>
         </View>
 
-        {tripsList.map((tripItem, index) => renderTripCard(tripItem, index))}
+        {carsList.map((carItem, index) => renderCarCard(carItem, index))}
       </ScrollView>
 
       <NoShowModal
@@ -282,3 +274,4 @@ const DesignatedCarDetails = ({ route }) => {
 };
 
 export default DesignatedCarDetails;
+

@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
-    // flex: 2,
   },
   statusScheduled: {
     color: "#10B981",
@@ -92,57 +91,52 @@ const styles = StyleSheet.create({
     color: "#EF4444",
     fontFamily: Fonts.FONT_REGULAR,
   },
-  participantContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F8F9FA",
-    borderRadius: 16,
-    padding: 10,
-    marginTop: 8,
-  },
-  participantPhoto: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginRight: 10,
-  },
-  participantInfo: {
-    flex: 1,
-  },
-  participantName: {
-    fontSize: 14,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.PrimaryText,
-    marginBottom: 6,
-  },
-  participantMobile: {
-    fontSize: 14,
-    fontFamily: Fonts.FONT_REGULAR,
-    color: Colors.Primary,
-    marginBottom: 4,
-  },
-  tripCard: {
+  carCard: {
     ...commonCardStyle,
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
     marginBottom: 16,
     padding: 20,
   },
-  tripTitle: {
+  carTitle: {
     fontSize: 18,
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.Primary,
     marginBottom: 16,
     fontWeight: "600",
   },
-  tripDetails: {
+  carDetails: {
     marginBottom: 16,
   },
-  tripActions: {
-    flexDirection: "row",
+  carActions: {
     gap: 12,
     marginTop: 16,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.Primary,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 8,
+  },
+  actionButtonSecondary: {
+    backgroundColor: Colors.Red || "#EF4444",
+  },
+  actionButtonDisabled: {
+    backgroundColor: Colors.Gray || "#E5E7EB",
+    opacity: 0.6,
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.White,
+    fontWeight: "600",
   },
 });
 
 export default styles;
+

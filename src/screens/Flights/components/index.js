@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Colors } from "../../../Global/colors";
 import {
   ActionButtonGroup,
   ActionButton,
@@ -12,13 +11,13 @@ import styles from "./Styles";
 const FlightCard = ({
   airlineName,
   flightNumber,
-  status,
-
   airportCode,
   airportName,
 
   date,
   time,
+  returnDate,
+  returnTime,
   participantType = null,
 
   userName = "-",
@@ -32,80 +31,25 @@ const FlightCard = ({
   onPress,
   width,
 }) => {
-  const getStatusConfig = () => {
-    const statusUpper = (status || "").toUpperCase().trim();
-
-    if (statusUpper === "SCHEDULED" || statusUpper.includes("SCHEDULED")) {
-      return {
-        color: "#3B82F6",
-        backgroundColor: "#DBEAFE",
-        icon: "schedule",
-      };
-    }
-
-    if (statusUpper === "DELAYED" || statusUpper.includes("DELAYED")) {
-      return {
-        color: "#C10007",
-        backgroundColor: "#FFE9E9",
-        icon: "error-outline",
-      };
-    }
-
-    if (statusUpper === "IN_FLIGHT" || statusUpper.includes("IN_FLIGHT")) {
-      return {
-        color: "#6366F1",
-        backgroundColor: "#E0E7FF",
-        icon: "flight",
-      };
-    }
-
-    if (statusUpper === "DEPARTED" || statusUpper.includes("DEPARTED")) {
-      return {
-        color: "#FFAC4A",
-        backgroundColor: "#FFE3C1",
-        icon: "flight-takeoff",
-      };
-    }
-
-    if (statusUpper === "DIVERTED" || statusUpper.includes("DIVERTED")) {
-      return {
-        color: "#F59E0B",
-        backgroundColor: "#FEF3C7",
-        icon: "swap-horiz",
-      };
-    }
-
-    if (statusUpper === "CANCELLED" || statusUpper.includes("CANCELLED")) {
-      return {
-        color: "#DC2626",
-        backgroundColor: "#FEE2E2",
-        icon: "error-outline",
-      };
-    }
-
-    return {
-      color: Colors.Primary,
-      backgroundColor: "#E0E7FF",
-      icon: null,
-    };
-  };
-
-  const statusConfig = getStatusConfig();
-
-  const getInitials = () => {
+  const userInitials = useMemo(() => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : "";
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : "";
     if (firstInitial && lastInitial) {
       return `${firstInitial}${lastInitial}`;
     }
     return userName ? userName.charAt(0).toUpperCase() : "";
-  };
+  }, [firstName, lastName, userName]);
 
-  const userInitials = getInitials();
-
-  const getArrivalDateTime = () => {
+  const arrivalDateTime = useMemo(() => {
     return formatDateTime(date, time);
-  };
+  }, [date, time]);
+
+  const returnDateTime = useMemo(() => {
+    if (returnDate && returnTime) {
+      return formatDateTime(returnDate, returnTime);
+    }
+    return null;
+  }, [returnDate, returnTime]);
 
   const renderActions = () => {
     if (!actionButtons || actionButtons.length === 0) return null;
@@ -157,8 +101,14 @@ const FlightCard = ({
 
           <View style={styles.detailRow}>
             <MaterialIcons name="event" size={14} color="#6B7280" />
-            <Text style={styles.detailText}>{getArrivalDateTime()}</Text>
+            <Text style={styles.detailText}>{arrivalDateTime}</Text>
           </View>
+          {returnDateTime && (
+            <View style={styles.detailRow}>
+              <MaterialIcons name="flight-land" size={14} color="#6B7280" />
+              <Text style={styles.detailText}>Return: {returnDateTime}</Text>
+            </View>
+          )}
         </View>
       </View>
       {participantType && (
@@ -171,4 +121,4 @@ const FlightCard = ({
   );
 };
 
-export default FlightCard;
+export default React.memo(FlightCard);

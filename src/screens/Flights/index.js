@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import { View, Text, FlatList, RefreshControl, Alert } from "react-native";
 import moment from "moment";
 import CustomEventHeader from "../../components/CustomEventHeader";
@@ -26,9 +32,10 @@ import { useFlightActions } from "./hooks/useFlightActions";
 
 const Flights = () => {
   const dispatch = useDispatch();
-  const { flights, loading, error } = useSelector((state) => state.api);
+  const { flights, loading } = useSelector((state) => state.api);
   const { selectedEvent } = useSelector((state) => state.api);
   const navigation = useNavigation();
+
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedFlightType, setSelectedFlightType] = useState("ARRIVAL");
   const [refreshing, setRefreshing] = useState(false);
@@ -38,51 +45,120 @@ const Flights = () => {
   const [isPrinting, setIsPrinting] = useState(false);
   const [viewMode, setViewMode] = useState("list");
 
+  const initialCategoriesRef = useRef([]);
+
   const { width: screenWidth } = getDeviceDimensions();
-  // console.log(flights?.flights);
   const horizontalPadding = horizontalMargin * 2;
 
-  const numColumns = useMemo(() => {
-    if (viewMode === "list") {
-      return 1;
-    }
-    return 2;
-  }, [viewMode]);
+  const numColumns = useMemo(() => (viewMode === "list" ? 1 : 2), [viewMode]);
 
-  const { cardWidth } = useMemo(() => {
+  const cardWidth = useMemo(() => {
     const gapBetweenCards = (numColumns - 1) * 8;
-    const width =
-      (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
-    return { cardWidth: width };
+    return (screenWidth - horizontalPadding - gapBetweenCards) / numColumns;
   }, [numColumns, screenWidth, horizontalPadding]);
 
-  const categories = [
-    { id: "all", label: "All", key: "all" },
-    { id: "official", label: "Official", key: "official" },
-  ];
+  const extractCategories = useCallback((flightsData) => {
+    const baseCategories = [{ id: "all", label: "All", key: "all" }];
+
+    if (!flightsData) {
+      return baseCategories;
+    }
+
+    const participants = flightsData?.participants || [];
+    const flightsArray = flightsData?.flights || [];
+    const participantTypeMap = new Map();
+
+    const addParticipantType = (participantType) => {
+      if (participantType?.id && participantType?.name) {
+        if (!participantTypeMap.has(participantType.id)) {
+          participantTypeMap.set(participantType.id, {
+            id: participantType.id,
+            label: participantType.name,
+            key: participantType.id,
+          });
+        }
+      }
+    };
+
+    participants.forEach((item) => {
+      addParticipantType(item?.participant?.participantType);
+    });
+
+    flightsArray.forEach((flight) => {
+      addParticipantType(flight?.participant?.participantType);
+    });
+
+    const participantTypeCategories = Array.from(
+      participantTypeMap.values()
+    ).sort((a, b) => a.label.localeCompare(b.label));
+
+    return [...baseCategories, ...participantTypeCategories];
+  }, []);
+
+  const [categoriesUpdated, setCategoriesUpdated] = useState(0);
+
+  useEffect(() => {
+    if (flights && selectedCategory === "all") {
+      const extractedCategories = extractCategories(flights);
+      if (
+        extractedCategories.length > 1 &&
+        extractedCategories.length >= initialCategoriesRef.current.length
+      ) {
+        initialCategoriesRef.current = extractedCategories;
+        setCategoriesUpdated((prev) => prev + 1);
+      }
+    }
+  }, [flights, selectedCategory, extractCategories]);
+
+  const categories = useMemo(() => {
+    if (initialCategoriesRef.current.length > 1) {
+      return initialCategoriesRef.current;
+    }
+    return extractCategories(flights);
+  }, [extractCategories, categoriesUpdated]);
 
   const flightTypeCategories = [
     { id: "ARRIVAL", label: "Arrival", key: "ARRIVAL" },
     { id: "DEPARTURE", label: "Departure", key: "DEPARTURE" },
   ];
-  // console.log(filteredFlights[0]);
 
   const filteredFlights = useMemo(() => {
     let filtered = flights?.flights || [];
-
-    // Apply filters in sequence
     filtered = filterFlightsBySearch(filtered, searchText);
     filtered = filterFlightsByDate(filtered, selectedDate, moment);
     filtered = filterFlightsByType(filtered, selectedFlightType);
-
     return filtered;
   }, [flights, searchText, selectedDate, selectedFlightType]);
 
   useEffect(() => {
-    if (selectedEvent?.id) {
-      fetchFlightsData();
+    if (selectedCategory !== "all" && categories.length > 0) {
+      const categoryExists = categories.some(
+        (cat) => cat.id === selectedCategory
+      );
+      if (!categoryExists) {
+        setSelectedCategory("all");
+      }
     }
-  }, [selectedEvent, selectedCategory]);
+  }, [categories, selectedCategory]);
+
+  const fetchFlightsData = useCallback(() => {
+    if (!selectedEvent?.id) return;
+
+    const params = {
+      page: 1,
+      limit: 5000,
+    };
+
+    if (selectedCategory !== "all") {
+      params.participantTypeId = selectedCategory;
+    }
+
+    dispatch(fetchFlights(selectedEvent.id, params));
+  }, [selectedEvent?.id, selectedCategory, dispatch]);
+
+  useEffect(() => {
+    fetchFlightsData();
+  }, [fetchFlightsData]);
 
   useEffect(() => {
     if (!loading && refreshing) {
@@ -90,55 +166,41 @@ const Flights = () => {
     }
   }, [loading, refreshing]);
 
-  const fetchFlightsData = useCallback(() => {
-    if (selectedEvent?.id) {
-      const params = {
-        page: 1,
-        limit: 5000,
-      };
-
-      // Only include participantsType if category is not "all"
-      if (selectedCategory !== "all") {
-        params.participantsType = selectedCategory;
-      }
-
-      dispatch(fetchFlights(selectedEvent.id, params));
-    }
-  }, [selectedEvent, selectedCategory, dispatch]);
-
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchFlightsData();
-  };
+  }, [fetchFlightsData]);
 
-  const handleFlightPress = (flight) => {
-    const selectedCategoryName =
-      categories.find((c) => c.id === selectedCategory)?.label ||
-      selectedCategory;
-    navigation.navigate("FlightDetails", {
-      flight,
-      selectedCategory,
-      selectedCategoryName,
-    });
-  };
+  const handleFlightPress = useCallback(
+    (flight) => {
+      const selectedCategoryName =
+        categories.find((c) => c.id === selectedCategory)?.label ||
+        selectedCategory;
+      navigation.navigate("FlightDetails", {
+        flight,
+        selectedCategory,
+        selectedCategoryName,
+      });
+    },
+    [categories, selectedCategory, navigation]
+  );
 
-  const handleSearchClear = () => {
+  const handleSearchClear = useCallback(() => {
     setSearchText("");
-  };
+  }, []);
 
-  const handleDateSelect = (date) => {
+  const handleDateSelect = useCallback((date) => {
     setSelectedDate(date);
-  };
+  }, []);
 
-  const handleDateModalClose = () => {
+  const handleDateModalClose = useCallback(() => {
     setShowDateModal(false);
-  };
+  }, []);
 
-  const printToFile = async () => {
+  const printToFile = useCallback(async () => {
     try {
       setIsPrinting(true);
 
-      // Check if there are flights to export
       if (filteredFlights.length === 0) {
         Alert.alert(
           "No Flights to Export",
@@ -148,7 +210,6 @@ const Flights = () => {
         return;
       }
 
-      // Prepare data for Excel
       const excelData = filteredFlights.map((flight) =>
         prepareFlightExportData(flight, selectedCategory)
       );
@@ -160,28 +221,26 @@ const Flights = () => {
         sheetName: "Flights",
       });
     } catch (error) {
-      let errorMessage = "Failed to generate Excel file. Please try again.";
-
-      if (error.message?.includes("sharing")) {
-        errorMessage =
-          "Excel file was generated but couldn't be shared. Please check your device settings.";
-      }
+      const errorMessage = error.message?.includes("sharing")
+        ? "Excel file was generated but couldn't be shared. Please check your device settings."
+        : "Failed to generate Excel file. Please try again.";
 
       Alert.alert("Error", errorMessage);
     } finally {
       setIsPrinting(false);
     }
-  };
+  }, [filteredFlights, selectedCategory]);
 
-  // Use custom hook for flight actions
   const { getActionButtons } = useFlightActions(
     fetchFlightsData,
     selectedCategory
   );
 
+  const actionButtonVisibility =
+    useSelector((state) => state.ui?.actionButtonVisibility) || {};
+
   const cardSettings = useMemo(() => {
     const isGrid = viewMode === "grid" && numColumns > 1;
-
     return {
       isGrid,
       component: FlightCard,
@@ -191,24 +250,17 @@ const Flights = () => {
     };
   }, [cardWidth, numColumns, viewMode]);
 
-  // Get action button visibility from Redux
-  const actionButtonVisibility =
-    useSelector((state) => state.ui?.actionButtonVisibility) || {};
-
-  // Helper function to filter action buttons
   const filterActionButtons = useCallback(
     (buttons) => {
       if (!buttons || !Array.isArray(buttons)) return [];
       return buttons.filter((button) => {
         if (!button || !button.text) return true;
         const storedValue = actionButtonVisibility[button.text];
-        const isVisible =
-          storedValue === undefined
-            ? true
-            : typeof storedValue === "string"
-            ? storedValue === "true"
-            : Boolean(storedValue);
-        return isVisible;
+        return storedValue === undefined
+          ? true
+          : typeof storedValue === "string"
+          ? storedValue === "true"
+          : Boolean(storedValue);
       });
     },
     [actionButtonVisibility]
@@ -243,7 +295,7 @@ const Flights = () => {
   const renderListFooter = () => (
     <View style={styles.listFooter}>
       <Text style={styles.footerText}>
-        {filteredFlights.length} {selectedCategory} flights found
+        {filteredFlights.length} flights found
         {searchText && " (filtered)"}
       </Text>
     </View>
@@ -282,14 +334,16 @@ const Flights = () => {
         selectedCategory={selectedFlightType}
         onCategorySelect={setSelectedFlightType}
       />
+
       <LoadingModal visible={loading} />
+
       {!loading && (
         <FlatList
           key={viewMode}
           data={filteredFlights}
           renderItem={renderFlightItem}
           keyExtractor={(item, index) =>
-            item.id ? `${item.id}-${index}` : `flight-${index}`
+            item.id ? String(item.id) : `flight-${index}`
           }
           ListFooterComponent={renderListFooter}
           ListEmptyComponent={renderEmptyComponent}
@@ -300,6 +354,11 @@ const Flights = () => {
           numColumns={cardSettings.numColumns}
           columnWrapperStyle={cardSettings.columnWrapper}
           contentContainerStyle={styles.listContainer}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={50}
+          initialNumToRender={10}
+          windowSize={10}
         />
       )}
 

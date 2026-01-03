@@ -26,14 +26,6 @@ import { Storage } from "expo-storage";
 
 const SECTION_CONFIG = [
   { id: "dashboardOverview", label: "Dashboard Overview" },
-  // { id: "eventAnalytics", label: "Event Analytics" },
-  // { id: "arrivalGuests", label: "Arrival Guests" },
-  // { id: "returnGuests", label: "Return Guests" },
-  // { id: "flights", label: "Flights" },
-  // { id: "hotelOccupancy", label: "Hotel Occupancy" },
-  // { id: "hotelDetails", label: "Hotel Details" },
-  // { id: "tripList", label: "Trip List" },
-  // { id: "tripsSummary", label: "Trips Summary" },
 ];
 
 const ACTION_BUTTON_CONFIG = [
@@ -64,6 +56,7 @@ const VisibilitySettings = () => {
   const storedActionButtonVisibility =
     useSelector((state) => state.ui?.actionButtonVisibility) || {};
   const rolePermission = useSelector((state) => state.auth.user?.user);
+  const userInfo = useSelector((state) => state.auth.user);
   const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
 
   useEffect(() => {
@@ -75,7 +68,6 @@ const VisibilitySettings = () => {
         const env = selectedCategory || "fmf";
         setCurrentEnvironment(env);
       } catch (error) {
-        console.log("Error loading environment:", error);
         setCurrentEnvironment("fmf");
       }
     };
@@ -191,7 +183,6 @@ const VisibilitySettings = () => {
     );
   };
 
-  // Group action buttons by category
   const actionButtonsByCategory = useMemo(() => {
     const grouped = {};
     ACTION_BUTTON_CONFIG.forEach((button) => {
@@ -203,10 +194,16 @@ const VisibilitySettings = () => {
     return grouped;
   }, []);
 
+  useEffect(() => {
+    if (userInfo) {
+      console.log("userInfo from redux:", JSON.stringify(userInfo, null, 2));
+    }
+  }, [userInfo]);
+
   return (
     <View style={styles.container}>
       <CustomHeader
-        title="Visibility Settings"
+        leftLabel="Visibility Settings"
         onLeftButtonPress={() => navigation.goBack()}
       />
       <ScrollView

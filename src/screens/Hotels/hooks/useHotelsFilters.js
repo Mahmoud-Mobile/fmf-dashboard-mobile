@@ -1,22 +1,56 @@
 import { useMemo } from "react";
 import moment from "moment";
 
+const searchInObject = (obj, searchText) => {
+  if (!obj || typeof obj !== "object") {
+    return false;
+  }
+
+  const searchLower = searchText.toLowerCase();
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const value = obj[key];
+
+      if (
+        value === null ||
+        value === undefined ||
+        typeof value === "function"
+      ) {
+        continue;
+      }
+
+      if (typeof value === "string" || typeof value === "number") {
+        if (String(value).toLowerCase().includes(searchLower)) {
+          return true;
+        }
+      } else if (
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        !(value instanceof Date)
+      ) {
+        if (searchInObject(value, searchText)) {
+          return true;
+        }
+      } else if (Array.isArray(value)) {
+        for (const item of value) {
+          if (searchInObject(item, searchText)) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+};
+
 export const useHotelsFilters = (hotelsData, searchText, selectedDate) => {
   const filteredHotels = useMemo(() => {
     let filtered = hotelsData;
 
     if (searchText.trim()) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter(
-        (hotel) =>
-          hotel?.accommodation?.hotelName
-            ?.toLowerCase()
-            .includes(searchLower) ||
-          hotel?.accommodation?.roomNumber
-            ?.toLowerCase()
-            .includes(searchLower) ||
-          hotel?.accommodation?.status?.toLowerCase().includes(searchLower)
-      );
+      filtered = filtered.filter((hotel) => searchInObject(hotel, searchText));
     }
 
     if (selectedDate) {

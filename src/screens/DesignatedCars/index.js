@@ -33,8 +33,7 @@ const DesignatedCars = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showNoShowModal, setShowNoShowModal] = useState(false);
   const [noShowReason, setNoShowReason] = useState("");
-  const [selectedDesignatedCarForNoShow, setSelectedDesignatedCarForNoShow] =
-    useState(null);
+  const [selectedCarForNoShow, setSelectedCarForNoShow] = useState(null);
 
   const {
     designatedCarsData,
@@ -70,8 +69,8 @@ const DesignatedCars = () => {
     setShowDateModal(false);
   };
 
-  const handleNoShowPress = ({ tripId, participantId }) => {
-    setSelectedDesignatedCarForNoShow({ tripId, participantId });
+  const handleNoShowPress = ({ carId, participantId }) => {
+    setSelectedCarForNoShow({ carId, participantId });
     setNoShowReason("");
     setShowNoShowModal(true);
   };
@@ -79,12 +78,12 @@ const DesignatedCars = () => {
   const handleNoShowModalClose = () => {
     setShowNoShowModal(false);
     setNoShowReason("");
-    setSelectedDesignatedCarForNoShow(null);
+    setSelectedCarForNoShow(null);
   };
 
   const onNoShowSubmit = async () => {
     await handleNoShowSubmit(
-      selectedDesignatedCarForNoShow,
+      selectedCarForNoShow,
       noShowReason,
       selectedEvent?.id,
       designatedCarsData,
@@ -92,7 +91,7 @@ const DesignatedCars = () => {
       fetchDesignatedCarsData,
       setShowNoShowModal,
       setNoShowReason,
-      setSelectedDesignatedCarForNoShow
+      setSelectedCarForNoShow
     );
   };
 
@@ -113,25 +112,25 @@ const DesignatedCars = () => {
     [selectedEvent?.id, fetchDesignatedCarsData, dispatch]
   );
 
-  const handleDesignatedCarPress = useCallback(
+  const handleCarPress = useCallback(
     (item) => {
-      // If participant has multiple trips, pass all trips data
-      if (item.hasMultipleTrips && item.allTrips) {
+      // If participant has multiple cars, pass all cars data
+      if (item.hasMultipleCars && item.allCars) {
         navigation.navigate("DesignatedCarDetails", {
-          trip: item,
-          allTrips: item.allTrips,
+          car: item,
+          allCars: item.allCars,
           participant: item.participant,
         });
       } else {
         navigation.navigate("DesignatedCarDetails", {
-          trip: item,
+          car: item,
         });
       }
     },
     [navigation]
   );
 
-  const renderDesignatedCarCard = useCallback(
+  const renderCarCard = useCallback(
     ({ item }) => {
       const allActionButtons = getActionButtons(item);
       const actionButtons = filterActionButtons(allActionButtons);
@@ -140,11 +139,11 @@ const DesignatedCars = () => {
           item={item}
           width={cardWidth}
           actionButtons={actionButtons}
-          onPress={() => handleDesignatedCarPress(item)}
+          onPress={() => handleCarPress(item)}
         />
       );
     },
-    [cardWidth, getActionButtons, handleDesignatedCarPress, filterActionButtons]
+    [cardWidth, getActionButtons, handleCarPress, filterActionButtons]
   );
 
   const listKeyExtractor = useCallback((item, index) => {
@@ -184,7 +183,7 @@ const DesignatedCars = () => {
         <FlatList
           key={viewMode}
           data={filteredDesignatedCars}
-          renderItem={renderDesignatedCarCard}
+          renderItem={renderCarCard}
           keyExtractor={listKeyExtractor}
           numColumns={cardSettings.numColumns}
           columnWrapperStyle={cardSettings.columnWrapper}
@@ -240,3 +239,4 @@ const DesignatedCars = () => {
 };
 
 export default DesignatedCars;
+
