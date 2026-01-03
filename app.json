@@ -28,7 +28,7 @@
       "supportsTablet": true,
       "requireFullScreen": true,
       "bundleIdentifier": "com.lead.fmfmanagement",
-      "buildNumber": "34",
+      "buildNumber": "35",
       "googleServicesFile": "./GoogleService-Info.plist",
 
       "infoPlist": {
@@ -47,7 +47,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.lead.fmfmanagement",
-      "versionCode": 2,
+      "versionCode": 3,
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": ["RECEIVE_BOOT_COMPLETED", "VIBRATE"]

@@ -6,17 +6,22 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  Alert,
 } from "react-native";
 import { Fonts } from "../../../Global/fonts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../../redux/actions/authActions";
+import { persistor } from "../../../redux/store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { horizontalMargin } from "../../../config/metrics";
 import { Colors } from "../../../Global/colors";
 
 const HomeHeader = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const userInfo = useSelector((state) => state.auth.user);
   const profileData = useMemo(() => {
     const profile = userInfo?.user ?? userInfo ?? {};
@@ -43,6 +48,32 @@ const HomeHeader = () => {
       role: profile.role || profile.userRole || profile.title || "",
     };
   }, [userInfo]);
+
+  const handleLogout = async () => {
+    Alert.alert("Logout", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await dispatch(logout());
+            await persistor.purge();
+            await AsyncStorage.clear();
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Login" }],
+            });
+          } catch (error) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Login" }],
+            });
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -81,6 +112,12 @@ const HomeHeader = () => {
             onPress={() => navigation.navigate("NotificationScreen")}
           >
             <Ionicons name="notifications-outline" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.notificationContainer}
+            onPress={handleLogout}
+          >
+            <Ionicons name="log-out-outline" size={20} color="white" />
           </TouchableOpacity>
         </View>
       </View>

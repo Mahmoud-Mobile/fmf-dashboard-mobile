@@ -113,6 +113,7 @@ const VisibilitySettings = () => {
       ? userInfo.user.permissions
       : [];
   }, [userInfo]);
+  console.log(JSON.stringify(userInfo, null, 2));
 
   const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
 
