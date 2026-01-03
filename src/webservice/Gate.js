@@ -11,7 +11,11 @@ export const setLogoutHandler = (handler) => {
   logoutHandler = handler;
 };
 
-async function createHeaders(jsonPayload, platform = null) {
+async function createHeaders(
+  jsonPayload,
+  platform = null,
+  additionalHeaders = null
+) {
   const accessToken = await SecureStore.getItemAsync("accessToken");
   // console.log("accessToken", accessToken);
   const headers = {
@@ -24,6 +28,11 @@ async function createHeaders(jsonPayload, platform = null) {
   // Add X-Platform header only if platform is provided (for login only)
   if (platform) {
     headers["X-Platform"] = platform;
+  }
+
+  // Merge additional headers if provided
+  if (additionalHeaders && typeof additionalHeaders === "object") {
+    Object.assign(headers, additionalHeaders);
   }
 
   return headers;
@@ -108,9 +117,9 @@ function handleErrors(error, showAlert = false) {
       handleUnauthorized();
       break;
     case 403:
-      alert("Forbidden: Access denied. Please login again.");
-      // Logout user and navigate to login for 403
-      handleUnauthorized();
+      alert("Forbidden: You don't have permission to access this resource.");
+      // Don't logout on 403 - user is authenticated but lacks permission
+      // This is different from 401 where the session has expired
       break;
     case 302:
       alert(data.message || "Redirected: " + errorMessage);
@@ -174,7 +183,8 @@ async function Post(
   method = "POST",
   jsonPayload = false,
   showAlert = false,
-  platform = null
+  platform = null,
+  additionalHeaders = null
 ) {
   const baseURL = await getEnvVars("apiUrl");
   const fullUrl = baseURL + url;
@@ -190,7 +200,7 @@ async function Post(
     formData = buildFormData(data);
   }
 
-  const headers = await createHeaders(jsonPayload, platform);
+  const headers = await createHeaders(jsonPayload, platform, additionalHeaders);
 
   try {
     const response = await axios.request({

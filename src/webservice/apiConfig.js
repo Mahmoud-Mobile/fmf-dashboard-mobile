@@ -2,7 +2,7 @@ import { Get, Post } from "./Gate";
 import { Platform } from "react-native";
 
 // login apis
-const login = async (data, showAlert = true) => {
+const login = async (data, showAlert = true, additionalHeaders = null) => {
   const platform = Platform.OS === "ios" ? "IOS" : "Android";
   return await Post(
     "mobile/ops/auth/login",
@@ -10,7 +10,8 @@ const login = async (data, showAlert = true) => {
     "POST",
     true,
     showAlert,
-    platform
+    platform,
+    additionalHeaders
   );
 };
 

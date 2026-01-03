@@ -1,4 +1,10 @@
-import React, { useMemo, useEffect, useRef, useState } from "react";
+import React, {
+  useMemo,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import {
   View,
   ScrollView,
@@ -22,10 +28,64 @@ import {
   getTabsForEnvironment,
   getDefaultTabVisibility,
 } from "../../config/tabConfig";
+import {
+  createPermissionCheckers,
+  hasSectionPermission as checkSectionPermission,
+  isActionButtonDisabled as checkActionButtonDisabled,
+} from "../../config/permissionUtils";
 import { Storage } from "expo-storage";
 
 const SECTION_CONFIG = [
-  { id: "dashboardOverview", label: "Dashboard Overview" },
+  {
+    id: "dashboardOverview",
+    label: "Dashboard Overview",
+    requiredPermission: "dashboard:read",
+  },
+  {
+    id: "topCountries",
+    label: "Top Countries",
+    requiredPermission: "dashboard:read",
+  },
+  {
+    id: "eventAnalytics",
+    label: "Event Analytics",
+    requiredPermission: "dashboard:read_data_entry",
+  },
+  {
+    id: "arrivalGuests",
+    label: "Arrival Guests",
+    requiredPermission: "dashboard:read_flights",
+  },
+  {
+    id: "returnGuests",
+    label: "Return Guests",
+    requiredPermission: "dashboard:read_flights",
+  },
+  {
+    id: "flights",
+    label: "Flights",
+    requiredPermission: "dashboard:read_flights",
+  },
+  {
+    id: "hotelOccupancy",
+    label: "Hotel Occupancy",
+    requiredPermission: "dashboard:read_accommodations",
+  },
+  {
+    id: "hotelDetails",
+    label: "Hotel Details",
+    requiredPermission: "dashboard:read_accommodations",
+  },
+  {
+    id: "tripList",
+    label: "Trip List",
+    requiredPermission: "dashboard:read_trips",
+  },
+  {
+    id: "tripsSummary",
+    label: "Trips Summary",
+    requiredPermission: "dashboard:read_trips",
+  },
 ];
 
 const ACTION_BUTTON_CONFIG = [
@@ -57,7 +117,19 @@ const VisibilitySettings = () => {
     useSelector((state) => state.ui?.actionButtonVisibility) || {};
   const rolePermission = useSelector((state) => state.auth.user?.user);
   const userInfo = useSelector((state) => state.auth.user);
+  const userPermissions = useMemo(() => {
+    return Array.isArray(userInfo?.user?.permissions)
+      ? userInfo.user.permissions
+      : [];
+  }, [userInfo]);
+
   const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
+
+  // Create permission checkers
+  const permissions = useMemo(
+    () => createPermissionCheckers(userPermissions),
+    [userPermissions]
+  );
 
   useEffect(() => {
     const loadEnvironment = async () => {
@@ -65,8 +137,7 @@ const VisibilitySettings = () => {
         const selectedCategory = await Storage.getItem({
           key: "selected-category",
         });
-        const env = selectedCategory || "fmf";
-        setCurrentEnvironment(env);
+        setCurrentEnvironment(selectedCategory || "fmf");
       } catch (error) {
         setCurrentEnvironment("fmf");
       }
@@ -74,23 +145,56 @@ const VisibilitySettings = () => {
     loadEnvironment();
   }, []);
 
+  // Helper to convert stored value to boolean
+  const toBoolean = useCallback((value, defaultValue = true) => {
+    if (value === undefined) return defaultValue;
+    if (typeof value === "string") return value === "true";
+    return Boolean(value);
+  }, []);
+
+  // Check if section has required permission
+  const hasSectionPermission = useCallback(
+    (requiredPermission) => {
+      return checkSectionPermission(requiredPermission, permissions);
+    },
+    [permissions]
+  );
+
   const visibleSections = useMemo(() => {
     return SECTION_CONFIG.reduce((acc, section) => {
-      const storedValue = storedSectionVisibility?.[section.id];
-      const boolValue =
-        storedValue === undefined
-          ? true
-          : typeof storedValue === "string"
-          ? storedValue === "true"
-          : Boolean(storedValue);
-      acc[section.id] = boolValue;
+      const hasPermission = hasSectionPermission(section.requiredPermission);
+      if (!hasPermission) {
+        acc[section.id] = false;
+        return acc;
+      }
+      acc[section.id] = toBoolean(
+        storedSectionVisibility?.[section.id],
+        true
+      );
       return acc;
     }, {});
-  }, [storedSectionVisibility]);
+  }, [storedSectionVisibility, hasSectionPermission, toBoolean]);
 
   const handleToggleSectionVisibility = (sectionId) => {
     dispatch(toggleSectionVisibility(sectionId));
   };
+
+  // Check if tab should be disabled
+  const isTabDisabled = useCallback(
+    (tabId) => {
+      if (tabId === "Trips" && !permissions.hasTripsPermission()) {
+        return true;
+      }
+      if (tabId === "Hotels" && !permissions.hasHotelsPermission()) {
+        return true;
+      }
+      if (tabId === "Flights" && !permissions.hasFlightsPermission()) {
+        return true;
+      }
+      return false;
+    },
+    [permissions]
+  );
 
   const TABS_CONFIG = useMemo(() => {
     const tabs = getTabsForEnvironment(currentEnvironment, rolePermission);
@@ -98,8 +202,9 @@ const VisibilitySettings = () => {
       id: tab.route,
       label: tab.titleText || tab.route,
       locked: tab.alwaysVisible || false,
+      disabled: isTabDisabled(tab.route),
     }));
-  }, [currentEnvironment, rolePermission]);
+  }, [currentEnvironment, rolePermission, isTabDisabled]);
 
   const DEFAULT_TAB_VISIBILITY = useMemo(() => {
     return getDefaultTabVisibility(currentEnvironment, rolePermission);
@@ -107,17 +212,11 @@ const VisibilitySettings = () => {
 
   const resolvedTabVisibility = useMemo(() => {
     return TABS_CONFIG.reduce((acc, tab) => {
-      const storedValue = storedTabVisibility?.[tab.id];
-      const boolValue =
-        storedValue === undefined
-          ? DEFAULT_TAB_VISIBILITY[tab.id] ?? true
-          : typeof storedValue === "string"
-          ? storedValue === "true"
-          : Boolean(storedValue);
-      acc[tab.id] = boolValue;
+      const defaultValue = DEFAULT_TAB_VISIBILITY[tab.id] ?? true;
+      acc[tab.id] = toBoolean(storedTabVisibility?.[tab.id], defaultValue);
       return acc;
     }, {});
-  }, [storedTabVisibility, TABS_CONFIG, DEFAULT_TAB_VISIBILITY]);
+  }, [storedTabVisibility, TABS_CONFIG, DEFAULT_TAB_VISIBILITY, toBoolean]);
 
   const latestTabVisibilityRef = useRef(resolvedTabVisibility);
   useEffect(() => {
@@ -125,6 +224,15 @@ const VisibilitySettings = () => {
   }, [resolvedTabVisibility]);
 
   const handleToggleTabVisibility = (tabId) => {
+    // Don't allow toggle if tab is disabled due to permissions
+    if (isTabDisabled(tabId)) {
+      Alert.alert(
+        "Access Denied",
+        "You don't have permission to modify this tab's visibility."
+      );
+      return;
+    }
+
     const MAX_VISIBLE_TABS = 5;
     const snapshot = latestTabVisibilityRef.current || {};
     const currentIsVisible = !!snapshot[tabId];
@@ -143,19 +251,22 @@ const VisibilitySettings = () => {
 
   const visibleActionButtons = useMemo(() => {
     return ACTION_BUTTON_CONFIG.reduce((acc, button) => {
-      const storedValue = storedActionButtonVisibility?.[button.text];
-      const boolValue =
-        storedValue === undefined
-          ? true
-          : typeof storedValue === "string"
-          ? storedValue === "true"
-          : Boolean(storedValue);
-      acc[button.text] = boolValue;
+      acc[button.text] = toBoolean(
+        storedActionButtonVisibility?.[button.text],
+        true
+      );
       return acc;
     }, {});
-  }, [storedActionButtonVisibility]);
+  }, [storedActionButtonVisibility, toBoolean]);
 
-  const handleToggleActionButtonVisibility = (buttonText) => {
+  const handleToggleActionButtonVisibility = (buttonText, category) => {
+    if (checkActionButtonDisabled(category, permissions)) {
+      Alert.alert(
+        "Access Denied",
+        "You don't have permission to modify this action button's visibility."
+      );
+      return;
+    }
     dispatch(toggleActionButtonVisibility(buttonText));
   };
 
@@ -183,6 +294,7 @@ const VisibilitySettings = () => {
     );
   };
 
+
   const actionButtonsByCategory = useMemo(() => {
     const grouped = {};
     ACTION_BUTTON_CONFIG.forEach((button) => {
@@ -193,12 +305,6 @@ const VisibilitySettings = () => {
     });
     return grouped;
   }, []);
-
-  useEffect(() => {
-    if (userInfo) {
-      console.log("userInfo from redux:", JSON.stringify(userInfo, null, 2));
-    }
-  }, [userInfo]);
 
   return (
     <View style={styles.container}>
@@ -214,73 +320,97 @@ const VisibilitySettings = () => {
         <View style={styles.content}>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>Sections</Text>
-            {SECTION_CONFIG.map((section) => (
-              <View
-                key={section.id}
-                style={[styles.visibilityRow, styles.sectionRow]}
-              >
-                <Text style={styles.visibilityLabel}>{section.label}</Text>
-                <Switch
-                  value={visibleSections[section.id]}
-                  onValueChange={() =>
-                    handleToggleSectionVisibility(section.id)
-                  }
-                  trackColor={{
-                    false: Colors.LightGray,
-                    true: Colors.Primary,
-                  }}
-                  thumbColor={Colors.White}
-                />
-              </View>
-            ))}
+            {SECTION_CONFIG.map((section) => {
+              const hasPermission = hasSectionPermission(
+                section.requiredPermission
+              );
+              return (
+                <View
+                  key={section.id}
+                  style={[styles.visibilityRow, styles.sectionRow]}
+                >
+                  <Text style={styles.visibilityLabel}>{section.label}</Text>
+                  <Switch
+                    value={hasPermission ? visibleSections[section.id] : false}
+                    onValueChange={() =>
+                      hasPermission && handleToggleSectionVisibility(section.id)
+                    }
+                    disabled={!hasPermission}
+                    trackColor={{
+                      false: Colors.LightGray,
+                      true: Colors.Primary,
+                    }}
+                    thumbColor={Colors.White}
+                  />
+                </View>
+              );
+            })}
           </View>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>Tabs</Text>
-            {TABS_CONFIG.map((tab) => (
-              <View key={tab.id} style={[styles.visibilityRow, styles.tabRow]}>
-                <Text style={styles.visibilityLabel}>{tab.label}</Text>
-                <Switch
-                  value={tab.locked ? true : resolvedTabVisibility[tab.id]}
-                  onValueChange={() =>
-                    !tab.locked && handleToggleTabVisibility(tab.id)
-                  }
-                  disabled={!!tab.locked}
-                  trackColor={{
-                    false: Colors.LightGray,
-                    true: Colors.Primary,
-                  }}
-                  thumbColor={Colors.White}
-                />
-              </View>
-            ))}
+            {TABS_CONFIG.map((tab) => {
+              const isDisabled = tab.locked || tab.disabled;
+              return (
+                <View
+                  key={tab.id}
+                  style={[styles.visibilityRow, styles.tabRow]}
+                >
+                  <Text style={styles.visibilityLabel}>{tab.label}</Text>
+                  <Switch
+                    value={tab.locked ? true : resolvedTabVisibility[tab.id]}
+                    onValueChange={() =>
+                      !isDisabled && handleToggleTabVisibility(tab.id)
+                    }
+                    disabled={isDisabled}
+                    trackColor={{
+                      false: Colors.LightGray,
+                      true: Colors.Primary,
+                    }}
+                    thumbColor={Colors.White}
+                  />
+                </View>
+              );
+            })}
           </View>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>Action Buttons</Text>
             {Object.entries(actionButtonsByCategory).map(
-              ([category, buttons]) => (
-                <View key={category} style={styles.categoryGroup}>
-                  <Text style={styles.categoryLabel}>{category}</Text>
-                  {buttons.map((button) => (
-                    <View
-                      key={button.text}
-                      style={[styles.visibilityRow, styles.actionButtonRow]}
-                    >
-                      <Text style={styles.visibilityLabel}>{button.text}</Text>
-                      <Switch
-                        value={visibleActionButtons[button.text]}
-                        onValueChange={() =>
-                          handleToggleActionButtonVisibility(button.text)
-                        }
-                        trackColor={{
-                          false: Colors.LightGray,
-                          true: Colors.Primary,
-                        }}
-                        thumbColor={Colors.White}
-                      />
-                    </View>
-                  ))}
-                </View>
-              )
+              ([category, buttons]) => {
+                const isCategoryDisabled = checkActionButtonDisabled(
+                  category,
+                  permissions
+                );
+                return (
+                  <View key={category} style={styles.categoryGroup}>
+                    <Text style={styles.categoryLabel}>{category}</Text>
+                    {buttons.map((button) => (
+                      <View
+                        key={button.text}
+                        style={[styles.visibilityRow, styles.actionButtonRow]}
+                      >
+                        <Text style={styles.visibilityLabel}>
+                          {button.text}
+                        </Text>
+                        <Switch
+                          value={visibleActionButtons[button.text]}
+                          onValueChange={() =>
+                            handleToggleActionButtonVisibility(
+                              button.text,
+                              category
+                            )
+                          }
+                          disabled={isCategoryDisabled}
+                          trackColor={{
+                            false: Colors.LightGray,
+                            true: Colors.Primary,
+                          }}
+                          thumbColor={Colors.White}
+                        />
+                      </View>
+                    ))}
+                  </View>
+                );
+              }
             )}
           </View>
           <View style={styles.resetContainer}>

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useCallback } from "react";
 import {
   View,
   Dimensions,
@@ -10,34 +10,88 @@ import styles from "./Styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
-import DataTableCard from "../../components/DataTableCard";
-import ChartCard from "../../components/ChartCard";
 import { Colors } from "../../Global/colors";
-import dummyData from "../../data/dummyData.json";
 import DashboardOverview from "./components/DashboardOverview";
 import TopCountries from "./components/TopCountries";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import { fetchDashboardSummary } from "../../redux/actions/dashboardActions";
+import {
+  createPermissionCheckers,
+  hasSectionPermission as checkSectionPermission,
+} from "../../config/permissionUtils";
 
 const SECTION_CONFIG = [
-  { id: "dashboardOverview", label: "Dashboard Overview" },
-  { id: "eventAnalytics", label: "Event Analytics" },
-  { id: "arrivalGuests", label: "Arrival Guests" },
-  { id: "returnGuests", label: "Return Guests" },
-  { id: "flights", label: "Flights" },
-  { id: "hotelOccupancy", label: "Hotel Occupancy" },
-  { id: "hotelDetails", label: "Hotel Details" },
-  { id: "tripList", label: "Trip List" },
-  { id: "tripsSummary", label: "Trips Summary" },
+  { 
+    id: "dashboardOverview", 
+    label: "Dashboard Overview",
+    requiredPermission: "dashboard:read"
+  },
+  { 
+    id: "topCountries", 
+    label: "Top Countries",
+    requiredPermission: "dashboard:read"
+  },
+  { 
+    id: "eventAnalytics", 
+    label: "Event Analytics",
+    requiredPermission: "dashboard:read_data_entry"
+  },
+  { 
+    id: "arrivalGuests", 
+    label: "Arrival Guests",
+    requiredPermission: "dashboard:read_flights"
+  },
+  { 
+    id: "returnGuests", 
+    label: "Return Guests",
+    requiredPermission: "dashboard:read_flights"
+  },
+  { 
+    id: "flights", 
+    label: "Flights",
+    requiredPermission: "dashboard:read_flights"
+  },
+  { 
+    id: "hotelOccupancy", 
+    label: "Hotel Occupancy",
+    requiredPermission: "dashboard:read_accommodations"
+  },
+  { 
+    id: "hotelDetails", 
+    label: "Hotel Details",
+    requiredPermission: "dashboard:read_accommodations"
+  },
+  { 
+    id: "tripList", 
+    label: "Trip List",
+    requiredPermission: "dashboard:read_trips"
+  },
+  { 
+    id: "tripsSummary", 
+    label: "Trips Summary",
+    requiredPermission: "dashboard:read_trips"
+  },
 ];
 
 const Dashboard = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { selectedEvent } = useSelector((state) => state.api) || {};
-
+  const userInfo = useSelector((state) => state.auth.user);
   const storedSectionVisibility =
     useSelector((state) => state.ui?.sectionVisibility) || {};
+
+  const userPermissions = useMemo(() => {
+    return Array.isArray(userInfo?.user?.permissions)
+      ? userInfo.user.permissions
+      : [];
+  }, [userInfo]);
+
+  // Create permission checkers
+  const permissions = useMemo(
+    () => createPermissionCheckers(userPermissions),
+    [userPermissions]
+  );
 
   // Fetch dashboard summary when component mounts or event changes
   useEffect(() => {
@@ -46,245 +100,35 @@ const Dashboard = () => {
     }
   }, [selectedEvent?.id, dispatch]);
 
-  const { width } = Dimensions.get("window");
-  const isTablet = width >= 768;
+  // Helper to convert stored value to boolean
+  const toBoolean = useCallback((value, defaultValue = true) => {
+    if (value === undefined) return defaultValue;
+    if (typeof value === "string") return value === "true";
+    return Boolean(value);
+  }, []);
+
+  // Check if section has required permission
+  const hasSectionPermission = useCallback(
+    (requiredPermission) => {
+      return checkSectionPermission(requiredPermission, permissions);
+    },
+    [permissions]
+  );
 
   const visibleSections = useMemo(() => {
     return SECTION_CONFIG.reduce((acc, section) => {
-      const storedValue = storedSectionVisibility?.[section.id];
-      // Convert string "true"/"false" to boolean if needed (from persisted state)
-      const boolValue =
-        storedValue === undefined
-          ? true
-          : typeof storedValue === "string"
-          ? storedValue === "true"
-          : Boolean(storedValue);
-      acc[section.id] = boolValue;
+      const hasPermission = hasSectionPermission(section.requiredPermission);
+      if (!hasPermission) {
+        acc[section.id] = false;
+        return acc;
+      }
+      acc[section.id] = toBoolean(
+        storedSectionVisibility?.[section.id],
+        true
+      );
       return acc;
     }, {});
-  }, [storedSectionVisibility]);
-
-  const handleItemPress = (item, screenName) => {
-    if (screenName && navigation) {
-      navigation.navigate(screenName, { item });
-    }
-  };
-
-  const {
-    returnGuestsData,
-    arrivalGuestsData,
-    flightsData,
-    hotelOccupancyData,
-    hotelDetailsData,
-    tripListData,
-    tripsSummaryData,
-    arrivalGuestsChartData,
-    returnGuestsChartData,
-    ageDistributionChartData,
-    continentChartData,
-    genderDistributionChartData,
-  } = dummyData;
-
-  const renderResponsiveCards = () => {
-    const cards = [
-      visibleSections.arrivalGuests && {
-        key: "arrival-guests",
-        element: (
-          <DataTableCard
-            title="Arrival Guests"
-            columns={[
-              {
-                title: "Flight No",
-                key: "flightNo",
-              },
-              { title: "Name", key: "name" },
-              {
-                title: "Date & Time",
-                key: "dateTime",
-                render: ({ item }) => (
-                  <View style={{}}>
-                    <Text style={styles.dateText}>{item.date}</Text>
-                    <Text style={styles.timeText}>{item.time}</Text>
-                  </View>
-                ),
-              },
-            ]}
-            data={arrivalGuestsData}
-            onPress={() => navigation.navigate("MyTabs", { screen: "Flights" })}
-          />
-        ),
-      },
-      visibleSections.returnGuests && {
-        key: "return-guests",
-        element: (
-          <DataTableCard
-            title="Return Guests"
-            columns={[
-              {
-                title: "Flight No",
-                key: "flightNo",
-              },
-              { title: "Name", key: "name" },
-              {
-                title: "Date & Time",
-                key: "dateTime",
-                render: ({ item }) => (
-                  <View style={{}}>
-                    <Text style={styles.dateText}>{item.date}</Text>
-                    <Text style={styles.timeText}>{item.time}</Text>
-                  </View>
-                ),
-              },
-            ]}
-            data={returnGuestsData}
-            onPress={() => navigation.navigate("MyTabs", { screen: "Flights" })}
-          />
-        ),
-      },
-      visibleSections.flights && {
-        key: "flights",
-        element: (
-          <DataTableCard
-            title="Flights"
-            columns={[
-              {
-                title: "Flight No",
-                key: "flightNo",
-              },
-              { title: "Airline", key: "airline" },
-              { title: "Destination", key: "destination" },
-              {
-                title: "Date & Time",
-                key: "dateTime",
-                render: ({ item }) => (
-                  <View style={{}}>
-                    <Text style={styles.dateText}>{item.date}</Text>
-                    <Text style={styles.timeText}>{item.time}</Text>
-                  </View>
-                ),
-              },
-            ]}
-            data={flightsData}
-            onPress={() => navigation.navigate("MyTabs", { screen: "Flights" })}
-          />
-        ),
-      },
-      visibleSections.hotelOccupancy && {
-        key: "hotel-occupancy",
-        element: (
-          <DataTableCard
-            title="Hotel Occupancy"
-            columns={[
-              { title: "Hotel Name", key: "hotelName" },
-              {
-                title: "Count",
-                key: "count",
-                render: ({ item }) => (
-                  <View style={{}}>
-                    <Text style={styles.countBadgeText}>{item.count}</Text>
-                  </View>
-                ),
-              },
-            ]}
-            data={hotelOccupancyData}
-            onPress={() => {}}
-          />
-        ),
-      },
-      visibleSections.hotelDetails && {
-        key: "hotel-details",
-        element: (
-          <DataTableCard
-            title="Hotel Details"
-            columns={[
-              { title: "Hotel", key: "hotel" },
-              { title: "Guest", key: "guest" },
-              {
-                title: "Status",
-                key: "status",
-                render: ({ item }) => {
-                  const getStatusColor = (status) => {
-                    switch (status) {
-                      case "Checked In":
-                        return Colors.Success;
-                      case "Checked Out":
-                        return Colors.DarkGray;
-                      case "Pending":
-                        return Colors.Warning;
-                      default:
-                        return Colors.DarkGray;
-                    }
-                  };
-                  return (
-                    <Text
-                      style={[
-                        styles.statusText,
-                        { color: getStatusColor(item.status) },
-                      ]}
-                    >
-                      {item.status}
-                    </Text>
-                  );
-                },
-              },
-            ]}
-            data={hotelDetailsData}
-            onPress={() => {
-              navigation.navigate("Hotels");
-            }}
-          />
-        ),
-      },
-      visibleSections.tripList && {
-        key: "trip-list",
-        element: (
-          <DataTableCard
-            title="Trip List"
-            columns={[
-              { title: "Car Name", key: "carName" },
-              { title: "Driver", key: "driver" },
-            ]}
-            data={tripListData}
-            onPress={() => navigation.navigate("MyTabs", { screen: "Trips" })}
-          />
-        ),
-      },
-      visibleSections.tripsSummary && {
-        key: "trips-summary",
-        element: (
-          <DataTableCard
-            title="Trips Summary"
-            columns={[
-              { title: "Guest Name", key: "guestName" },
-              { title: "Driver", key: "driver" },
-            ]}
-            data={tripsSummaryData}
-            onPress={() => navigation.navigate("MyTabs", { screen: "Trips" })}
-          />
-        ),
-      },
-    ].filter(Boolean);
-
-    if (!cards.length) {
-      return null;
-    }
-
-    const cardWidth = isTablet ? "48%" : "100%";
-    const containerStyle = [
-      styles.responsiveGridContainer,
-      !isTablet && { justifyContent: "flex-start" },
-    ];
-
-    return (
-      <View style={containerStyle}>
-        {cards.map(({ key, element }) => (
-          <View key={key} style={{ width: cardWidth, marginBottom: 10 }}>
-            {element}
-          </View>
-        ))}
-      </View>
-    );
-  };
+  }, [storedSectionVisibility, hasSectionPermission, toBoolean]);
 
   return (
     <View style={styles.container}>
@@ -299,7 +143,7 @@ const Dashboard = () => {
         showsVerticalScrollIndicator={false}
       >
         {visibleSections.dashboardOverview && <DashboardOverview />}
-        <TopCountries />
+        {visibleSections.topCountries && <TopCountries />}
         <TouchableOpacity
           onPress={() => navigation.navigate("VisibilitySettings")}
           style={styles.visibleBtn}

@@ -14,4 +14,15 @@ export const styles = StyleSheet.create({
   columnWrapper: {
     marginBottom: 8,
   },
+  noAccessContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: horizontalMargin * 2,
+  },
+  noAccessText: {
+    fontSize: 16,
+    color: Colors.DarkGray,
+    textAlign: "center",
+  },
 });

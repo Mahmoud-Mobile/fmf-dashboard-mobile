@@ -7,7 +7,6 @@ import SearchActionRow from "../../components/SearchActionRow";
 import LoadingModal from "../../components/LoadingModal";
 import EmptyListComponent from "../../components/EmptyListComponent";
 import DateSearchModal from "../../components/DateSearchModal";
-import CustomCategories from "../../components/CustomCategories";
 import DesignatedCarCard from "./components";
 import NoShowModal from "./components/NoShowModal";
 import { Colors } from "../../Global/colors";
@@ -20,8 +19,6 @@ import { createDesignatedCarsActionButtons } from "./utils/designatedCarsActions
 import { useActionButtonFilter } from "./utils/actionButtonFilter";
 import { getDesignatedCarKey } from "./utils/designatedCarsUtils";
 import { handleNoShowSubmit } from "./utils/noShowHandler";
-import { DESIGNATED_CARS_CATEGORIES } from "./constants/designatedCarsCategories";
-
 const DesignatedCars = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -172,11 +169,6 @@ const DesignatedCars = () => {
         onClearDate={() => setSelectedDate(null)}
       />
 
-      <CustomCategories
-        categories={DESIGNATED_CARS_CATEGORIES}
-        selectedCategory={selectedCategory}
-        onCategorySelect={setSelectedCategory}
-      />
       {loading ? (
         <LoadingModal visible={loading} />
       ) : (
@@ -239,4 +231,3 @@ const DesignatedCars = () => {
 };
 
 export default DesignatedCars;
-

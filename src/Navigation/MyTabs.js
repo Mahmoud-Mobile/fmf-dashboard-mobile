@@ -17,6 +17,10 @@ import {
   getTabsForEnvironment,
   getDefaultTabVisibility,
 } from "../config/tabConfig";
+import {
+  createPermissionCheckers,
+  isTabAllowed as checkTabAllowed,
+} from "../config/permissionUtils";
 
 const Tab = createBottomTabNavigator();
 
@@ -74,9 +78,29 @@ const MyTabs = () => {
   const dispatch = useDispatch();
   const tabVisibility = useSelector((state) => state.ui?.tabVisibility) || {};
   const rolePermission = useSelector((state) => state.auth.user?.user);
+  const userInfo = useSelector((state) => state.auth.user);
+
+  const userPermissions = React.useMemo(() => {
+    return Array.isArray(userInfo?.user?.permissions)
+      ? userInfo.user.permissions
+      : [];
+  }, [userInfo]);
+
+  // Create permission checkers
+  const permissions = React.useMemo(
+    () => createPermissionCheckers(userPermissions),
+    [userPermissions]
+  );
+
   const [currentEnvironment, setCurrentEnvironment] = React.useState("fmf");
   const [TabArr, setTabArr] = React.useState(() =>
     getTabsForEnvironment("fmf", rolePermission)
+  );
+
+  // Check if tab is allowed based on permissions
+  const isTabAllowed = React.useCallback(
+    (tabId) => checkTabAllowed(tabId, permissions),
+    [permissions]
   );
 
   React.useEffect(() => {
@@ -95,7 +119,7 @@ const MyTabs = () => {
       }
     };
     loadEnvironment();
-  }, []);
+  }, [rolePermission]);
 
   // Update tabs when role or environment changes
   React.useEffect(() => {
@@ -108,30 +132,41 @@ const MyTabs = () => {
     }
   }, [route.params?.selectedEvent, dispatch]);
 
+  // Filter tabs based on permissions first, then check visibility
+  const allowedTabs = React.useMemo(() => {
+    return TabArr.filter((tab) => isTabAllowed(tab.route));
+  }, [TabArr, isTabAllowed]);
+
+  // Helper to convert stored value to boolean
+  const toBoolean = React.useCallback((value, defaultValue = true) => {
+    if (value === undefined) return defaultValue;
+    if (typeof value === "string") return value === "true";
+    return Boolean(value);
+  }, []);
+
   const resolvedTabVisibility = React.useMemo(() => {
     const defaultVisibility = getDefaultTabVisibility(
       currentEnvironment,
       rolePermission
     );
 
-    return TabArr.reduce((acc, tab) => {
-      const stored = tabVisibility?.[tab.route];
-      acc[tab.route] =
-        stored === undefined ? defaultVisibility[tab.route] ?? true : stored;
+    return allowedTabs.reduce((acc, tab) => {
+      const defaultValue = defaultVisibility[tab.route] ?? true;
+      acc[tab.route] = toBoolean(tabVisibility?.[tab.route], defaultValue);
       return acc;
     }, {});
-  }, [tabVisibility, TabArr, currentEnvironment, rolePermission]);
+  }, [tabVisibility, allowedTabs, currentEnvironment, rolePermission, toBoolean]);
 
   const visibleRoutes = React.useMemo(() => {
     const forcedVisible = { ...resolvedTabVisibility };
 
-    TabArr.forEach((tab) => {
+    allowedTabs.forEach((tab) => {
       if (tab.alwaysVisible) {
         forcedVisible[tab.route] = true;
       }
     });
 
-    const sortedTabs = [...TabArr]
+    const sortedTabs = [...allowedTabs]
       .filter((tab) => forcedVisible[tab.route])
       .sort((a, b) => (a.priority || 999) - (b.priority || 999));
 
@@ -143,9 +178,9 @@ const MyTabs = () => {
       if (selected.length >= 5) break;
     }
     return new Set(selected);
-  }, [resolvedTabVisibility, TabArr]);
+  }, [resolvedTabVisibility, allowedTabs]);
 
-  const visibleTabs = TabArr.filter((t) => visibleRoutes.has(t.route));
+  const visibleTabs = allowedTabs.filter((t) => visibleRoutes.has(t.route));
 
   // Don't render navigator if there are no visible tabs
   if (visibleTabs.length === 0) {

@@ -31,6 +31,7 @@ import SubEventDetails from "../screens/SubEventDetails";
 import ResourceDetails from "../screens/ResourceDetails";
 import VisibilitySettings from "../screens/VisibilitySettings";
 import Ambassador from "../screens/Ambassador";
+import PDFViewer from "../screens/PDFViewer";
 import NetInfo from "@react-native-community/netinfo";
 import * as SecureStore from "expo-secure-store";
 import { logout } from "../redux/actions/authActions";
@@ -282,6 +283,13 @@ const NavStack = () => {
       <Stack.Screen
         name="Ambassador"
         component={Ambassador}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="PDFViewer"
+        component={PDFViewer}
         options={{
           headerShown: false,
         }}

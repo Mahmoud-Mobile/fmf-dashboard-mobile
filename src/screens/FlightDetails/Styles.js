@@ -150,6 +150,33 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.SecondaryText,
   },
+  documentsContainer: {
+    marginBottom: 16,
+  },
+  pdfButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.Primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    shadowColor: Colors.Primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  pdfButtonText: {
+    fontSize: 16,
+    fontFamily: Fonts.FONT_MEDIUM,
+    color: Colors.White,
+    marginLeft: 8,
+  },
 });
 
 export default styles;

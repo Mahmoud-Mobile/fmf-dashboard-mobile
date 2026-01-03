@@ -20,12 +20,20 @@ export const useHotelActionButtons = (hotel, selectedEvent, navigation) => {
       return [];
     }
 
-    return [
-      {
+    // If both checked in and checked out, hide all buttons
+    if (isCheckedIn && isCheckedOut) {
+      return [];
+    }
+
+    const buttons = [];
+
+    // If not checked in, show only Check In button
+    if (!isCheckedIn) {
+      buttons.push({
         icon: "check-circle",
         text: "Check In",
-        isSelected: isCheckedIn,
-        disabled: isCheckedIn,
+        isSelected: true,
+        disabled: false,
         iconId: `check-in-${hotelId}`,
         onPress: async () => {
           const success = await handleCheckIn(
@@ -39,12 +47,16 @@ export const useHotelActionButtons = (hotel, selectedEvent, navigation) => {
             navigation.goBack();
           }
         },
-      },
-      {
+      });
+    }
+
+    // If checked in but not checked out, show only Check Out button
+    if (isCheckedIn && !isCheckedOut) {
+      buttons.push({
         icon: "exit-to-app",
         text: "Check Out",
-        isSelected: isCheckedOut,
-        disabled: isCheckedOut,
+        isSelected: true,
+        disabled: false,
         iconId: `check-out-${hotelId}`,
         onPress: async () => {
           const success = await handleCheckOut(
@@ -58,8 +70,10 @@ export const useHotelActionButtons = (hotel, selectedEvent, navigation) => {
             navigation.goBack();
           }
         },
-      },
-    ];
+      });
+    }
+
+    return buttons;
   }, [
     hotelId,
     isCheckedIn,

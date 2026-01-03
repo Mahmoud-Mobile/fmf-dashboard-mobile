@@ -18,6 +18,7 @@ import { setEmail, setPassword } from "../../redux/actions/authActions";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/actions/authActions";
 import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -89,7 +90,7 @@ const Login = () => {
     };
     setLoading(true);
     try {
-      const response = await dispatch(login(body, true)); // showAlert=true to show 400 errors
+      const response = await dispatch(login(body, true, token));
       console.log("response", JSON.stringify(response, null, 2));
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({

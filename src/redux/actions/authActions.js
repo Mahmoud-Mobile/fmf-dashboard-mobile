@@ -1,5 +1,8 @@
 import { login as loginUser } from "../../webservice/apiConfig";
 import * as SecureStore from "expo-secure-store";
+import { Storage } from "expo-storage";
+import { Platform } from "react-native";
+import * as Device from "expo-device";
 import {
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
@@ -10,10 +13,19 @@ import {
 } from "./actionTypes";
 
 export const login =
-  (params, showAlert = true) =>
+  (params, showAlert = true, deviceToken = null) =>
   async (dispatch) => {
     try {
-      const response = await loginUser(params, showAlert);
+      // Build additional headers for device information
+      const additionalHeaders = {
+        "X-Device-Token": deviceToken || params.deviceToken || "",
+        "X-Device-ID": Device.osBuildId || "",
+        "X-Device-Model": Device.modelId || Device.modelName || "",
+        "X-OS-Version": Device.osVersion || "",
+        "X-App-Version": "1.0.1",
+      };
+
+      const response = await loginUser(params, showAlert, additionalHeaders);
       const token = response?.access_token;
 
       if (token) {
@@ -45,10 +57,16 @@ export const login =
   };
 
 export const logout = () => async (dispatch) => {
-  await SecureStore.deleteItemAsync("accessToken");
-  await SecureStore.deleteItemAsync("userInfo");
-  console.log("User logged out");
-  dispatch({ type: LOGOUT });
+  try {
+    await SecureStore.deleteItemAsync("accessToken");
+    await SecureStore.deleteItemAsync("userInfo");
+    await Storage.removeItem({ key: "selected-category" });
+    await Storage.removeItem({ key: "active-env" });
+
+    dispatch({ type: LOGOUT });
+  } catch (error) {
+    dispatch({ type: LOGOUT });
+  }
 };
 
 export const setEmail = (email) => ({

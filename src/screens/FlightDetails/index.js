@@ -1,9 +1,11 @@
 import React, { useMemo } from "react";
-import { View, Text, ScrollView, Alert } from "react-native";
+import { View, Text, ScrollView, Alert, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 import CustomHeader from "../../components/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
 import styles from "./Styles";
+import { Colors } from "../../Global/colors";
 import { ActionButton, ActionButtonGroup } from "../../components/ActionButton";
 import { horizontalMargin } from "../../config/metrics";
 import {
@@ -246,6 +248,33 @@ const FlightDetails = ({ route }) => {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
+        {flight?.documents &&
+          Array.isArray(flight.documents) &&
+          flight.documents.length > 0 && (
+            <View style={styles.documentsContainer}>
+              {flight.documents.map((document) => (
+                <TouchableOpacity
+                  key={document.id || document.fileUrl}
+                  style={styles.pdfButton}
+                  onPress={() =>
+                    navigation.navigate("PDFViewer", {
+                      pdfUrl: document.fileUrl,
+                    })
+                  }
+                  activeOpacity={0.8}
+                >
+                  <MaterialIcons
+                    name="picture-as-pdf"
+                    size={24}
+                    color={Colors.White}
+                  />
+                  <Text style={styles.pdfButtonText}>
+                    {document.fileName || "View Document"}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         <View style={styles.card}>
           <View style={styles.cardContent}>
             <View style={styles.flexOne}>

@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/actions/authActions";
 import LoadingModal from "../../components/LoadingModal";
 import * as SecureStore from "expo-secure-store";
+import { persistor } from "../../redux/store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const More = () => {
   const navigation = useNavigation();
@@ -31,8 +33,20 @@ const More = () => {
   }, []);
   console.log(userInfo?.access_token);
   const handleLogout = async () => {
-    await dispatch(logout());
-    navigation.navigate("Login");
+    try {
+      await dispatch(logout());
+      await persistor.purge();
+      await AsyncStorage.clear();
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+    } catch (error) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+    }
   };
 
   const list = [
