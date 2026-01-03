@@ -32,6 +32,7 @@ import {
   createPermissionCheckers,
   hasSectionPermission as checkSectionPermission,
   isActionButtonDisabled as checkActionButtonDisabled,
+  isTabAllowed as checkTabAllowed,
 } from "../../config/permissionUtils";
 import { Storage } from "expo-storage";
 
@@ -50,16 +51,6 @@ const SECTION_CONFIG = [
     id: "eventAnalytics",
     label: "Event Analytics",
     requiredPermission: "dashboard:read_data_entry",
-  },
-  {
-    id: "arrivalGuests",
-    label: "Arrival Guests",
-    requiredPermission: "dashboard:read_flights",
-  },
-  {
-    id: "returnGuests",
-    label: "Return Guests",
-    requiredPermission: "dashboard:read_flights",
   },
   {
     id: "flights",
@@ -167,10 +158,7 @@ const VisibilitySettings = () => {
         acc[section.id] = false;
         return acc;
       }
-      acc[section.id] = toBoolean(
-        storedSectionVisibility?.[section.id],
-        true
-      );
+      acc[section.id] = toBoolean(storedSectionVisibility?.[section.id], true);
       return acc;
     }, {});
   }, [storedSectionVisibility, hasSectionPermission, toBoolean]);
@@ -196,15 +184,28 @@ const VisibilitySettings = () => {
     [permissions]
   );
 
+  // Filter tabs based on permissions - always show Dashboard and More
   const TABS_CONFIG = useMemo(() => {
-    const tabs = getTabsForEnvironment(currentEnvironment, rolePermission);
-    return tabs.map((tab) => ({
+    const allTabs = getTabsForEnvironment(currentEnvironment, rolePermission);
+    const alwaysVisibleTabs = ["Dashboard", "More"];
+
+    // Filter tabs: show only if user has permission OR it's Dashboard/More
+    const filteredTabs = allTabs.filter((tab) => {
+      // Always show Dashboard and More
+      if (alwaysVisibleTabs.includes(tab.route)) {
+        return true;
+      }
+      // For other tabs, check if user has permission
+      return checkTabAllowed(tab.route, permissions);
+    });
+
+    return filteredTabs.map((tab) => ({
       id: tab.route,
       label: tab.titleText || tab.route,
       locked: tab.alwaysVisible || false,
       disabled: isTabDisabled(tab.route),
     }));
-  }, [currentEnvironment, rolePermission, isTabDisabled]);
+  }, [currentEnvironment, rolePermission, isTabDisabled, permissions]);
 
   const DEFAULT_TAB_VISIBILITY = useMemo(() => {
     return getDefaultTabVisibility(currentEnvironment, rolePermission);
@@ -294,7 +295,6 @@ const VisibilitySettings = () => {
     );
   };
 
-
   const actionButtonsByCategory = useMemo(() => {
     const grouped = {};
     ACTION_BUTTON_CONFIG.forEach((button) => {
@@ -320,10 +320,10 @@ const VisibilitySettings = () => {
         <View style={styles.content}>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>Sections</Text>
-            {SECTION_CONFIG.map((section) => {
-              const hasPermission = hasSectionPermission(
-                section.requiredPermission
-              );
+            {SECTION_CONFIG.filter((section) => {
+              // Only show sections user has permission for
+              return hasSectionPermission(section.requiredPermission);
+            }).map((section) => {
               return (
                 <View
                   key={section.id}
@@ -331,11 +331,10 @@ const VisibilitySettings = () => {
                 >
                   <Text style={styles.visibilityLabel}>{section.label}</Text>
                   <Switch
-                    value={hasPermission ? visibleSections[section.id] : false}
+                    value={visibleSections[section.id]}
                     onValueChange={() =>
-                      hasPermission && handleToggleSectionVisibility(section.id)
+                      handleToggleSectionVisibility(section.id)
                     }
-                    disabled={!hasPermission}
                     trackColor={{
                       false: Colors.LightGray,
                       true: Colors.Primary,
@@ -374,12 +373,12 @@ const VisibilitySettings = () => {
           </View>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>Action Buttons</Text>
-            {Object.entries(actionButtonsByCategory).map(
-              ([category, buttons]) => {
-                const isCategoryDisabled = checkActionButtonDisabled(
-                  category,
-                  permissions
-                );
+            {Object.entries(actionButtonsByCategory)
+              .filter(([category]) => {
+                // Only show categories user has permission for
+                return !checkActionButtonDisabled(category, permissions);
+              })
+              .map(([category, buttons]) => {
                 return (
                   <View key={category} style={styles.categoryGroup}>
                     <Text style={styles.categoryLabel}>{category}</Text>
@@ -399,7 +398,6 @@ const VisibilitySettings = () => {
                               category
                             )
                           }
-                          disabled={isCategoryDisabled}
                           trackColor={{
                             false: Colors.LightGray,
                             true: Colors.Primary,
@@ -410,8 +408,7 @@ const VisibilitySettings = () => {
                     ))}
                   </View>
                 );
-              }
-            )}
+              })}
           </View>
           <View style={styles.resetContainer}>
             <TouchableOpacity
