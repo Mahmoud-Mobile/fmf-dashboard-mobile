@@ -17,6 +17,7 @@ const apiSlice = createSlice({
     selectedResource: {},
     seatingPlans: null,
     accommodation: [],
+    selectedParticipant: {},
     loading: false,
     error: null,
   },
@@ -91,6 +92,11 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setSelectedParticipant: (state, action) => {
+      state.selectedParticipant = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
     setLoading: (state, action) => {
       state.loading = action.payload !== undefined ? action.payload : true;
     },
@@ -117,6 +123,7 @@ export const {
   setSeatingPlans,
   setAccommodation,
   setTripsParticipants,
+  setSelectedParticipant,
   setLoading,
   setError,
 } = apiSlice.actions;

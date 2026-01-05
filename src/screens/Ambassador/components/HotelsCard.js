@@ -7,9 +7,47 @@ import CustomPressable from "../../../components/CustomPressable";
 import ProgressBar from "./ProgressBar";
 import styles from "./CardStyles";
 
-const HotelsCard = () => {
+const HotelsCard = ({ accommodation }) => {
+  if (!accommodation) {
+    return null;
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const statusLower = status?.toLowerCase() || "";
+    if (statusLower === "booked") {
+      return (
+        <View style={[styles.badge, styles.badgeOngoing]}>
+          <Text style={styles.badgeText}>Booked</Text>
+        </View>
+      );
+    }
+    return (
+      <View style={[styles.badge, styles.badgePending]}>
+        <Text style={styles.badgeTextPending}>{status || "N/A"}</Text>
+      </View>
+    );
+  };
+
   const stages = ["Room Prepared", "Guest Arrived", "Room Occupied"];
-  const currentStage = 1; // 0-indexed, so 1 means second stage is current
+  let currentStage = 0;
+  if (accommodation.isCheckedIn) currentStage = 1;
+  if (accommodation.isCheckedOut) currentStage = 2;
 
   return (
     <View style={[commonCardStyle, styles.card, styles.marginTop]}>
@@ -23,24 +61,50 @@ const HotelsCard = () => {
       <View style={styles.hotelSection}>
         <View style={styles.hotelDetailRow}>
           <Text style={styles.hotelLabel}>Hotel Name:</Text>
-          <Text style={styles.hotelValue}>Marriott Hotel</Text>
+          <Text style={styles.hotelValue}>
+            {accommodation.hotelName || "N/A"}
+          </Text>
         </View>
-        <View style={styles.hotelDetailRow}>
-          <Text style={styles.hotelLabel}>Arrival Date:</Text>
-          <Text style={styles.hotelValue}>Jan 10, 2026 - 4:00 PM</Text>
-        </View>
+        {accommodation.checkInDate && (
+          <View style={styles.hotelDetailRow}>
+            <Text style={styles.hotelLabel}>Check-in Date:</Text>
+            <Text style={styles.hotelValue}>
+              {formatDate(accommodation.checkInDate)}
+            </Text>
+          </View>
+        )}
         <View style={styles.hotelDetailRow}>
           <Text style={styles.hotelLabel}>Room Number:</Text>
           <View style={styles.hotelValueRow}>
-            <Text style={styles.hotelValue}>207</Text>
-            <View style={[styles.badge, styles.badgePending]}>
-              <Text style={styles.badgeTextPending}>Pending</Text>
-            </View>
+            <Text style={styles.hotelValue}>
+              {accommodation.roomNumber || "N/A"}
+            </Text>
+            {getStatusBadge(accommodation.status)}
           </View>
         </View>
+        {accommodation.checkOutDate && (
+          <View style={styles.hotelDetailRow}>
+            <Text style={styles.hotelLabel}>Check-out Date:</Text>
+            <Text style={styles.hotelValue}>
+              {formatDate(accommodation.checkOutDate)}
+            </Text>
+          </View>
+        )}
         <View style={styles.hotelDetailRow}>
-          <Text style={styles.hotelLabel}>Check-out:</Text>
-          <Text style={styles.hotelValue}>Jan 18, 2026 - 4:00 PM</Text>
+          <Text style={styles.hotelLabel}>Status:</Text>
+          <Text style={styles.hotelValue}>{accommodation.status || "N/A"}</Text>
+        </View>
+        <View style={styles.hotelDetailRow}>
+          <Text style={styles.hotelLabel}>Checked In:</Text>
+          <Text style={styles.hotelValue}>
+            {accommodation.isCheckedIn ? "Yes" : "No"}
+          </Text>
+        </View>
+        <View style={styles.hotelDetailRow}>
+          <Text style={styles.hotelLabel}>Checked Out:</Text>
+          <Text style={styles.hotelValue}>
+            {accommodation.isCheckedOut ? "Yes" : "No"}
+          </Text>
         </View>
       </View>
 

@@ -15,6 +15,8 @@ const HotelDetails = ({ route }) => {
 
   const navigation = useNavigation();
   const { selectedEvent } = useSelector((state) => state.api);
+  // console.log(hotel?.participant?.id, selectedEvent?.id);
+  console.log(hotel?.accommodation?.id);
 
   const filteredActionButtons = useHotelActionButtons(
     hotel,

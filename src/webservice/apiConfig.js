@@ -220,6 +220,14 @@ const getAccommodationParticipants = async (eventId, data) => {
   );
 };
 
+// Get participant by ID
+const getParticipantById = async (eventId, participantId, data = {}) => {
+  return await Get(
+    `mobile/ops/events/${eventId}/participants/${participantId}`,
+    data
+  );
+};
+
 // Mark accommodation checked in
 const markAccommodationCheckedIn = async (eventId, accommodationId, data) => {
   return await Post(
@@ -271,4 +279,5 @@ export {
   markTripParticipantNoShow,
   markTripParticipantPickedUp,
   markTripComplete,
+  getParticipantById,
 };

@@ -6,15 +6,7 @@ import { commonCardStyle } from "../../../config/metrics";
 import styles from "./CardStyles";
 
 const MeetingsCard = () => {
-  const todayMeetings = [
-    { time: "9:00 AM", description: "Meeting with Mr. Ali in hotel" },
-    { time: "9:00 AM", description: "Meeting with Mr. Ali in hotel" },
-  ];
-
-  const tomorrowMeetings = [
-    { time: "9:00 AM", description: "Meeting with Mr. Ali in hotel" },
-    { time: "9:00 AM", description: "Meeting with Mr. Ali in hotel" },
-  ];
+  const todayMeetings = [];
 
   return (
     <View style={[commonCardStyle, styles.card, styles.marginTop]}>
@@ -38,20 +30,9 @@ const MeetingsCard = () => {
             <Text style={styles.meetingDescription}>{meeting.description}</Text>
           </View>
         ))}
-
-        <Text style={[styles.meetingSectionTitle, styles.meetingSectionTitleMargin]}>
-          Tomorrow's Meetings
-        </Text>
-        {tomorrowMeetings.map((meeting, index) => (
-          <View key={index} style={styles.meetingItem}>
-            <Text style={styles.meetingTime}>{meeting.time}</Text>
-            <Text style={styles.meetingDescription}>{meeting.description}</Text>
-          </View>
-        ))}
       </View>
     </View>
   );
 };
 
 export default MeetingsCard;
-

@@ -10,8 +10,8 @@ import PreviewSeats from "../screens/PreviewSeats";
 import ShowSeats from "../screens/ShowSeats";
 import CameraQRScanner from "../screens/CameraQRScanner";
 import ZebraQR from "../screens/ZebraQR";
-import CheckInScan from "../screens/OfferHome/CheckInScan";
-import CheckIn_Area from "../screens/OfferHome/CheckIn_Area";
+import CheckInScan_Vendor from "../screens/CheckInScan_Vendor";
+import CheckIn_Area from "../screens/CheckIn_Area";
 import Chat from "../screens/Chat";
 import DesignatedCars from "../screens/DesignatedCars";
 import DesignatedCarDetails from "../screens/DesignatedCarDetails";
@@ -30,6 +30,7 @@ import SubEventDetails from "../screens/SubEventDetails";
 import ResourceDetails from "../screens/ResourceDetails";
 import VisibilitySettings from "../screens/VisibilitySettings";
 import Ambassador from "../screens/Ambassador";
+import Delegations from "../screens/Delegations";
 import PDFViewer from "../screens/PDFViewer";
 import NetInfo from "@react-native-community/netinfo";
 import * as SecureStore from "expo-secure-store";
@@ -140,8 +141,8 @@ const NavStack = () => {
         }}
       />
       <Stack.Screen
-        name="CheckInScan"
-        component={CheckInScan}
+        name="CheckInScan_Vendor"
+        component={CheckInScan_Vendor}
         options={{
           headerShown: false,
         }}
@@ -275,6 +276,13 @@ const NavStack = () => {
       <Stack.Screen
         name="Ambassador"
         component={Ambassador}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Delegations"
+        component={Delegations}
         options={{
           headerShown: false,
         }}

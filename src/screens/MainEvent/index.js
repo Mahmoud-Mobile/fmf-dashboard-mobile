@@ -116,6 +116,7 @@ const MainEvent = () => {
     try {
       dispatch(setSelectedEvent(item));
       await dispatch(fetchEventById(item.id));
+      // navigation.navigate("Delegations");
       navigation.navigate("MyTabs");
     } catch (error) {
       Alert.alert("Error", "Failed to load event details");

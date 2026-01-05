@@ -10,24 +10,7 @@ const EventsCheckInCard = () => {
   const dailySchedules = [
     {
       day: "Day 1, 13 Jan",
-      events: [
-        { name: "Welcome Reception", time: "6:00 PM - 8:00 PM" },
-        { name: "Keynote Speech", time: "6:00 PM - 8:00 PM" },
-      ],
-    },
-    {
-      day: "Day 2, 14 Jan",
-      events: [
-        { name: "Welcome Reception", time: "6:00 PM - 8:00 PM" },
-        { name: "Keynote Speech", time: "6:00 PM - 8:00 PM" },
-      ],
-    },
-    {
-      day: "Day 3, 14 Jan",
-      events: [
-        { name: "Welcome Reception", time: "6:00 PM - 8:00 PM" },
-        { name: "Keynote Speech", time: "6:00 PM - 8:00 PM" },
-      ],
+      events: [{ name: "Welcome", time: "6:00 PM - 8:00 PM" }],
     },
   ];
 
@@ -76,4 +59,3 @@ const EventsCheckInCard = () => {
 };
 
 export default EventsCheckInCard;
-

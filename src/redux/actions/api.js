@@ -11,6 +11,7 @@ import {
   getResourceById,
   getSeatingPlans,
   getAccommodationParticipants,
+  getParticipantById,
 } from "../../webservice/apiConfig";
 
 import {
@@ -28,6 +29,7 @@ import {
   setSeatingPlans,
   setAccommodation,
   setTripsParticipants,
+  setSelectedParticipant,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -196,6 +198,21 @@ export const fetchAccommodationParticipants =
       }
     } catch (error) {
       dispatch(setError("Error fetching accommodation participants"));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Fetch participant by ID
+export const fetchParticipantById =
+  (eventId, participantId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      const response = await getParticipantById(eventId, participantId, params);
+      dispatch(setSelectedParticipant(response));
+    } catch (error) {
+      dispatch(setError("Error fetching participant details"));
     } finally {
       dispatch(setLoading(false));
     }

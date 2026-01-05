@@ -18,6 +18,7 @@ const More = () => {
   const [userInfo, setUserInfo] = useState(null);
   const dispatch = useDispatch();
   const { profile, loading, error } = useSelector((state) => state.api);
+
   useEffect(() => {
     const loadUserInfo = async () => {
       try {
@@ -30,6 +31,7 @@ const More = () => {
       }
     };
     loadUserInfo();
+    // console.log(JSON.stringify(userInfo, null, 2));
   }, []);
   const handleLogout = async () => {
     try {

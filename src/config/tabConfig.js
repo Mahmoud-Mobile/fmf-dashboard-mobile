@@ -5,9 +5,9 @@ import Trips from "../screens/Trips";
 import More from "../screens/More";
 import Hotels from "../screens/Hotels";
 import DesignatedCars from "../screens/DesignatedCars";
-import VendorOfferHome from "../screens/OfferHome/VendorOfferHome";
-import DashboardOfferHome from "../screens/OfferHome/DashboardOfferHome";
-import SelectYourArea from "../screens/OfferHome/SelectYourArea";
+import Vendors from "../screens/Vendors";
+import DashboardOfferHome from "../screens/DashboardOfferHome";
+import SelectYourArea from "../screens/SelectYourArea";
 import store from "../redux/store";
 export const ENVIRONMENT_TABS = {
   fmf: [
@@ -98,8 +98,8 @@ export const ENVIRONMENT_TABS = {
       defaultVisible: true,
     },
     {
-      route: "VendorOfferHome",
-      component: VendorOfferHome,
+      route: "Vendors",
+      component: Vendors,
       icon: "Vendor_Icon",
       headerShown: false,
       titleText: "Vendor",
@@ -138,11 +138,11 @@ export const getTabsForEnvironment = (environment, role = null) => {
   if (environment === "offerHome" && rolePermission) {
     const allowedRoutes = {
       organizer: ["DashboardOfferHome", "SelectYourArea", "More"],
-      vendor: ["DashboardOfferHome", "VendorOfferHome", "More"],
+      vendor: ["DashboardOfferHome", "Vendors", "More"],
       admin: [
         "DashboardOfferHome",
         "SelectYourArea",
-        "VendorOfferHome",
+        "Vendors",
         "More",
       ],
     };
