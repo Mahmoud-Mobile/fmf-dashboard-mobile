@@ -74,6 +74,7 @@ const DateSearchModal = ({
         mode="date"
         display="default"
         onChange={handleDateChange}
+        themeVariant="light"
       />
     ) : null;
   }
@@ -123,6 +124,7 @@ const DateSearchModal = ({
                   onChange={handleDateChange}
                   style={styles.datePicker}
                   textColor={Colors.Primary}
+                  themeVariant="light"
                 />
               </View>
 

@@ -6,19 +6,6 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
-  center: {
-    flex: 1,
-    backgroundColor: Colors.Black,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    color: Colors.White,
-    fontSize: 16,
-    fontFamily: Fonts.FONT_REGULAR,
-    marginTop: 16,
-  },
   overlay: {
     position: "absolute",
     left: 0,
@@ -63,5 +50,43 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
+  },
+  manualInputContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: Colors.White,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderColor,
+    gap: 12,
+  },
+  manualInput: {
+    flex: 1,
+    height: 44,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 14,
+    fontFamily: Fonts.FONT_REGULAR,
+    color: Colors.PrimaryText,
+    backgroundColor: Colors.White,
+  },
+  submitButton: {
+    height: 44,
+    paddingHorizontal: 20,
+    backgroundColor: Colors.Primary,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  submitButtonDisabled: {
+    backgroundColor: Colors.gray,
+    opacity: 0.6,
+  },
+  submitButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.FONT_Semi,
+    color: Colors.White,
   },
 });

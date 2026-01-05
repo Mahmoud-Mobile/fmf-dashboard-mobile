@@ -10,9 +10,8 @@ import PreviewSeats from "../screens/PreviewSeats";
 import ShowSeats from "../screens/ShowSeats";
 import CameraQRScanner from "../screens/CameraQRScanner";
 import ZebraQR from "../screens/ZebraQR";
-import CameraQRScannerOfferHome from "../screens/OfferHome/CameraQRScanner";
-import ZebraQROfferHome from "../screens/OfferHome/ZebraQR";
 import CheckInScan from "../screens/OfferHome/CheckInScan";
+import CheckIn_Area from "../screens/OfferHome/CheckIn_Area";
 import Chat from "../screens/Chat";
 import DesignatedCars from "../screens/DesignatedCars";
 import DesignatedCarDetails from "../screens/DesignatedCarDetails";
@@ -141,22 +140,15 @@ const NavStack = () => {
         }}
       />
       <Stack.Screen
-        name="CameraQRScannerOfferHome"
-        component={CameraQRScannerOfferHome}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="ZebraQROfferHome"
-        component={ZebraQROfferHome}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
         name="CheckInScan"
         component={CheckInScan}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="CheckIn_Area"
+        component={CheckIn_Area}
         options={{
           headerShown: false,
         }}

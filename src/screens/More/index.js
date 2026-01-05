@@ -31,7 +31,6 @@ const More = () => {
     };
     loadUserInfo();
   }, []);
-  console.log(userInfo?.access_token);
   const handleLogout = async () => {
     try {
       await dispatch(logout());

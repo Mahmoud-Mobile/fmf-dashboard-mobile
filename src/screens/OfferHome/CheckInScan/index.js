@@ -14,6 +14,7 @@ import {
   useRoute,
   useNavigation,
 } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 import { Colors } from "../../../Global/colors";
 import CustomHeader from "../../../components/CustomHeader";
 import { styles } from "./Styles";
@@ -22,6 +23,7 @@ import CheckInSuccessModal from "./components/CheckInSuccessModal";
 import CheckInDeclineModal from "./components/CheckInDeclineModal";
 import RecordPurchaseModal from "../../../components/RecordPurchaseModal";
 import { MaterialIcons } from "@expo/vector-icons";
+import { resource_Checkin } from "../../../webservice/apiConfig";
 
 const DUMMY_VISITOR_INFO = {
   name: "Ahmed Al-Mansour",
@@ -32,7 +34,6 @@ const DUMMY_VISITOR_INFO = {
   image: null,
 };
 
-const ROLE_CONFIG = "vendor";
 const SOURCE_SCREENS = {
   SELECT_YOUR_AREA: "SelectYourArea",
   VENDOR_OFFER_HOME: "VendorOfferHome",
@@ -41,7 +42,8 @@ const SOURCE_SCREENS = {
 const CheckInScan = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { slectedVendor, actionType, sourceScreen } = route.params || {};
+  const { selectedEvent } = useSelector((state) => state.api);
+  const { area, actionType, sourceScreen } = route.params || {};
 
   // State management
   const [permission, requestPermission] = useCameraPermissions();
@@ -62,21 +64,23 @@ const CheckInScan = () => {
   const checkInDeclineModalRef = useRef(null);
   const recordPurchaseModalRef = useRef(null);
 
-  // Log source screen
-  useEffect(() => {
-    if (sourceScreen) {
-      console.log("CheckInScan: Navigated from screen:", sourceScreen);
-    } else {
-      console.log("CheckInScan: No source screen provided");
-    }
-  }, [sourceScreen]);
+  const isFromSelectYourArea = sourceScreen === SOURCE_SCREENS.SELECT_YOUR_AREA;
 
-  // Navigation handlers
-  const handleBack = () => {
-    navigation.goBack();
-  };
+  const logCheckInSuccess = useCallback(
+    (response, companionsCount = 0) => {
+      console.log("Check-In Success:", {
+        response,
+        companionsCount,
+        area: area?.name || area?.id,
+        eventId: selectedEvent?.id,
+        resourceId: area?.id,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    [area, selectedEvent]
+  );
 
-  // Scan handlers
+  // Handle scanned QR code
   const handleScanned = useCallback(
     async (qrCode) => {
       console.log("QR Code scanned:", qrCode);
@@ -85,32 +89,46 @@ const CheckInScan = () => {
       setUserInfo(null);
 
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // For SelectYourArea, use resource_Checkin API
+        if (isFromSelectYourArea && area?.id) {
+          const payload = {
+            qrCode: qrCode,
+            scanLocation: area?.location || "",
+          };
 
-        // Determine which modal to show based on source screen and role
-        const isFromSelectYourArea =
-          sourceScreen === SOURCE_SCREENS.SELECT_YOUR_AREA;
-        const isOrganizer = ROLE_CONFIG === "organizer";
-        const isVendorOrAdmin =
-          ROLE_CONFIG === "vendor" || ROLE_CONFIG === "admin";
+          const response = await resource_Checkin(
+            selectedEvent?.id,
+            area.id,
+            payload
+          );
 
-        if (isFromSelectYourArea || isOrganizer) {
-          // Show SuccessWithAddCompanions first for SelectYourArea or organizer role
-          setUserInfo(DUMMY_VISITOR_INFO);
+          console.log("resource_Checkin Response:", response);
+          setUserInfo(response);
           successWithAddCompanionsRef.current?.open();
-        } else if (isVendorOrAdmin) {
-          // For vendor/admin from VendorOfferHome
-          setUserInfo({ participant: { name: "Test User" } });
-          if (selectedActionType === "purchase") {
-            recordPurchaseModalRef.current?.open();
+        } else {
+          // Simulate API call for VendorOfferHome
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          if (sourceScreen === SOURCE_SCREENS.VENDOR_OFFER_HOME) {
+            setUserInfo({ participant: { name: "Test User" } });
+            if (selectedActionType === "purchase") {
+              recordPurchaseModalRef.current?.open();
+            } else {
+              checkInSuccessModalRef.current?.open();
+            }
           } else {
-            checkInSuccessModalRef.current?.open();
+            setUserInfo(DUMMY_VISITOR_INFO);
+            successWithAddCompanionsRef.current?.open();
           }
         }
       } catch (error) {
+        console.log("Check-In Error:", error);
+        const errorData = error?.response?.data || error?.data || {};
         const errorMsg =
-          error?.message || "Failed to check in. Please try again.";
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to check in. Please try again.";
         setErrorMessage(errorMsg);
         setUserInfo(null);
         checkInDeclineModalRef.current?.open();
@@ -118,18 +136,33 @@ const CheckInScan = () => {
         setIsLoadingUserInfo(false);
       }
     },
-    [sourceScreen, selectedActionType]
+    [
+      isFromSelectYourArea,
+      area,
+      selectedEvent?.id,
+      sourceScreen,
+      selectedActionType,
+    ]
   );
 
   // Modal handlers
-  const handleCompleteCheckIn = useCallback(async (companionsCount) => {
-    console.log("Completing check-in with companions:", companionsCount);
-    successWithAddCompanionsRef.current?.close();
+  const handleCompleteCheckIn = useCallback(
+    async (companionsCount) => {
+      console.log("Completing check-in with companions:", companionsCount);
 
-    setTimeout(() => {
-      checkInSuccessModalRef.current?.open();
-    }, 300);
-  }, []);
+      // Log success
+      if (userInfo) {
+        logCheckInSuccess(userInfo, companionsCount);
+      }
+
+      successWithAddCompanionsRef.current?.close();
+
+      setTimeout(() => {
+        checkInSuccessModalRef.current?.open();
+      }, 300);
+    },
+    [userInfo, logCheckInSuccess]
+  );
 
   const handleScanAnother = useCallback(() => {
     isLockedRef.current = false;
@@ -213,34 +246,24 @@ const CheckInScan = () => {
 
   // Helper functions
   const shouldShowActionTypeSelector = () => {
-    return (
-      sourceScreen === SOURCE_SCREENS.VENDOR_OFFER_HOME &&
-      (ROLE_CONFIG === "vendor" || ROLE_CONFIG === "admin")
-    );
+    return sourceScreen === SOURCE_SCREENS.VENDOR_OFFER_HOME;
   };
 
   const shouldShowSuccessWithCompanionsModals = () => {
-    // Show for SelectYourArea (any role) or organizer role
-    return (
-      sourceScreen === SOURCE_SCREENS.SELECT_YOUR_AREA ||
-      ROLE_CONFIG === "organizer"
-    );
+    return isFromSelectYourArea;
   };
 
   const shouldShowVendorModals = () => {
-    // Show for VendorOfferHome with vendor/admin role
-    return (
-      sourceScreen === SOURCE_SCREENS.VENDOR_OFFER_HOME &&
-      (ROLE_CONFIG === "vendor" || ROLE_CONFIG === "admin")
-    );
+    return sourceScreen === SOURCE_SCREENS.VENDOR_OFFER_HOME;
   };
 
   const getVisitorName = () => {
-    if (
-      sourceScreen === SOURCE_SCREENS.SELECT_YOUR_AREA ||
-      ROLE_CONFIG === "organizer"
-    ) {
-      return userInfo?.name || DUMMY_VISITOR_INFO?.name;
+    if (isFromSelectYourArea) {
+      return (
+        userInfo?.name ||
+        userInfo?.participant?.name ||
+        DUMMY_VISITOR_INFO?.name
+      );
     }
     return userInfo?.participant?.name;
   };
@@ -250,7 +273,7 @@ const CheckInScan = () => {
       <View style={styles.container}>
         <CustomHeader
           leftLabel="Camera Scanner"
-          onLeftButtonPress={handleBack}
+          onLeftButtonPress={() => navigation.goBack()}
         />
         <View style={styles.center}>
           <ActivityIndicator size="large" color={Colors.White} />
@@ -261,9 +284,13 @@ const CheckInScan = () => {
       </View>
     );
   }
+
   return (
     <View style={styles.container}>
-      <CustomHeader leftLabel="Camera Scanner" onLeftButtonPress={handleBack} />
+      <CustomHeader
+        leftLabel="Camera Scanner"
+        onLeftButtonPress={() => navigation.goBack()}
+      />
 
       <View style={styles.manualInputContainer}>
         <TextInput
@@ -289,7 +316,6 @@ const CheckInScan = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Action Type Selector - Only for VendorOfferHome */}
       {shouldShowActionTypeSelector() && (
         <View style={styles.actionTypeContainer}>
           <TouchableOpacity
@@ -328,6 +354,7 @@ const CheckInScan = () => {
           </TouchableOpacity>
         </View>
       )}
+
       <View style={styles.container}>
         {isFocused ? (
           <CameraView
@@ -350,7 +377,6 @@ const CheckInScan = () => {
         </View>
       </View>
 
-      {/* Modals for SelectYourArea or Organizer - Show SuccessWithAddCompanions first */}
       {shouldShowSuccessWithCompanionsModals() && (
         <>
           <SuccessWithAddCompanions
@@ -362,7 +388,7 @@ const CheckInScan = () => {
           <CheckInSuccessModal
             ref={checkInSuccessModalRef}
             visitorName={getVisitorName()}
-            location={userInfo?.location}
+            location={area?.location || userInfo?.location}
             dateTime={new Date().toLocaleString()}
             onClose={handleScanAnother}
           />
@@ -374,7 +400,6 @@ const CheckInScan = () => {
         </>
       )}
 
-      {/* Modals for VendorOfferHome - Show CheckInSuccessModal or RecordPurchaseModal */}
       {shouldShowVendorModals() && (
         <>
           <CheckInSuccessModal

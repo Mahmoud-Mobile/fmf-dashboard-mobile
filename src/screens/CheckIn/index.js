@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
 import { View, Text, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -97,21 +103,14 @@ const CheckInScreen = () => {
         );
       }
     }
-  }, [
-    selectedCategory,
-    hasSubEventsPermission,
-    hasResourcesPermission,
-  ]);
+  }, [selectedCategory, hasSubEventsPermission, hasResourcesPermission]);
 
   // Build categories based on permissions and environment
   const categories = useMemo(() => {
     const availableCategories = [];
 
     // Add sub-event category if user has permission and not in offerHome
-    if (
-      currentEnvironment !== "offerHome" &&
-      hasSubEventsPermission
-    ) {
+    if (currentEnvironment !== "offerHome" && hasSubEventsPermission) {
       availableCategories.push({
         id: "subEvent",
         label: "Sub Event",

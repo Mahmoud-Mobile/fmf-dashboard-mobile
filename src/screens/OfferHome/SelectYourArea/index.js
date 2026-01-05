@@ -1,27 +1,35 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import CustomEventHeader from "../../../components/CustomEventHeader";
 import { styles } from "./Styles";
 import { Colors } from "../../../Global/colors";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { fetchResources } from "../../../redux/actions/api";
 
 const SelectYourArea = () => {
   const navigation = useNavigation();
-  const { selectedEvent } = useSelector((state) => state.api);
+  const dispatch = useDispatch();
+  const { selectedEvent, resources } = useSelector((state) => state.api);
 
-  const areas = [
-    { id: 1, name: "Area 1" },
-    { id: 2, name: "Area 2" },
-    { id: 3, name: "Area 3" },
-    { id: 4, name: "Area 4" },
-    { id: 5, name: "Area 5" },
-  ];
+  useEffect(() => {
+    if (selectedEvent?.id) {
+      dispatch(
+        fetchResources(selectedEvent.id, {
+          type: "AREA",
+          page: 1,
+          limit: 100,
+        })
+      );
+    }
+  }, [selectedEvent?.id, dispatch]);
 
-  const handleAreaPress = () => {
-    navigation.navigate("CheckInScan", {
-      sourceScreen: "SelectYourArea",
+  const areas = resources?.resources || [];
+
+  const handleAreaPress = (area) => {
+    navigation.navigate("CheckIn_Area", {
+      area: area,
     });
   };
 
