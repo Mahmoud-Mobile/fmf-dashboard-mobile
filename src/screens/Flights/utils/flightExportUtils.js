@@ -1,4 +1,4 @@
-import { formatDateTime } from "../../../config/dateUtils";
+import moment from "moment";
 
 export const prepareFlightExportData = (flight, selectedCategory = "all") => {
   const participant = flight.participant || {};
@@ -12,10 +12,39 @@ export const prepareFlightExportData = (flight, selectedCategory = "all") => {
   const nationality = participant?.nationality?.name || "-";
   const nationalityCode = participant?.nationality?.code || "-";
 
-  const formatDateAndTime = (date, time) => {
+  const formatDateOnly = (date) => {
     if (!date) return "-";
-    const dateTime = time ? formatDateTime(date, time) : formatDateTime(date);
-    return dateTime || "-";
+    try {
+      const nativeDate = new Date(date);
+      if (!isNaN(nativeDate.getTime())) {
+        return moment(nativeDate).format("MMM DD, YYYY");
+      }
+      return "-";
+    } catch (error) {
+      return "-";
+    }
+  };
+
+  const formatTimeOnly = (date, time) => {
+    if (!date && !time) return "-";
+    try {
+      if (time) {
+        const [hours, minutes] = time.split(":");
+        if (hours && minutes) {
+          return `${hours.padStart(2, "0")}:${minutes}`;
+        }
+        return time;
+      }
+      if (date) {
+        const nativeDate = new Date(date);
+        if (!isNaN(nativeDate.getTime())) {
+          return moment(nativeDate).format("HH:mm");
+        }
+      }
+      return "-";
+    } catch (error) {
+      return "-";
+    }
   };
 
   // Arrival flight data
@@ -24,7 +53,8 @@ export const prepareFlightExportData = (flight, selectedCategory = "all") => {
   const arrivalAirport = flight.arrivalAirport || "-";
   const arrivalAirportCode = flight.arrivalAirportCode || "-";
   const arrivalCity = flight.arrivalCity || "-";
-  const arrivalDate = formatDateAndTime(flight.arrivalDate, flight.arrivalTime);
+  const arrivalDate = formatDateOnly(flight.arrivalDate);
+  const arrivalTime = formatTimeOnly(flight.arrivalDate, flight.arrivalTime);
   const arrivalStatus = flight.arrivalFlightStatus || "-";
 
   // Return/Departure flight data
@@ -34,7 +64,8 @@ export const prepareFlightExportData = (flight, selectedCategory = "all") => {
   const returnAirport = flight.returnAirport || "-";
   const returnAirportCode = flight.returnAirportCode || "-";
   const returnCity = flight.returnCity || "-";
-  const returnDate = formatDateAndTime(flight.returnDate, flight.returnTime);
+  const returnDate = formatDateOnly(flight.returnDate);
+  const returnTime = formatTimeOnly(flight.returnDate, flight.returnTime);
   const returnStatus = flight.returnFlightStatus || "-";
 
   // Flight details
@@ -73,7 +104,8 @@ export const prepareFlightExportData = (flight, selectedCategory = "all") => {
     "Arrival Airport": arrivalAirport,
     "Arrival Airport Code": arrivalAirportCode,
     "Arrival City": arrivalCity,
-    "Arrival Date & Time": arrivalDate,
+    "Arrival Date": arrivalDate,
+    "Arrival Time": arrivalTime,
     "Arrival Status": arrivalStatus,
 
     // Return/Departure Flight Information
@@ -82,7 +114,8 @@ export const prepareFlightExportData = (flight, selectedCategory = "all") => {
     "Return Airport": returnAirport,
     "Return Airport Code": returnAirportCode,
     "Return City": returnCity,
-    "Return Date & Time": returnDate,
+    "Return Date": returnDate,
+    "Return Time": returnTime,
     "Return Status": returnStatus,
 
     // Flight Details

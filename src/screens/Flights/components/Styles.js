@@ -39,12 +39,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   userInitial: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.FONT_MEDIUM,
     color: Colors.White,
   },
   userName: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
   },

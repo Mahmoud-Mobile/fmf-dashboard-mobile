@@ -6,7 +6,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import {
@@ -14,6 +13,7 @@ import {
   useRoute,
   useNavigation,
 } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../Global/colors";
 import CustomHeader from "../../components/CustomHeader";
@@ -21,6 +21,7 @@ import { styles } from "./Styles";
 import CheckInSuccessModal from "./components/CheckInSuccessModal";
 import CheckInDeclineModal from "./components/CheckInDeclineModal";
 import RecordPurchaseModal from "../../components/RecordPurchaseModal";
+import { visitVendorCheckIn, createPurchase } from "../../webservice/apiConfig";
 
 const ACTION_TYPES = {
   VISIT: "visit",
@@ -31,7 +32,8 @@ const CheckInScan_Vendor = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const { actionType } = route.params || {};
+  const { actionType, slectedVendor } = route.params || {};
+  const { selectedEvent } = useSelector((state) => state.api);
   const [permission, requestPermission] = useCameraPermissions();
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -42,8 +44,10 @@ const CheckInScan_Vendor = () => {
   const [selectedActionType, setSelectedActionType] = useState(
     actionType || ACTION_TYPES.VISIT
   );
+  const [currentQrCode, setCurrentQrCode] = useState(null);
 
   const isLockedRef = useRef(false);
+  const isModalOpenRef = useRef(false);
   const checkInSuccessModalRef = useRef(null);
   const checkInDeclineModalRef = useRef(null);
   const recordPurchaseModalRef = useRef(null);
@@ -51,34 +55,84 @@ const CheckInScan_Vendor = () => {
   const isReady = Boolean(permission?.granted);
   const isSubmitDisabled = !manualCode.trim() || isProcessing;
 
-  const handleVisitAction = useCallback((qrCode) => {
-    console.log("qr is scan", qrCode);
-    isLockedRef.current = false;
-  }, []);
+  const handleVisitAction = useCallback(
+    async (qrCode) => {
+      setIsLoadingUserInfo(true);
+      setErrorMessage(null);
+      setUserInfo(null);
 
-  const handlePurchaseAction = useCallback(async (qrCode) => {
-    setIsLoadingUserInfo(true);
-    setErrorMessage(null);
-    setUserInfo(null);
+      try {
+        const data = { qrCode: qrCode };
+        const response = await visitVendorCheckIn(
+          selectedEvent.id,
+          slectedVendor.id,
+          data
+        );
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setUserInfo({ participant: { name: "Test User" } });
-      recordPurchaseModalRef.current?.open();
-    } catch (error) {
-      console.log("Purchase Error:", error);
-      const errorData = error?.response?.data || error?.data || {};
-      const errorMsg =
-        errorData?.message ||
-        error?.message ||
-        errorData?.error ||
-        "Failed to process purchase. Please try again.";
-      setErrorMessage(errorMsg);
-      checkInDeclineModalRef.current?.open();
-    } finally {
-      setIsLoadingUserInfo(false);
-    }
-  }, []);
+        setUserInfo(response?.data || { participant: { name: qrCode } });
+        isModalOpenRef.current = true;
+        checkInSuccessModalRef.current?.open();
+      } catch (error) {
+        console.log("Visit Check-In Error:", error);
+        const errorData = error?.response?.data || error?.data || {};
+        const errorMsg =
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to process visit check-in. Please try again.";
+        setErrorMessage(errorMsg);
+        isModalOpenRef.current = true;
+        checkInDeclineModalRef.current?.open();
+      } finally {
+        setIsLoadingUserInfo(false);
+        isLockedRef.current = false;
+      }
+    },
+    [selectedEvent, slectedVendor]
+  );
+
+  const handlePurchaseAction = useCallback(
+    async (qrCode) => {
+      setIsLoadingUserInfo(true);
+      setErrorMessage(null);
+      setUserInfo(null);
+      setCurrentQrCode(qrCode);
+
+      try {
+        // First, perform check-in
+        const checkInData = { qrCode: qrCode };
+        const checkInResponse = await visitVendorCheckIn(
+          selectedEvent.id,
+          slectedVendor.id,
+          checkInData
+        );
+
+        // If check-in is successful, show the purchase modal
+        if (checkInResponse) {
+          setUserInfo(
+            checkInResponse?.data || { participant: { name: qrCode } }
+          );
+          isModalOpenRef.current = true;
+          recordPurchaseModalRef.current?.open();
+        }
+      } catch (error) {
+        console.log("Purchase Check-In Error:", error);
+        const errorData = error?.response?.data || error?.data || {};
+        const errorMsg =
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to process purchase check-in. Please try again.";
+        setErrorMessage(errorMsg);
+        isModalOpenRef.current = true;
+        checkInDeclineModalRef.current?.open();
+      } finally {
+        setIsLoadingUserInfo(false);
+        isLockedRef.current = false;
+      }
+    },
+    [selectedEvent, slectedVendor]
+  );
 
   const handleScanned = useCallback(
     async (qrCode) => {
@@ -99,12 +153,15 @@ const CheckInScan_Vendor = () => {
 
   const handleScanAnother = useCallback(() => {
     isLockedRef.current = false;
+    isModalOpenRef.current = false;
     setUserInfo(null);
     setErrorMessage(null);
+    setCurrentQrCode(null);
   }, []);
 
   const handleTryAgain = useCallback(() => {
     isLockedRef.current = false;
+    isModalOpenRef.current = false;
     setErrorMessage(null);
   }, []);
 
@@ -127,7 +184,20 @@ const CheckInScan_Vendor = () => {
 
   const handleBarCodeScanned = useCallback(
     async ({ data }) => {
-      if (isLockedRef.current || !data) return;
+      // Prevent scanning if:
+      // - Already locked/processing
+      // - Modal is open
+      // - Currently loading user info
+      // - No data
+      if (
+        isLockedRef.current ||
+        isModalOpenRef.current ||
+        isProcessing ||
+        isLoadingUserInfo ||
+        !data
+      ) {
+        return;
+      }
 
       isLockedRef.current = true;
       setIsProcessing(true);
@@ -141,26 +211,63 @@ const CheckInScan_Vendor = () => {
         }
       }
     },
-    [handleScanned, selectedActionType]
+    [handleScanned, selectedActionType, isProcessing, isLoadingUserInfo]
   );
 
   const handleRecordPurchaseConfirm = useCallback(
-    (purchaseData) => {
-      recordPurchaseModalRef.current?.close();
+    async (purchaseData) => {
+      setIsLoadingUserInfo(true);
+      setErrorMessage(null);
 
-      Alert.alert(
-        "Success",
-        "Purchase recorded successfully!",
-        [
-          {
-            text: "OK",
-            onPress: handleScanAnother,
-          },
-        ],
-        { cancelable: false }
-      );
+      try {
+        // Format the purchase data according to API requirements
+        const purchasePayload = {
+          qrCode: currentQrCode,
+          items: [
+            {
+              productId: purchaseData.productName || "unknown",
+              itemName: purchaseData.productName || "",
+              quantity: purchaseData.quantity || 1,
+              originalPrice: purchaseData.originalPrice || 0,
+              discountType: "PERCENTAGE",
+              discountValue: purchaseData.discount || 0,
+            },
+          ],
+        };
+
+        const response = await createPurchase(
+          selectedEvent.id,
+          slectedVendor.id,
+          purchasePayload
+        );
+
+        recordPurchaseModalRef.current?.close();
+        isModalOpenRef.current = false;
+
+        // Update user info from response if available
+        setUserInfo(
+          response?.data || userInfo || { participant: { name: currentQrCode } }
+        );
+
+        // Show success modal
+        isModalOpenRef.current = true;
+        checkInSuccessModalRef.current?.open();
+      } catch (error) {
+        console.log("Purchase Error:", error);
+        const errorData = error?.response?.data || error?.data || {};
+        const errorMsg =
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to record purchase. Please try again.";
+        setErrorMessage(errorMsg);
+        isModalOpenRef.current = true;
+        checkInDeclineModalRef.current?.open();
+      } finally {
+        setIsLoadingUserInfo(false);
+      }
     },
-    [handleScanAnother]
+    [currentQrCode, selectedEvent, slectedVendor, userInfo]
   );
 
   const getVisitorName = () => {
@@ -310,6 +417,7 @@ const CheckInScan_Vendor = () => {
         discount=""
         onRecordPurchase={handleRecordPurchaseConfirm}
         onCancel={() => {
+          isModalOpenRef.current = false;
           recordPurchaseModalRef.current?.close();
           handleScanAnother();
         }}

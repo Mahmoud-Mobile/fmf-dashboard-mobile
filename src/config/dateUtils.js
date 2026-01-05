@@ -40,15 +40,12 @@ export const formatDateTime = (dateString, timeString) => {
       if (timeString) {
         const [hours, minutes] = timeString.split(":");
         if (hours && minutes) {
-          const hour24 = parseInt(hours, 10);
-          const hour12 = hour24 % 12 || 12;
-          const ampm = hour24 >= 12 ? "PM" : "AM";
-          formattedTime = `${hour12}:${minutes} ${ampm}`;
+          formattedTime = `${hours.padStart(2, "0")}:${minutes}`;
         } else {
           formattedTime = timeString;
         }
       } else {
-        formattedTime = moment(nativeDate).format("h:mm A");
+        formattedTime = moment(nativeDate).format("HH:mm");
       }
 
       return `${formattedDate} - ${formattedTime}`;
