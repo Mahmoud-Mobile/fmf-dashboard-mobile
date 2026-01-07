@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   heroTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     flex: 1,

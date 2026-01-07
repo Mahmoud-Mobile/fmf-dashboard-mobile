@@ -18,7 +18,6 @@ import { setEmail, setPassword } from "../../redux/actions/authActions";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/actions/authActions";
 import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
 
 const Login = () => {
   const navigation = useNavigation();

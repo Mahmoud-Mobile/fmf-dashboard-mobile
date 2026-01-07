@@ -1,7 +1,6 @@
 import { login as loginUser } from "../../webservice/apiConfig";
 import * as SecureStore from "expo-secure-store";
 import { Storage } from "expo-storage";
-import { Platform } from "react-native";
 import * as Device from "expo-device";
 import {
   LOGIN_SUCCESS,
@@ -10,6 +9,8 @@ import {
   SET_EMAIL,
   SET_PASSWORD,
   SET_ROLE_PERMISSION,
+  SET_EXHIBITOR_ID,
+  SET_EXHIBITOR,
 } from "./actionTypes";
 
 export const login =
@@ -37,6 +38,20 @@ export const login =
           response?.user?.roles?.[0] || response?.user?.role || null;
         dispatch({ type: LOGIN_SUCCESS, payload: response });
         dispatch({ type: SET_ROLE_PERMISSION, payload: rolePermission });
+
+        // Store exhibitor if environment is offerHome
+        const selectedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        if (selectedCategory === "offerHome") {
+          // Store exhibitor object if available
+          const exhibitor = response?.exhibitor ?? response?.payload?.exhibitor;
+
+          if (exhibitor !== undefined && exhibitor !== null) {
+            dispatch({ type: SET_EXHIBITOR, payload: exhibitor });
+          }
+        }
+
         return { type: LOGIN_SUCCESS, payload: response };
       } else {
         console.log("Login failed: No access token in response");
@@ -82,4 +97,14 @@ export const setPassword = (password) => ({
 export const setRolePermission = (rolePermission) => ({
   type: SET_ROLE_PERMISSION,
   payload: rolePermission,
+});
+
+export const setExhibitorId = (exhibitorId) => ({
+  type: SET_EXHIBITOR_ID,
+  payload: exhibitorId,
+});
+
+export const setExhibitor = (exhibitor) => ({
+  type: SET_EXHIBITOR,
+  payload: exhibitor,
 });

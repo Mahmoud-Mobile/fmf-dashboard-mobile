@@ -5,6 +5,8 @@ import {
   SET_EMAIL,
   SET_PASSWORD,
   SET_ROLE_PERMISSION,
+  SET_EXHIBITOR_ID,
+  SET_EXHIBITOR,
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -14,6 +16,8 @@ const initialState = {
   email: "",
   password: "",
   rolePermission: null,
+  exhibitorId: [],
+  exhibitor: null,
 };
 
 export default function authReducer(state = initialState, action) {
@@ -37,6 +41,8 @@ export default function authReducer(state = initialState, action) {
         user: null,
         error: null,
         rolePermission: null,
+        exhibitorId: [],
+        exhibitor: null,
       };
     case SET_EMAIL:
       return { ...state, email: action.payload };
@@ -44,6 +50,10 @@ export default function authReducer(state = initialState, action) {
       return { ...state, password: action.payload };
     case SET_ROLE_PERMISSION:
       return { ...state, rolePermission: action.payload };
+    case SET_EXHIBITOR_ID:
+      return { ...state, exhibitorId: action.payload };
+    case SET_EXHIBITOR:
+      return { ...state, exhibitor: action.payload };
     default:
       return state;
   }

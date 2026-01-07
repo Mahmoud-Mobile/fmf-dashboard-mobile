@@ -1,30 +1,78 @@
-import React, { useState, useMemo, useRef, useCallback } from "react";
-import { View, FlatList, Alert, Platform } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { View, FlatList, Pressable, Text } from "react-native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useSelector, useDispatch } from "react-redux";
+import { MaterialIcons } from "@expo/vector-icons";
 import CustomEventHeader from "../../components/CustomEventHeader";
+import LoadingModal from "../../components/LoadingModal";
 import SearchActionRow from "../../components/SearchActionRow";
 import CustomItem from "./components";
-import { vendorData as vendorsData } from "./components/vendorData";
 import { styles } from "./Styles";
+import { fetchExhibitorById } from "../../redux/actions/api";
+import { Colors } from "../../Global/colors";
 
 const Vendors = () => {
   const navigation = useNavigation();
-  const { selectedEvent } = useSelector((state) => state.api);
+  const dispatch = useDispatch();
+  const { selectedEvent, exhibitor, loading } = useSelector(
+    (state) => state.api
+  );
+  const exhibitorFromAuth = useSelector((state) => state.auth.exhibitor);
   const [searchText, setSearchText] = useState("");
 
-  const filteredVendors = useMemo(() => {
-    if (!searchText.trim()) return vendorsData;
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedEvent?.id && exhibitorFromAuth?.id) {
+        dispatch(fetchExhibitorById(selectedEvent.id, exhibitorFromAuth.id));
+      }
+    }, [selectedEvent?.id, exhibitorFromAuth?.id, dispatch])
+  );
 
-    return vendorsData
-      .map((vendor) => {
-        const filteredProducts = vendor.products.filter((product) =>
-          product.name.toLowerCase().includes(searchText.toLowerCase())
-        );
-        return { ...vendor, products: filteredProducts };
-      })
-      .filter((vendor) => vendor.products.length > 0);
-  }, [searchText]);
+  // Transform API response to match component structure
+  const transformedVendor = useMemo(() => {
+    if (!exhibitor?.exhibitor) return null;
+
+    const exhibitorData = exhibitor.exhibitor;
+    const products = exhibitor.products || [];
+    const purchases = exhibitor.purchases || [];
+
+    // Transform products array to match expected structure
+    const transformedProducts = products.map((product) => ({
+      id: product.id,
+      name: product.name || "Product",
+      discount: product.discount || 0,
+      originalPrice: product.originalPrice || product.price || 0,
+      finalPrice: product.finalPrice || product.price || 0,
+      recordedPurchaseTime:
+        product.recordedPurchaseTime || product.createdAt || "",
+    }));
+
+    return {
+      id: exhibitorData.id,
+      name: exhibitorData.name || " ",
+      booth: exhibitorData.boothNumber || exhibitorData.boothLocation || " ",
+      visits: exhibitorData.stats?.totalVisits || 0,
+      purchases: exhibitor.purchasesTotal || purchases.length || 0,
+      avatar: exhibitorData.logo || null,
+      products: transformedProducts,
+    };
+  }, [exhibitor]);
+
+  const filteredVendors = useMemo(() => {
+    if (!transformedVendor) return [];
+
+    if (!searchText.trim()) {
+      return [transformedVendor];
+    }
+
+    const filteredProducts = transformedVendor.products.filter((product) =>
+      product.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    if (filteredProducts.length === 0) return [];
+
+    return [{ ...transformedVendor, products: filteredProducts }];
+  }, [transformedVendor, searchText]);
 
   const handleSearchClear = () => {
     setSearchText("");
@@ -35,6 +83,7 @@ const Vendors = () => {
       slectedVendor: vendor,
       actionType: actionType, // "visit" or "purchase"
       sourceScreen: "Vendors",
+      exhibitorId: exhibitor.id,
     });
   };
 
@@ -72,6 +121,7 @@ const Vendors = () => {
 
   return (
     <View style={styles.container}>
+      <LoadingModal visible={loading} />
       <CustomEventHeader
         event={selectedEvent}
         onLeftButtonPress={() => navigation.goBack()}
@@ -86,7 +136,10 @@ const Vendors = () => {
         showPrintButton={false}
         showDateButton={false}
       />
-
+      <Pressable style={styles.importButton}>
+        <MaterialIcons name="file-upload" size={16} color={Colors.DarkGray} />
+        <Text style={styles.importButtonText}>Import Files Excel</Text>
+      </Pressable>
       <FlatList
         data={filteredVendors}
         renderItem={renderVendorCard}

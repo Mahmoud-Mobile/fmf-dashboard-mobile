@@ -9,7 +9,7 @@ import dashboardReducer from "./dashboardReducer";
 const authPersistConfig = {
   key: "auth",
   storage: AsyncStorage,
-  whitelist: ["user", "isLoggedIn", "rolePermission"],
+  whitelist: ["user", "isLoggedIn", "rolePermission", "exhibitorId"],
 };
 
 const uiPersistConfig = {

@@ -15,8 +15,8 @@ const CustomItem = ({
   showVendorOnly = false,
 }) => {
   const {
-    name: vendorName = "Vendor Name",
-    booth = "Booth A-12",
+    name: vendorName = " ",
+    booth = " ",
     visits = 0,
     purchases = 0,
     avatar,
@@ -28,7 +28,13 @@ const CustomItem = ({
 
   const renderAvatar = () => {
     if (avatar) {
-      return <Image source={{ uri: avatar }} style={styles.avatarImage} />;
+      return (
+        <Image
+          source={{ uri: avatar }}
+          style={styles.avatarImage}
+          resizeMode="contain"
+        />
+      );
     }
     return (
       <View style={styles.vendorAvatar}>
@@ -52,7 +58,6 @@ const CustomItem = ({
                 styles.vendorName,
                 isSmallScreen && styles.vendorNameSmall,
               ]}
-              numberOfLines={1}
             >
               {vendorName}
             </Text>

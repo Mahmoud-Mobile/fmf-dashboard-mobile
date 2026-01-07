@@ -249,9 +249,9 @@ const markAccommodationCheckedOut = async (eventId, accommodationId, data) => {
 };
 // offer home visit apis
 // Mark vendor check in
-const visitVendorCheckIn = async (eventId, vendorId, data) => {
+const visitVendorCheckIn = async (eventId, exhibitorId, data) => {
   return await Post(
-    `mobile/ops/events/${eventId}/exhibitors/${vendorId}/check-in`,
+    `mobile/ops/events/${eventId}/exhibitors/${exhibitorId}/scan`,
     data,
     "POST",
     true
@@ -263,6 +263,14 @@ const createPurchase = async (eventId, exhibitorId, data) => {
     data,
     "POST",
     true
+  );
+};
+
+// Get exhibitor by ID
+const getExhibitorById = async (eventId, exhibitorId, data = {}) => {
+  return await Get(
+    `mobile/ops/events/${eventId}/exhibitors/${exhibitorId}`,
+    data
   );
 };
 
@@ -300,4 +308,5 @@ export {
   getParticipantById,
   visitVendorCheckIn,
   createPurchase,
+  getExhibitorById,
 };

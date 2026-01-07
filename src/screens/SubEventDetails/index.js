@@ -111,7 +111,7 @@ const SubEventDetails = ({ route }) => {
     <View style={styles.container}>
       <CustomHeader
         leftLabel="Back"
-        title={title || subEvent.name || " "}
+        // title={title || subEvent?.name || " "}
         subtitle={location || subEvent.location}
         onLeftButtonPress={() => navigation.goBack()}
       />

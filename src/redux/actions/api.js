@@ -12,6 +12,7 @@ import {
   getSeatingPlans,
   getAccommodationParticipants,
   getParticipantById,
+  getExhibitorById,
 } from "../../webservice/apiConfig";
 
 import {
@@ -30,6 +31,7 @@ import {
   setAccommodation,
   setTripsParticipants,
   setSelectedParticipant,
+  setExhibitor,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -213,6 +215,29 @@ export const fetchParticipantById =
       dispatch(setSelectedParticipant(response));
     } catch (error) {
       dispatch(setError("Error fetching participant details"));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Fetch exhibitor by ID
+export const fetchExhibitorById =
+  (eventId, exhibitorId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      const response = await getExhibitorById(eventId, exhibitorId, {
+        includeProducts: true,
+        includeVisits: true,
+        includePurchases: true,
+        ...params,
+      });
+      dispatch(setExhibitor(response));
+      console.log("Vendors Screen - fetchExhibitorById Response:", response);
+      return response;
+    } catch (error) {
+      dispatch(setError("Error fetching exhibitor details"));
+      throw error;
     } finally {
       dispatch(setLoading(false));
     }

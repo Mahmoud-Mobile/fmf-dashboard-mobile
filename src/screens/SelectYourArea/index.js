@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import CustomEventHeader from "../../components/CustomEventHeader";
+import LoadingModal from "../../components/LoadingModal";
 import { styles } from "./Styles";
 import { Colors } from "../../Global/colors";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
@@ -11,19 +12,23 @@ import { fetchResources } from "../../redux/actions/api";
 const SelectYourArea = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { selectedEvent, resources } = useSelector((state) => state.api);
+  const { selectedEvent, resources, loading } = useSelector(
+    (state) => state.api
+  );
 
-  useEffect(() => {
-    if (selectedEvent?.id) {
-      dispatch(
-        fetchResources(selectedEvent.id, {
-          type: "AREA",
-          page: 1,
-          limit: 100,
-        })
-      );
-    }
-  }, [selectedEvent?.id, dispatch]);
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedEvent?.id) {
+        dispatch(
+          fetchResources(selectedEvent.id, {
+            type: "AREA",
+            page: 1,
+            limit: 100,
+          })
+        );
+      }
+    }, [selectedEvent?.id, dispatch])
+  );
 
   const areas = resources?.resources || [];
 
@@ -35,6 +40,7 @@ const SelectYourArea = () => {
 
   return (
     <View style={styles.container}>
+      <LoadingModal visible={loading} />
       <CustomEventHeader
         event={selectedEvent}
         onLeftButtonPress={() => navigation.goBack()}

@@ -32,7 +32,7 @@ const CheckInScan_Vendor = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const { actionType, slectedVendor } = route.params || {};
+  const { actionType, slectedVendor, exhibitorId } = route.params || {};
   const { selectedEvent } = useSelector((state) => state.api);
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -54,7 +54,6 @@ const CheckInScan_Vendor = () => {
 
   const isReady = Boolean(permission?.granted);
   const isSubmitDisabled = !manualCode.trim() || isProcessing;
-
   const handleVisitAction = useCallback(
     async (qrCode) => {
       setIsLoadingUserInfo(true);
@@ -73,7 +72,6 @@ const CheckInScan_Vendor = () => {
         isModalOpenRef.current = true;
         checkInSuccessModalRef.current?.open();
       } catch (error) {
-        console.log("Visit Check-In Error:", error);
         const errorData = error?.response?.data || error?.data || {};
         const errorMsg =
           errorData?.message ||

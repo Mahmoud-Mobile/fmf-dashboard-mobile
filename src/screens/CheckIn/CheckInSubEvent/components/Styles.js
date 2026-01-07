@@ -26,10 +26,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   eventTitle: {
-    fontSize: 16,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     marginLeft: 4,
+    width: "90%",
   },
   detailItem: {
     flexDirection: "row",

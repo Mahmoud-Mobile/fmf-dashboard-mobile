@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     marginHorizontal: horizontalMargin,
     backgroundColor: Colors.Background,
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 10,
     gap: 8,
   },
   searchBar: {

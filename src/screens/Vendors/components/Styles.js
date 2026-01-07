@@ -75,6 +75,7 @@ export const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 16,
+    marginRight: 12,
   },
   avatarText: {
     fontSize: 12,
@@ -85,13 +86,13 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   vendorName: {
-    fontSize: 16,
+    fontSize: 12,
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
     marginBottom: 4,
   },
   vendorNameSmall: {
-    fontSize: 14,
+    fontSize: 12,
   },
   boothContainer: {
     flexDirection: "row",
