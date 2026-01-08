@@ -32,9 +32,33 @@ const CheckInScan_Vendor = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const { actionType, slectedVendor, exhibitorId } = route.params || {};
-  const { selectedEvent } = useSelector((state) => state.api);
+  const { actionType, slectedVendor, selectedVendor, exhibitorId } =
+    route.params || {};
+  const { selectedEvent, exhibitor } = useSelector((state) => state.api);
+  const exhibitorFromAuth = useSelector((state) => state.auth.exhibitor);
   const [permission, requestPermission] = useCameraPermissions();
+
+  // Get exhibitor ID from various sources with fallback
+  const getExhibitorId = useCallback(() => {
+    // Try selectedVendor first (correct spelling)
+    if (selectedVendor?.id) return selectedVendor.id;
+    // Try slectedVendor (typo, for backward compatibility)
+    if (slectedVendor?.id) return slectedVendor.id;
+    // Try exhibitorId from route params
+    if (exhibitorId) return exhibitorId;
+    // Try exhibitor from Redux API state
+    if (exhibitor?.exhibitor?.id) return exhibitor.exhibitor.id;
+    if (exhibitor?.id) return exhibitor.id;
+    // Try exhibitor from auth state
+    if (exhibitorFromAuth?.id) return exhibitorFromAuth.id;
+    return null;
+  }, [
+    selectedVendor,
+    slectedVendor,
+    exhibitorId,
+    exhibitor,
+    exhibitorFromAuth,
+  ]);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
@@ -56,6 +80,14 @@ const CheckInScan_Vendor = () => {
   const isSubmitDisabled = !manualCode.trim() || isProcessing;
   const handleVisitAction = useCallback(
     async (qrCode) => {
+      const vendorId = getExhibitorId();
+      if (!vendorId) {
+        setErrorMessage("Exhibitor information not found. Please try again.");
+        isModalOpenRef.current = true;
+        checkInDeclineModalRef.current?.open();
+        return;
+      }
+
       setIsLoadingUserInfo(true);
       setErrorMessage(null);
       setUserInfo(null);
@@ -64,7 +96,7 @@ const CheckInScan_Vendor = () => {
         const data = { qrCode: qrCode };
         const response = await visitVendorCheckIn(
           selectedEvent.id,
-          slectedVendor.id,
+          vendorId,
           data
         );
         setUserInfo(response);
@@ -85,11 +117,19 @@ const CheckInScan_Vendor = () => {
         isLockedRef.current = false;
       }
     },
-    [selectedEvent, slectedVendor]
+    [selectedEvent, getExhibitorId]
   );
 
   const handlePurchaseAction = useCallback(
     async (qrCode) => {
+      const vendorId = getExhibitorId();
+      if (!vendorId) {
+        setErrorMessage("Exhibitor information not found. Please try again.");
+        isModalOpenRef.current = true;
+        checkInDeclineModalRef.current?.open();
+        return;
+      }
+
       setIsLoadingUserInfo(true);
       setErrorMessage(null);
       setUserInfo(null);
@@ -100,7 +140,7 @@ const CheckInScan_Vendor = () => {
         const checkInData = { qrCode: qrCode };
         const checkInResponse = await visitVendorCheckIn(
           selectedEvent.id,
-          slectedVendor.id,
+          vendorId,
           checkInData
         );
 
@@ -128,7 +168,7 @@ const CheckInScan_Vendor = () => {
         isLockedRef.current = false;
       }
     },
-    [selectedEvent, slectedVendor]
+    [selectedEvent, getExhibitorId]
   );
 
   const handleScanned = useCallback(
@@ -213,6 +253,14 @@ const CheckInScan_Vendor = () => {
 
   const handleRecordPurchaseConfirm = useCallback(
     async (purchaseData) => {
+      const vendorId = getExhibitorId();
+      if (!vendorId) {
+        setErrorMessage("Exhibitor information not found. Please try again.");
+        isModalOpenRef.current = true;
+        checkInDeclineModalRef.current?.open();
+        return;
+      }
+
       setIsLoadingUserInfo(true);
       setErrorMessage(null);
 
@@ -234,7 +282,7 @@ const CheckInScan_Vendor = () => {
 
         const response = await createPurchase(
           selectedEvent.id,
-          slectedVendor.id,
+          vendorId,
           purchasePayload
         );
 
@@ -264,7 +312,7 @@ const CheckInScan_Vendor = () => {
         setIsLoadingUserInfo(false);
       }
     },
-    [currentQrCode, selectedEvent, slectedVendor, userInfo]
+    [currentQrCode, selectedEvent, getExhibitorId, userInfo]
   );
 
   const getVisitorName = () => {
