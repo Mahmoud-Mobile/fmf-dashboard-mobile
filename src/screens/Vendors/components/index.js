@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, Dimensions } from "react-native";
 import { styles } from "./Styles";
 import { Colors } from "../../../Global/colors";
 import { Ionicons } from "@expo/vector-icons";
+import moment from "moment";
 
 const { width: screenWidth } = Dimensions.get("window");
 const isSmallScreen = screenWidth < 375;
@@ -156,79 +157,107 @@ const CustomItem = ({
 
   if (!item) return null;
 
-  return (
-    <View style={styles.productCard}>
-      <View
-        style={[
-          styles.productContent,
-          isSmallScreen && styles.productContentSmall,
-        ]}
-      >
-        <View
-          style={[styles.productLeft, isSmallScreen && styles.productLeftSmall]}
-        >
-          <Text
-            style={[
-              styles.productName,
-              isSmallScreen && styles.productNameSmall,
-            ]}
-            numberOfLines={2}
-          >
-            {item.name}
-          </Text>
-          <Text
-            style={[
-              styles.productDiscount,
-              isSmallScreen && styles.productDiscountSmall,
-            ]}
-          >
-            Discount: {item.discount}%
-          </Text>
-        </View>
+  const formatPurchaseDate = (dateString) => {
+    if (!dateString) return "";
+    const date = moment(dateString);
+    return date.isValid() ? date.format("DD MMM YYYY") : "";
+  };
 
+  if (item.type === "purchase") {
+    return (
+      <View style={styles.productCard}>
         <View
           style={[
-            styles.productMiddle,
-            isSmallScreen && styles.productMiddleSmall,
+            styles.productContent,
+            isSmallScreen && styles.productContentSmall,
           ]}
         >
-          <Text
+          <View
             style={[
-              styles.originalPrice,
-              isSmallScreen && styles.originalPriceSmall,
+              styles.productLeft,
+              isSmallScreen && styles.productLeftSmall,
             ]}
-            numberOfLines={1}
           >
-            Original Price: SAR{" "}
-            <Text style={styles.strikethrough}>{item.originalPrice}</Text>
-          </Text>
-          <Text
-            style={[styles.finalPrice, isSmallScreen && styles.finalPriceSmall]}
-            numberOfLines={1}
-          >
-            Final Price: SAR {item.finalPrice}
-          </Text>
-        </View>
+            <Text
+              style={[
+                styles.productName,
+                isSmallScreen && styles.productNameSmall,
+              ]}
+              numberOfLines={2}
+            >
+              {item.name || "Purchase"}
+            </Text>
+            <Text
+              style={[
+                styles.productDiscount,
+                isSmallScreen && styles.productDiscountSmall,
+              ]}
+            >
+              Status: {item.status || "N/A"} • {item.itemsCount || 0} items
+            </Text>
+          </View>
 
-        <View
-          style={[
-            styles.productRight,
-            isSmallScreen && styles.productRightSmall,
-          ]}
-        >
-          <Text
+          <View
             style={[
-              styles.recordedPurchase,
-              isSmallScreen && styles.recordedPurchaseSmall,
+              styles.productMiddle,
+              isSmallScreen && styles.productMiddleSmall,
             ]}
-            numberOfLines={1}
           >
-            {item.recordedPurchaseTime}
-          </Text>
+            <Text
+              style={[
+                styles.originalPrice,
+                isSmallScreen && styles.originalPriceSmall,
+              ]}
+              numberOfLines={1}
+            >
+              Subtotal: SAR{" "}
+              <Text style={styles.strikethrough}>{item.originalPrice}</Text>
+            </Text>
+            <Text
+              style={[
+                styles.finalPrice,
+                isSmallScreen && styles.finalPriceSmall,
+              ]}
+              numberOfLines={1}
+            >
+              Total: SAR {item.finalPrice}
+            </Text>
+            {item.totalSavings > 0 && (
+              <Text
+                style={[
+                  styles.productDiscount,
+                  isSmallScreen && styles.productDiscountSmall,
+                  { marginTop: 4, color: Colors.Success },
+                ]}
+                numberOfLines={1}
+              >
+                Savings: SAR {item.totalSavings}
+              </Text>
+            )}
+          </View>
+
+          <View
+            style={[
+              styles.productRight,
+              isSmallScreen && styles.productRightSmall,
+            ]}
+          >
+            <Text
+              style={[
+                styles.recordedPurchase,
+                isSmallScreen && styles.recordedPurchaseSmall,
+              ]}
+              numberOfLines={1}
+            >
+              {formatPurchaseDate(item.recordedPurchaseTime)}
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
-  );
+    );
+  }
+
+  return null;
 };
 
 export default CustomItem;

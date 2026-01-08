@@ -1,12 +1,12 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { View, Text, TouchableOpacity, Modal } from "react-native";
+import { View, Text, TouchableOpacity, Modal, Image } from "react-native";
 import { Colors } from "../../../../Global/colors";
-import { Fonts } from "../../../../Global/fonts";
 import { MaterialIcons } from "@expo/vector-icons";
+import moment from "moment";
 import styles from "./Styles";
 
 const CheckInSuccessModal = forwardRef(
-  ({ visitorName, location, dateTime, onClose }, ref) => {
+  ({ visitorName, location, dateTime, onClose, profilePicture }, ref) => {
     const [visible, setVisible] = useState(false);
 
     useImperativeHandle(ref, () => ({
@@ -25,6 +25,15 @@ const CheckInSuccessModal = forwardRef(
       }
     };
 
+    const formatDateTime = (dateTime) => {
+      if (!dateTime) return "";
+      const date = moment(dateTime);
+      if (date.isValid()) {
+        return date.format("DD MMM YYYY, hh:mm A");
+      }
+      return dateTime;
+    };
+
     return (
       <Modal
         visible={visible}
@@ -41,32 +50,61 @@ const CheckInSuccessModal = forwardRef(
             >
               <MaterialIcons
                 name="close"
-                size={20}
-                color={Colors.PrimaryText}
+                size={24}
+                color={Colors.SecondaryText}
               />
             </TouchableOpacity>
 
             <View style={styles.contentContainer}>
-              <View style={styles.iconContainer}>
-                <MaterialIcons
-                  name="check-circle"
-                  size={64}
-                  color={Colors.Success}
-                />
-              </View>
+              {profilePicture && (
+                <View style={styles.profileImageContainer}>
+                  <Image
+                    source={{ uri: profilePicture }}
+                    style={styles.profileImage}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.profileImageBorder} />
+                </View>
+              )}
 
               <Text style={styles.title}>Checked-In Successful!</Text>
 
               {visitorName && (
-                <Text style={styles.visitorName}>{visitorName}</Text>
+                <View style={styles.infoCard}>
+                  <MaterialIcons
+                    name="person"
+                    size={18}
+                    color={Colors.PrimaryText}
+                    style={styles.infoIcon}
+                  />
+                  <Text style={styles.visitorName}>{visitorName}</Text>
+                </View>
               )}
 
               {location && (
-                <Text style={styles.detailText}>Location: {location}</Text>
+                <View style={styles.infoCard}>
+                  <MaterialIcons
+                    name="location-on"
+                    size={18}
+                    color={Colors.PrimaryText}
+                    style={styles.infoIcon}
+                  />
+                  <Text style={styles.detailText}>{location}</Text>
+                </View>
               )}
 
               {dateTime && (
-                <Text style={styles.detailText}>Date & Time: {dateTime}</Text>
+                <View style={styles.infoCard}>
+                  <MaterialIcons
+                    name="access-time"
+                    size={18}
+                    color={Colors.PrimaryText}
+                    style={styles.infoIcon}
+                  />
+                  <Text style={styles.detailText}>
+                    {formatDateTime(dateTime)}
+                  </Text>
+                </View>
               )}
             </View>
           </View>

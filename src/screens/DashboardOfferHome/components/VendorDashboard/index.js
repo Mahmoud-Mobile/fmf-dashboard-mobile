@@ -14,11 +14,7 @@ const CustomItem = ({
   selectedDateFilter,
   setSelectedDateFilter,
 }) => {
-  const {
-    name: vendorName = "Vendor Name",
-    booth = "Booth A-12",
-    avatar,
-  } = vendorData || {};
+  const { name: vendorName = " ", booth = " ", avatar } = vendorData || {};
 
   const vendorInitial =
     vendorName.charAt(0).toUpperCase() + vendorName.charAt(1).toUpperCase() ||

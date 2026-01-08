@@ -163,15 +163,6 @@ const getSeatingPlans = async (eventId, subeventId, data) => {
   );
 };
 
-const checkin_OfferHome = async (eventId, vendorId, data) => {
-  return await Post(
-    `events/${eventId}/operations/resources/${vendorId}/check-in`,
-    data,
-    "POST",
-    true
-  );
-};
-
 // Mark flight arrived
 const markFlightArrived = async (flightId, participantId, data) => {
   return await Post(
@@ -274,6 +265,24 @@ const getExhibitorById = async (eventId, exhibitorId, data = {}) => {
   );
 };
 
+const verifyCheckin_Area = async (eventId, resourceId, data) => {
+  return await Post(
+    `mobile/ops/events/${eventId}/resources/${resourceId}/verify`,
+    data,
+    "POST",
+    true
+  );
+};
+
+const checkin_Area = async (eventId, resourceId, data) => {
+  return await Post(
+    `mobile/ops/events/${eventId}/resources/${resourceId}/check-in`,
+    data,
+    "POST",
+    true
+  );
+};
+
 export {
   login,
   profile,
@@ -294,7 +303,8 @@ export {
   resource_Checkout,
   subEvent_ManualRegister,
   getSeatingPlans,
-  checkin_OfferHome,
+  verifyCheckin_Area,
+  checkin_Area,
   markFlightArrived,
   markFlightDeparted,
   toggleMeetDone,

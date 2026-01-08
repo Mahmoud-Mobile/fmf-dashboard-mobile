@@ -21,6 +21,10 @@ import {
   createPermissionCheckers,
   isTabAllowed as checkTabAllowed,
 } from "../config/permissionUtils";
+import {
+  createPermissionCheckersOffer,
+  isTabAllowedOffer as checkTabAllowedOffer,
+} from "../config/permissionUtilsOffer";
 
 const Tab = createBottomTabNavigator();
 
@@ -86,21 +90,28 @@ const MyTabs = () => {
       : [];
   }, [userInfo]);
 
-  // Create permission checkers
-  const permissions = React.useMemo(
-    () => createPermissionCheckers(userPermissions),
-    [userPermissions]
-  );
-
   const [currentEnvironment, setCurrentEnvironment] = React.useState("fmf");
   const [TabArr, setTabArr] = React.useState(() =>
     getTabsForEnvironment("fmf", rolePermission)
   );
 
-  // Check if tab is allowed based on permissions
+  // Create permission checkers based on environment
+  const permissions = React.useMemo(() => {
+    if (currentEnvironment === "offerHome") {
+      return createPermissionCheckersOffer(userPermissions);
+    }
+    return createPermissionCheckers(userPermissions);
+  }, [userPermissions, currentEnvironment]);
+
+  // Check if tab is allowed based on permissions and environment
   const isTabAllowed = React.useCallback(
-    (tabId) => checkTabAllowed(tabId, permissions),
-    [permissions]
+    (tabId) => {
+      if (currentEnvironment === "offerHome") {
+        return checkTabAllowedOffer(tabId, permissions);
+      }
+      return checkTabAllowed(tabId, permissions);
+    },
+    [permissions, currentEnvironment]
   );
 
   React.useEffect(() => {

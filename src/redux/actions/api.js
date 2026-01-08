@@ -233,7 +233,6 @@ export const fetchExhibitorById =
         ...params,
       });
       dispatch(setExhibitor(response));
-      console.log("Vendors Screen - fetchExhibitorById Response:", response);
       return response;
     } catch (error) {
       dispatch(setError("Error fetching exhibitor details"));

@@ -11,11 +11,13 @@ import LoadingModal from "../../components/LoadingModal";
 import * as SecureStore from "expo-secure-store";
 import { persistor } from "../../redux/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Storage } from "expo-storage";
 
 const More = () => {
   const navigation = useNavigation();
   const [scrollY] = useState(new Animated.Value(0));
   const [userInfo, setUserInfo] = useState(null);
+  const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
   const dispatch = useDispatch();
   const { profile, loading, error } = useSelector((state) => state.api);
 
@@ -32,6 +34,21 @@ const More = () => {
     };
     loadUserInfo();
     // console.log(JSON.stringify(userInfo, null, 2));
+  }, []);
+
+  useEffect(() => {
+    const loadEnvironment = async () => {
+      try {
+        const selectedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        setCurrentEnvironment(selectedCategory || "fmf");
+      } catch (error) {
+        console.log("Error loading environment:", error);
+        setCurrentEnvironment("fmf");
+      }
+    };
+    loadEnvironment();
   }, []);
   const handleLogout = async () => {
     try {
@@ -87,13 +104,13 @@ const More = () => {
       iconColor: "#374151",
       navigation: "ContactUs",
     },
-    // {
-    //   id: 6,
-    //   title: "Visibility Settings",
-    //   icon: "Calendar_Icon",
-    //   iconColor: "#374151",
-    //   navigation: "VisibilitySettings",
-    // },
+    {
+      id: 6,
+      title: "Visibility Settings",
+      icon: "Calendar_Icon",
+      iconColor: "#374151",
+      navigation: null, // Will be set dynamically based on environment
+    },
     {
       id: 7,
       title: "Logout",
@@ -102,6 +119,23 @@ const More = () => {
       navigation: null,
     },
   ];
+
+  // Update Visibility Settings navigation based on environment
+  const menuList = React.useMemo(() => {
+    return list.map((item) => {
+      if (item.id === 6) {
+        // Visibility Settings item
+        return {
+          ...item,
+          navigation:
+            currentEnvironment === "offerHome"
+              ? "VisibilitySettingsOfferHome"
+              : "VisibilitySettings",
+        };
+      }
+      return item;
+    });
+  }, [currentEnvironment]);
 
   return (
     <View style={styles.container} edges={{ top: "additive" }}>
@@ -129,7 +163,7 @@ const More = () => {
           </LinearGradient>
           <View style={styles.borderList}>
             <FlatList
-              data={list}
+              data={menuList}
               showsVerticalScrollIndicator={false}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item, index }) => (
@@ -138,7 +172,7 @@ const More = () => {
                   Logout={() => {
                     handleLogout();
                   }}
-                  totalItems={list.length}
+                  totalItems={menuList.length}
                   index={index}
                 />
               )}

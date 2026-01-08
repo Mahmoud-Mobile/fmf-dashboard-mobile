@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 import { Colors } from "../../Global/colors";
 import CustomHeader from "../../components/CustomHeader";
 import { styles } from "./Styles";
-import { resource_Checkin } from "../../webservice/apiConfig";
+import { verifyCheckin_Area, checkin_Area } from "../../webservice/apiConfig";
 import SuccessWithAddCompanions from "./components/SuccessWithAddCompanions";
 import CheckInDeclineModal from "./components/CheckInDeclineModal";
 import CheckInSuccessModal from "./components/CheckInSuccessModal";
@@ -36,6 +36,7 @@ const CheckIn_Area = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentQrCode, setCurrentQrCode] = useState(null);
   const isLockedRef = useRef(false);
   const isFocused = useIsFocused();
   const successWithAddCompanionsRef = useRef(null);
@@ -49,14 +50,14 @@ const CheckIn_Area = () => {
       setIsLoading(true);
       setErrorMessage(null);
       setUserInfo(null);
+      setCurrentQrCode(null);
 
       try {
         const payload = {
           qrCode: qrCode,
-          scanLocation: resourceLocation || "",
         };
 
-        const response = await resource_Checkin(
+        const response = await verifyCheckin_Area(
           selectedEvent?.id,
           resourceId,
           payload
@@ -74,6 +75,7 @@ const CheckIn_Area = () => {
           qrCode: response?.participant?.qrCode || null,
         };
 
+        setCurrentQrCode(qrCode);
         setUserInfo(transformedUserInfo);
         setIsModalVisible(true);
         successWithAddCompanionsRef.current?.open();
@@ -94,15 +96,43 @@ const CheckIn_Area = () => {
     [selectedEvent?.id, resourceId, resourceLocation, isModalVisible]
   );
 
-  const handleCompleteCheckIn = useCallback((companionsCount) => {
-    console.log("Completing check-in with companions:", companionsCount);
-    successWithAddCompanionsRef.current?.close();
+  const handleCompleteCheckIn = useCallback(
+    async (companionsCount) => {
+      if (!currentQrCode) return;
 
-    setTimeout(() => {
-      setIsModalVisible(true);
-      checkInSuccessModalRef.current?.open();
-    }, 300);
-  }, []);
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      try {
+        const payload = {
+          qrCode: currentQrCode,
+          numberOfCompanions: companionsCount || 0,
+        };
+
+        await checkin_Area(selectedEvent?.id, resourceId, payload);
+
+        successWithAddCompanionsRef.current?.close();
+
+        setTimeout(() => {
+          setIsModalVisible(true);
+          checkInSuccessModalRef.current?.open();
+        }, 300);
+      } catch (error) {
+        const errorData = error?.response?.data || error?.data || {};
+        const errorMsg =
+          errorData?.message ||
+          error?.message ||
+          errorData?.error ||
+          "Failed to complete check-in. Please try again.";
+        setErrorMessage(errorMsg);
+        setIsModalVisible(true);
+        checkInDeclineModalRef.current?.open();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [currentQrCode, selectedEvent?.id, resourceId]
+  );
 
   const handleScanAnother = useCallback(() => {
     checkInSuccessModalRef.current?.close();
@@ -110,6 +140,7 @@ const CheckIn_Area = () => {
     isLockedRef.current = false;
     setUserInfo(null);
     setErrorMessage(null);
+    setCurrentQrCode(null);
   }, []);
 
   const handleTryAgain = useCallback(() => {

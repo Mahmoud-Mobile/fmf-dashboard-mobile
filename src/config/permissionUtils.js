@@ -103,6 +103,7 @@ export const createPermissionCheckers = (userPermissions) => {
 export const isTabAllowed = (tabId, permissions) => {
   // Always allowed tabs (no permission checks)
   // Dashboard is always shown, but sections inside are filtered by permissions
+  // CheckIn is always allowed for FMF environment
   const alwaysAllowedTabs = ["Dashboard", "CheckIn", "More", "DesignatedCars"];
   if (alwaysAllowedTabs.includes(tabId)) {
     return true;

@@ -45,7 +45,7 @@ const CheckInScan_Vendor = () => {
     actionType || ACTION_TYPES.VISIT
   );
   const [currentQrCode, setCurrentQrCode] = useState(null);
-
+  console.log("userInfo", userInfo);
   const isLockedRef = useRef(false);
   const isModalOpenRef = useRef(false);
   const checkInSuccessModalRef = useRef(null);
@@ -67,8 +67,7 @@ const CheckInScan_Vendor = () => {
           slectedVendor.id,
           data
         );
-
-        setUserInfo(response?.data || { participant: { name: qrCode } });
+        setUserInfo(response);
         isModalOpenRef.current = true;
         checkInSuccessModalRef.current?.open();
       } catch (error) {
@@ -218,19 +217,19 @@ const CheckInScan_Vendor = () => {
       setErrorMessage(null);
 
       try {
-        // Format the purchase data according to API requirements
         const purchasePayload = {
           qrCode: currentQrCode,
           items: [
             {
-              productId: purchaseData.productName || "unknown",
               itemName: purchaseData.productName || "",
+              itemDescription: purchaseData.productName || "",
               quantity: purchaseData.quantity || 1,
               originalPrice: purchaseData.originalPrice || 0,
               discountType: "PERCENTAGE",
               discountValue: purchaseData.discount || 0,
             },
           ],
+          notes: purchaseData.notes || " ",
         };
 
         const response = await createPurchase(
@@ -269,7 +268,9 @@ const CheckInScan_Vendor = () => {
   );
 
   const getVisitorName = () => {
-    return userInfo?.participant?.name || userInfo?.name || "";
+    return (
+      userInfo?.participant?.firstName || userInfo?.participant?.lastName || ""
+    );
   };
 
   useEffect(() => {
@@ -399,8 +400,9 @@ const CheckInScan_Vendor = () => {
         ref={checkInSuccessModalRef}
         visitorName={getVisitorName()}
         location={userInfo?.location}
-        dateTime={new Date().toLocaleString()}
+        dateTime={new Date()}
         onClose={handleScanAnother}
+        profilePicture={userInfo?.participant?.profilePicture}
       />
       <CheckInDeclineModal
         ref={checkInDeclineModalRef}

@@ -29,6 +29,7 @@ import TripsDetails from "../screens/TripsDetails";
 import SubEventDetails from "../screens/SubEventDetails";
 import ResourceDetails from "../screens/ResourceDetails";
 import VisibilitySettings from "../screens/VisibilitySettings";
+import VisibilitySettingsOfferHome from "../screens/VisibilitySettingsOfferHome";
 import Ambassador from "../screens/Ambassador";
 import Delegations from "../screens/Delegations";
 import PDFViewer from "../screens/PDFViewer";
@@ -269,6 +270,13 @@ const NavStack = () => {
       <Stack.Screen
         name="VisibilitySettings"
         component={VisibilitySettings}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="VisibilitySettingsOfferHome"
+        component={VisibilitySettingsOfferHome}
         options={{
           headerShown: false,
         }}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { View, FlatList, Pressable, Text } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -39,6 +39,7 @@ const Vendors = () => {
     // Transform products array to match expected structure
     const transformedProducts = products.map((product) => ({
       id: product.id,
+      type: "product",
       name: product.name || "Product",
       discount: product.discount || 0,
       originalPrice: product.originalPrice || product.price || 0,
@@ -46,6 +47,23 @@ const Vendors = () => {
       recordedPurchaseTime:
         product.recordedPurchaseTime || product.createdAt || "",
     }));
+
+    // Transform purchases array to match expected structure
+    const transformedPurchases = purchases.map((purchase) => ({
+      id: purchase.id,
+      type: "purchase",
+      name: purchase.notes || "Purchase",
+      discount: purchase.totalDiscount || 0,
+      originalPrice: purchase.subtotal || 0,
+      finalPrice: purchase.total || 0,
+      recordedPurchaseTime: purchase.createdAt || "",
+      status: purchase.status || "",
+      totalSavings: purchase.totalSavings || 0,
+      itemsCount: purchase.items?.length || 0,
+    }));
+
+    // Show only purchases (filter out products)
+    const items = [...transformedPurchases];
 
     return {
       id: exhibitorData.id,
@@ -55,6 +73,7 @@ const Vendors = () => {
       purchases: exhibitor.purchasesTotal || purchases.length || 0,
       avatar: exhibitorData.logo || null,
       products: transformedProducts,
+      items: items, // Only purchases
     };
   }, [exhibitor]);
 
@@ -65,13 +84,20 @@ const Vendors = () => {
       return [transformedVendor];
     }
 
-    const filteredProducts = transformedVendor.products.filter((product) =>
-      product.name.toLowerCase().includes(searchText.toLowerCase())
-    );
+    const searchLower = searchText.toLowerCase();
+    const filteredItems = transformedVendor.items.filter((item) => {
+      if (item.type === "purchase") {
+        return (
+          (item.name && item.name.toLowerCase().includes(searchLower)) ||
+          (item.status && item.status.toLowerCase().includes(searchLower))
+        );
+      }
+      return false;
+    });
 
-    if (filteredProducts.length === 0) return [];
+    if (filteredItems.length === 0) return [];
 
-    return [{ ...transformedVendor, products: filteredProducts }];
+    return [{ ...transformedVendor, items: filteredItems }];
   }, [transformedVendor, searchText]);
 
   const handleSearchClear = () => {
@@ -88,7 +114,7 @@ const Vendors = () => {
   };
 
   const renderVendorCard = ({ item: vendor }) => {
-    const renderProductItem = ({ item, index }) => (
+    const renderItem = ({ item, index }) => (
       <CustomItem
         item={item}
         vendorData={vendor}
@@ -110,9 +136,11 @@ const Vendors = () => {
         />
         <View style={styles.separator} />
         <FlatList
-          data={vendor.products}
-          renderItem={renderProductItem}
-          keyExtractor={(product) => `product-${vendor.id}-${product.id}`}
+          data={vendor.items || []}
+          renderItem={renderItem}
+          keyExtractor={(item) =>
+            `${item.type || "purchase"}-${vendor.id}-${item.id}`
+          }
           scrollEnabled={false}
         />
       </View>
@@ -129,7 +157,7 @@ const Vendors = () => {
       />
 
       <SearchActionRow
-        searchPlaceholder="Search products..."
+        searchPlaceholder="Search purchases..."
         searchValue={searchText}
         onSearchChange={setSearchText}
         onSearchClear={handleSearchClear}
