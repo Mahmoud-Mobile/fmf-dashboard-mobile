@@ -159,8 +159,22 @@ const CustomItem = ({
 
   const formatPurchaseDate = (dateString) => {
     if (!dateString) return "";
-    const date = moment(dateString);
-    return date.isValid() ? date.format("DD MMM YYYY") : "";
+
+    try {
+      // First convert to native Date to validate the format
+      const nativeDate = new Date(dateString);
+      if (isNaN(nativeDate.getTime())) {
+        return "";
+      }
+      // Then use moment with the validated date
+      const date = moment(nativeDate);
+      if (!date.isValid()) {
+        return "";
+      }
+      return date.format("DD MMM YYYY");
+    } catch (error) {
+      return "";
+    }
   };
 
   if (item.type === "purchase") {

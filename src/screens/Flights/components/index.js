@@ -1,10 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import {
   ActionButtonGroup,
   ActionButton,
 } from "../../../components/ActionButton";
+import ImageSinglePreview from "../../../components/ImageSinglePreview";
 import { formatDateTime } from "../../../config/dateUtils";
 import styles from "./Styles";
 
@@ -31,6 +32,8 @@ const FlightCard = ({
   onPress,
   width,
 }) => {
+  const [previewVisible, setPreviewVisible] = useState(false);
+
   const userInitials = useMemo(() => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : "";
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : "";
@@ -39,6 +42,12 @@ const FlightCard = ({
     }
     return userName ? userName.charAt(0).toUpperCase() : "";
   }, [firstName, lastName, userName]);
+
+  const handleImagePress = () => {
+    if (userPhoto) {
+      setPreviewVisible(true);
+    }
+  };
 
   const arrivalDateTime = useMemo(() => {
     return formatDateTime(date, time);
@@ -71,11 +80,13 @@ const FlightCard = ({
         <View style={{}}>
           <View style={styles.flexRow}>
             {userPhoto ? (
-              <Image
-                source={{ uri: userPhoto }}
-                style={styles.userPhoto}
-                resizeMode="cover"
-              />
+              <TouchableOpacity onPress={handleImagePress} activeOpacity={0.8}>
+                <Image
+                  source={{ uri: userPhoto }}
+                  style={styles.userPhoto}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
             ) : (
               <View style={styles.userIconCircle}>
                 <Text style={styles.userInitial}>{userInitials}</Text>
@@ -117,6 +128,11 @@ const FlightCard = ({
         </View>
       )}
       {renderActions()}
+      <ImageSinglePreview
+        visible={previewVisible}
+        source={userPhoto ? { uri: userPhoto } : null}
+        onClose={() => setPreviewVisible(false)}
+      />
     </TouchableOpacity>
   );
 };

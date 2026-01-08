@@ -257,6 +257,11 @@ const createPurchase = async (eventId, exhibitorId, data) => {
   );
 };
 
+// Get all exhibitors for an event
+const getExhibitors = async (eventId, data = {}) => {
+  return await Get(`mobile/ops/events/${eventId}/exhibitors`, data);
+};
+
 // Get exhibitor by ID
 const getExhibitorById = async (eventId, exhibitorId, data = {}) => {
   return await Get(
@@ -318,5 +323,6 @@ export {
   getParticipantById,
   visitVendorCheckIn,
   createPurchase,
+  getExhibitors,
   getExhibitorById,
 };

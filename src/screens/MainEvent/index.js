@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { View, Alert, FlatList, RefreshControl } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import { Storage } from "expo-storage";
 import LoadingModal from "../../components/LoadingModal";
 import DateSearchModal from "../../components/DateSearchModal";
 import SearchActionRow from "../../components/SearchActionRow";
@@ -10,6 +11,7 @@ import {
   setSelectedEvent,
   fetchEventById,
 } from "../../redux/actions/api";
+import { createPermissionCheckersOffer } from "../../config/permissionUtilsOffer";
 import HomeHeader from "./components/HomeHeader";
 import CustomEventCard from "./components";
 import EmptyListComponent from "../../components/EmptyListComponent";
@@ -27,12 +29,51 @@ const MainEvent = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state.api);
+  const userInfo = useSelector((state) => state.auth.user);
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [viewMode, setViewMode] = useState("list");
+  const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
+
+  // Get user permissions
+  const userPermissions = useMemo(() => {
+    return Array.isArray(userInfo?.user?.permissions)
+      ? userInfo.user.permissions
+      : [];
+  }, [userInfo]);
+
+  // Create permission checkers for Offer Home
+  const permissions = useMemo(
+    () => createPermissionCheckersOffer(userPermissions),
+    [userPermissions]
+  );
+
+  // Load environment
+  useEffect(() => {
+    const loadEnvironment = async () => {
+      try {
+        const selectedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        setCurrentEnvironment(selectedCategory || "fmf");
+      } catch (error) {
+        setCurrentEnvironment("fmf");
+      }
+    };
+    loadEnvironment();
+  }, []);
+
+  // Check if user has exhibitor and resources full permissions
+  const hasExhibitor = useMemo(() => {
+    return permissions.hasAnyExhibitorPermission();
+  }, [permissions]);
+
+  const hasResourcesFull = useMemo(() => {
+    return permissions.hasResourcesFullPermission();
+  }, [permissions]);
 
   const { width: screenWidth } = getDeviceDimensions();
 
@@ -99,6 +140,7 @@ const MainEvent = () => {
   useEffect(() => {
     let params = {
       eventLevel: "MAIN",
+      status: "PUBLISHED",
     };
     dispatch(fetchEvents(params));
   }, [dispatch]);
@@ -106,6 +148,7 @@ const MainEvent = () => {
   const onRefresh = async () => {
     let params = {
       eventLevel: "MAIN",
+      status: "PUBLISHED",
     };
     setRefreshing(true);
     await dispatch(fetchEvents(params));
@@ -116,8 +159,18 @@ const MainEvent = () => {
     try {
       dispatch(setSelectedEvent(item));
       await dispatch(fetchEventById(item.id));
-      // navigation.navigate("Delegations");
-      navigation.navigate("MyTabs");
+
+      if (
+        currentEnvironment === "offerHome" &&
+        hasExhibitor &&
+        hasResourcesFull
+      ) {
+        // Navigate to AllExhibitors screen
+        navigation.navigate("AllExhibitors");
+      } else {
+        // Navigate to MyTabs as before
+        navigation.navigate("MyTabs");
+      }
     } catch (error) {
       Alert.alert("Error", "Failed to load event details");
     }

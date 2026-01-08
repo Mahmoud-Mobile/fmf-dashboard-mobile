@@ -107,32 +107,34 @@ const SelectYourArea = () => {
 
   return (
     <View style={styles.container}>
-      <LoadingModal visible={loading} />
       <CustomEventHeader
         event={selectedEvent}
         onLeftButtonPress={() => navigation.goBack()}
         onRightButtonPress={() => navigation.navigate("NotificationScreen")}
       />
-
-      <FlatList
-        data={areas}
-        renderItem={renderAreaItemWrapper}
-        keyExtractor={keyExtractor}
-        ListHeaderComponent={renderListHeader}
-        ListEmptyComponent={renderEmptyComponent}
-        ListFooterComponent={renderListFooter}
-        ItemSeparatorComponent={null}
-        contentContainerStyle={[styles.listContainer, styles.cardBody]}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[Colors.Primary]}
-            tintColor={Colors.Primary}
-          />
-        }
-      />
+      {loading ? (
+        <LoadingModal visible={loading} />
+      ) : (
+        <FlatList
+          data={areas}
+          renderItem={renderAreaItemWrapper}
+          keyExtractor={keyExtractor}
+          ListHeaderComponent={renderListHeader}
+          ListEmptyComponent={renderEmptyComponent}
+          ListFooterComponent={renderListFooter}
+          ItemSeparatorComponent={null}
+          contentContainerStyle={[styles.listContainer, styles.cardBody]}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[Colors.Primary]}
+              tintColor={Colors.Primary}
+            />
+          }
+        />
+      )}
     </View>
   );
 };

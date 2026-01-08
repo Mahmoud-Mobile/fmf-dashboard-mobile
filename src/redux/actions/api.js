@@ -12,6 +12,7 @@ import {
   getSeatingPlans,
   getAccommodationParticipants,
   getParticipantById,
+  getExhibitors,
   getExhibitorById,
 } from "../../webservice/apiConfig";
 
@@ -31,6 +32,7 @@ import {
   setAccommodation,
   setTripsParticipants,
   setSelectedParticipant,
+  setExhibitors,
   setExhibitor,
 } from "../reducers/apiReducer";
 
@@ -215,6 +217,23 @@ export const fetchParticipantById =
       dispatch(setSelectedParticipant(response));
     } catch (error) {
       dispatch(setError("Error fetching participant details"));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Fetch all exhibitors for an event
+export const fetchExhibitors =
+  (eventId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      const response = await getExhibitors(eventId, params);
+      dispatch(setExhibitors(response));
+      return response;
+    } catch (error) {
+      dispatch(setError("Error fetching exhibitors"));
+      throw error;
     } finally {
       dispatch(setLoading(false));
     }
