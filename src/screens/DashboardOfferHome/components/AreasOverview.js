@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     color: Colors.PrimaryText,
   },
   areaRight: {
-    alignItems: "flex-satrt",
+    alignItems: "flex-end",
   },
   areaCount: {
     fontSize: 16,

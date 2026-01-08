@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from "react-native";
+import { Storage } from "expo-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { Colors } from "../../../Global/colors";
@@ -15,6 +16,21 @@ import { horizontalMargin } from "../../../config/metrics";
 
 const DashboardOverview = () => {
   const { summary, loading } = useSelector((state) => state.dashboard) || {};
+  const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
+
+  useEffect(() => {
+    const loadEnvironment = async () => {
+      try {
+        const selectedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        setCurrentEnvironment(selectedCategory || "fmf");
+      } catch (error) {
+        setCurrentEnvironment("fmf");
+      }
+    };
+    loadEnvironment();
+  }, []);
 
   const dashboardData = useMemo(() => {
     if (!summary) return [];
@@ -150,6 +166,11 @@ const DashboardOverview = () => {
       </View>
     );
   };
+
+  // Don't render if not in FMF environment
+  if (currentEnvironment !== "fmf") {
+    return null;
+  }
 
   if (loading && !summary) {
     return (

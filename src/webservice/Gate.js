@@ -164,13 +164,26 @@ function buildFormData(data) {
     if (Array.isArray(value)) {
       value.forEach((element, index) => {
         if (typeof element === "object") {
-          for (const [nestedKey, nestedValue] of Object.entries(element)) {
-            formData.append(`${key}[${index}][${nestedKey}]`, nestedValue);
+          // Check if it's a file object (has uri, name, type)
+          if (element.uri && element.name && element.type) {
+            formData.append(`${key}[${index}]`, element);
+          } else {
+            for (const [nestedKey, nestedValue] of Object.entries(element)) {
+              formData.append(`${key}[${index}][${nestedKey}]`, nestedValue);
+            }
           }
         } else {
           formData.append(`${key}[${index}]`, element);
         }
       });
+    } else if (value && typeof value === "object") {
+      // Check if it's a file object (has uri, name, type)
+      if (value.uri && value.name && value.type) {
+        formData.append(key, value);
+      } else {
+        // For other objects, append as JSON string
+        formData.append(key, JSON.stringify(value));
+      }
     } else {
       formData.append(key, value);
     }
@@ -236,7 +249,27 @@ async function Get(url = "", data = {}, showAlert = false) {
   }
 }
 
+// GetBinary - for downloading binary files (Excel, CSV, etc.)
+async function GetBinary(url = "", data = {}, showAlert = false) {
+  const baseURL = await getEnvVars("apiUrl");
+  const fullUrl = `${baseURL}${url}${buildQueryParams(data) ? `?${buildQueryParams(data)}` : ""}`;
+
+  console.log("GetBinary Request", fullUrl);
+
+  try {
+    const response = await axios({
+      method: "GET",
+      url: fullUrl,
+      headers: await createHeaders(true),
+      responseType: "blob",
+    });
+    return response.data;
+  } catch (error) {
+    return handleErrors(error, showAlert);
+  }
+}
+
 // PostC is an alias for Post with JSON payload
 const PostC = (url, data, method = "POST") => Post(url, data, method, true);
 
-export { Get, Post, PostC };
+export { Get, Post, PostC, GetBinary };

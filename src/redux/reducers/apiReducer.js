@@ -20,6 +20,7 @@ const apiSlice = createSlice({
     selectedParticipant: {},
     exhibitors: [],
     exhibitor: null,
+    exhibitorDashboard: null,
     loading: false,
     error: null,
   },
@@ -109,6 +110,11 @@ const apiSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setExhibitorDashboard: (state, action) => {
+      state.exhibitorDashboard = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
     setLoading: (state, action) => {
       state.loading = action.payload !== undefined ? action.payload : true;
     },
@@ -138,6 +144,7 @@ export const {
   setSelectedParticipant,
   setExhibitors,
   setExhibitor,
+  setExhibitorDashboard,
   setLoading,
   setError,
 } = apiSlice.actions;

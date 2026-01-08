@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { Storage } from "expo-storage";
 import { useSelector, useDispatch } from "react-redux";
 import { Colors } from "../../../Global/colors";
 import { Fonts } from "../../../Global/fonts";
@@ -17,12 +18,32 @@ const TopCountries = () => {
     topCountriesLoading: false,
     topCountriesError: null,
   };
+  const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
 
   useEffect(() => {
-    if (selectedEvent?.id) {
+    const loadEnvironment = async () => {
+      try {
+        const selectedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        setCurrentEnvironment(selectedCategory || "fmf");
+      } catch (error) {
+        setCurrentEnvironment("fmf");
+      }
+    };
+    loadEnvironment();
+  }, []);
+
+  useEffect(() => {
+    if (selectedEvent?.id && currentEnvironment === "fmf") {
       dispatch(fetchTopCountries(selectedEvent.id, 20));
     }
-  }, [selectedEvent?.id, dispatch]);
+  }, [selectedEvent?.id, currentEnvironment, dispatch]);
+
+  // Don't render if not in FMF environment
+  if (currentEnvironment !== "fmf") {
+    return null;
+  }
 
   if (topCountriesLoading) {
     return (

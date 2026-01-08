@@ -1,8 +1,14 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { View, FlatList, Pressable, Text } from "react-native";
+import { View, FlatList, Pressable, Text, Alert } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system/legacy";
+import * as SecureStore from "expo-secure-store";
+import { shareAsync } from "expo-sharing";
+
+import { getEnvVars } from "../../constant";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import LoadingModal from "../../components/LoadingModal";
 import SearchActionRow from "../../components/SearchActionRow";
@@ -10,6 +16,11 @@ import CustomItem from "./components";
 import { styles } from "./Styles";
 import { fetchExhibitorById } from "../../redux/actions/api";
 import { Colors } from "../../Global/colors";
+
+import {
+  importPurchases,
+  downloadPurchasesTemplate,
+} from "../../webservice/apiConfig";
 
 const SEARCH_PLACEHOLDER = "Search purchases, vendor, or booth...";
 const ACTION_TYPE_VISIT = "visit";
@@ -40,7 +51,7 @@ const transformExhibitorToVendor = (exhibitor) => {
   if (!exhibitorData?.id) return null;
 
   const purchases = exhibitor.purchases || [];
-  const transformedPurchases = purchases.map(transformPurchase).filter(Boolean); // Filter out any null values
+  const transformedPurchases = purchases.map(transformPurchase).filter(Boolean);
 
   return {
     id: exhibitorData.id,
@@ -53,7 +64,6 @@ const transformExhibitorToVendor = (exhibitor) => {
   };
 };
 
-// Filter items based on search text (purchase name and status)
 const filterItemsBySearch = (items, searchText) => {
   if (!searchText.trim()) return items;
 
@@ -67,7 +77,6 @@ const filterItemsBySearch = (items, searchText) => {
   });
 };
 
-// Check if vendor matches search (vendor name or booth)
 const doesVendorMatchSearch = (vendor, searchText) => {
   if (!searchText.trim() || !vendor) return false;
 
@@ -81,11 +90,15 @@ const doesVendorMatchSearch = (vendor, searchText) => {
 const Vendors = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
   const { selectedEvent, exhibitor, loading } = useSelector(
     (state) => state.api
   );
   const exhibitorFromAuth = useSelector((state) => state.auth.exhibitor);
+
   const [searchText, setSearchText] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -103,35 +116,22 @@ const Vendors = () => {
   const filteredVendors = useMemo(() => {
     if (!transformedVendor) return [];
 
-    // If no search text, return all vendor data
-    if (!searchText.trim()) {
-      return [transformedVendor];
-    }
+    if (!searchText.trim()) return [transformedVendor];
 
-    // Check if search matches vendor name or booth
     const vendorMatches = doesVendorMatchSearch(transformedVendor, searchText);
+    if (vendorMatches) return [transformedVendor];
 
-    // If vendor matches, return all items for that vendor
-    if (vendorMatches) {
-      return [transformedVendor];
-    }
-
-    // Otherwise, filter items by purchase name and status
     const filteredItems = filterItemsBySearch(
       transformedVendor.items,
       searchText
     );
 
-    // If no items match, return empty array
     if (filteredItems.length === 0) return [];
 
-    // Return vendor with filtered items
     return [{ ...transformedVendor, items: filteredItems }];
   }, [transformedVendor, searchText]);
 
-  const handleSearchClear = useCallback(() => {
-    setSearchText("");
-  }, []);
+  const handleSearchClear = useCallback(() => setSearchText(""), []);
 
   const handleVisitPress = useCallback(
     (vendor, actionType = ACTION_TYPE_VISIT) => {
@@ -199,9 +199,118 @@ const Vendors = () => {
     []
   );
 
+  // ✅ IMPORT (FIXED)
+  const handleImportFile = useCallback(async () => {
+    const eventId = selectedEvent?.id;
+    const exhibitorId = exhibitor?.exhibitor?.id || exhibitorFromAuth?.id;
+
+    if (!eventId || !exhibitorId) {
+      Alert.alert("Error", "Event or exhibitor information not found.");
+      return;
+    }
+
+    try {
+      setIsImporting(true);
+
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "application/vnd.ms-excel",
+          "text/csv",
+        ],
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled) return;
+
+      const file = result.assets?.[0];
+      if (!file?.uri) throw new Error("No file selected");
+
+      const uri = file.uri;
+      const name = file.name || `import_${Date.now()}.xlsx`;
+      const type =
+        file.mimeType ||
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+      // FormData الحقيقي
+      const fd = new FormData();
+      fd.append("file", { uri, name, type });
+
+      // ارفع
+      await importPurchases(eventId, exhibitorId, fd);
+
+      // Refresh
+      dispatch(fetchExhibitorById(eventId, exhibitorId));
+      Alert.alert("Success", "File imported successfully!");
+    } catch (error) {
+      console.error("Import error:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.errorMessage ||
+        error?.message ||
+        "Failed to import file. Please try again.";
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsImporting(false);
+    }
+  }, [
+    selectedEvent?.id,
+    exhibitor?.exhibitor?.id,
+    exhibitorFromAuth?.id,
+    dispatch,
+  ]);
+
+  const handleDownloadTemplate = useCallback(async () => {
+    const eventId = selectedEvent?.id;
+    if (!eventId) {
+      Alert.alert("Error", "Event information not found.");
+      return;
+    }
+
+    try {
+      setIsDownloading(true);
+
+      const baseURL = await getEnvVars("apiUrl");
+      const accessToken = await SecureStore.getItemAsync("accessToken");
+      if (!accessToken) throw new Error("Authentication token not found.");
+
+      const downloadUrl = `${baseURL}mobile/ops/events/${eventId}/exhibitors/template/purchases`;
+
+      const fileName = `purchases_template_${Date.now()}.xlsx`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+      const downloadResult = await FileSystem.downloadAsync(
+        downloadUrl,
+        fileUri,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+
+      if (downloadResult.status === 200) {
+        await shareAsync(downloadResult.uri, {
+          UTI: "org.openxmlformats-officedocument.spreadsheetml.sheet",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+      } else {
+        throw new Error("Failed to download template file");
+      }
+    } catch (error) {
+      console.error("Download template error:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.errorMessage ||
+        error?.message ||
+        "Failed to download template. Please try again.";
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [selectedEvent?.id]);
+
   return (
     <View style={styles.container}>
       <LoadingModal visible={loading} />
+
       <CustomEventHeader
         event={selectedEvent}
         onLeftButtonPress={() => navigation.goBack()}
@@ -217,10 +326,36 @@ const Vendors = () => {
         showDateButton={false}
       />
 
-      <Pressable style={styles.importButton}>
-        <MaterialIcons name="file-upload" size={16} color={Colors.DarkGray} />
-        <Text style={styles.importButtonText}>Import Files Excel</Text>
-      </Pressable>
+      <View style={styles.buttonsContainer}>
+        <Pressable
+          style={[
+            styles.downloadButton,
+            isDownloading && styles.buttonDisabled,
+          ]}
+          onPress={handleDownloadTemplate}
+          disabled={isDownloading || isImporting}
+        >
+          <MaterialIcons
+            name="file-download"
+            size={16}
+            color={Colors.DarkGray}
+          />
+          <Text style={styles.buttonText}>
+            {isDownloading ? "Downloading..." : "Download Template"}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.importButton, isImporting && styles.buttonDisabled]}
+          onPress={handleImportFile}
+          disabled={isDownloading || isImporting}
+        >
+          <MaterialIcons name="file-upload" size={16} color={Colors.DarkGray} />
+          <Text style={styles.buttonText}>
+            {isImporting ? "Importing..." : "Import Files Excel"}
+          </Text>
+        </Pressable>
+      </View>
 
       <FlatList
         data={filteredVendors}

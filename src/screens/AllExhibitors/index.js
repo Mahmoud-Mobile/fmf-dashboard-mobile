@@ -67,13 +67,15 @@ const AllExhibitors = () => {
 
   const handleExhibitorPress = useCallback(
     async (exhibitor) => {
+      console.log(exhibitor);
+
       try {
         // Store exhibitor in auth state
         if (exhibitor) {
           dispatch(setExhibitorAction(exhibitor));
         }
         // Navigate to MyTabs
-        navigation.navigate("MyTabs");
+        navigation.navigate("MyTabs", { exhibitorId: exhibitor.id });
       } catch (error) {
         Alert.alert("Error", "Failed to select exhibitor");
       }

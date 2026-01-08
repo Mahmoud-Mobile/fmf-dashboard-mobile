@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useCallback } from "react";
+import React, { useMemo, useEffect, useCallback, useState } from "react";
 import {
   View,
   Dimensions,
@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { Storage } from "expo-storage";
 import styles from "./Styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -21,55 +22,55 @@ import {
 } from "../../config/permissionUtils";
 
 const SECTION_CONFIG = [
-  { 
-    id: "dashboardOverview", 
+  {
+    id: "dashboardOverview",
     label: "Dashboard Overview",
-    requiredPermission: "dashboard:read"
+    requiredPermission: "dashboard:read",
   },
-  { 
-    id: "topCountries", 
+  {
+    id: "topCountries",
     label: "Top Countries",
-    requiredPermission: "dashboard:read"
+    requiredPermission: "dashboard:read",
   },
-  { 
-    id: "eventAnalytics", 
+  {
+    id: "eventAnalytics",
     label: "Event Analytics",
-    requiredPermission: "dashboard:read_data_entry"
+    requiredPermission: "dashboard:read_data_entry",
   },
-  { 
-    id: "arrivalGuests", 
+  {
+    id: "arrivalGuests",
     label: "Arrival Guests",
-    requiredPermission: "dashboard:read_flights"
+    requiredPermission: "dashboard:read_flights",
   },
-  { 
-    id: "returnGuests", 
+  {
+    id: "returnGuests",
     label: "Return Guests",
-    requiredPermission: "dashboard:read_flights"
+    requiredPermission: "dashboard:read_flights",
   },
-  { 
-    id: "flights", 
+  {
+    id: "flights",
     label: "Flights",
-    requiredPermission: "dashboard:read_flights"
+    requiredPermission: "dashboard:read_flights",
   },
-  { 
-    id: "hotelOccupancy", 
+  {
+    id: "hotelOccupancy",
     label: "Hotel Occupancy",
-    requiredPermission: "dashboard:read_accommodations"
+    requiredPermission: "dashboard:read_accommodations",
   },
-  { 
-    id: "hotelDetails", 
+  {
+    id: "hotelDetails",
     label: "Hotel Details",
-    requiredPermission: "dashboard:read_accommodations"
+    requiredPermission: "dashboard:read_accommodations",
   },
-  { 
-    id: "tripList", 
+  {
+    id: "tripList",
     label: "Trip List",
-    requiredPermission: "dashboard:read_trips"
+    requiredPermission: "dashboard:read_trips",
   },
-  { 
-    id: "tripsSummary", 
+  {
+    id: "tripsSummary",
     label: "Trips Summary",
-    requiredPermission: "dashboard:read_trips"
+    requiredPermission: "dashboard:read_trips",
   },
 ];
 
@@ -80,6 +81,7 @@ const Dashboard = () => {
   const userInfo = useSelector((state) => state.auth.user);
   const storedSectionVisibility =
     useSelector((state) => state.ui?.sectionVisibility) || {};
+  const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
 
   const userPermissions = useMemo(() => {
     return Array.isArray(userInfo?.user?.permissions)
@@ -87,27 +89,37 @@ const Dashboard = () => {
       : [];
   }, [userInfo]);
 
-  // Create permission checkers
   const permissions = useMemo(
     () => createPermissionCheckers(userPermissions),
     [userPermissions]
   );
 
-  // Fetch dashboard summary when component mounts or event changes
   useEffect(() => {
-    if (selectedEvent?.id) {
+    const loadEnvironment = async () => {
+      try {
+        const selectedCategory = await Storage.getItem({
+          key: "selected-category",
+        });
+        setCurrentEnvironment(selectedCategory || "fmf");
+      } catch (error) {
+        setCurrentEnvironment("fmf");
+      }
+    };
+    loadEnvironment();
+  }, []);
+
+  useEffect(() => {
+    if (selectedEvent?.id && currentEnvironment === "fmf") {
       dispatch(fetchDashboardSummary(selectedEvent.id));
     }
-  }, [selectedEvent?.id, dispatch]);
+  }, [selectedEvent?.id, currentEnvironment, dispatch]);
 
-  // Helper to convert stored value to boolean
   const toBoolean = useCallback((value, defaultValue = true) => {
     if (value === undefined) return defaultValue;
     if (typeof value === "string") return value === "true";
     return Boolean(value);
   }, []);
 
-  // Check if section has required permission
   const hasSectionPermission = useCallback(
     (requiredPermission) => {
       return checkSectionPermission(requiredPermission, permissions);
@@ -122,13 +134,15 @@ const Dashboard = () => {
         acc[section.id] = false;
         return acc;
       }
-      acc[section.id] = toBoolean(
-        storedSectionVisibility?.[section.id],
-        true
-      );
+      acc[section.id] = toBoolean(storedSectionVisibility?.[section.id], true);
       return acc;
     }, {});
   }, [storedSectionVisibility, hasSectionPermission, toBoolean]);
+
+  // Don't render Dashboard content if not in FMF environment
+  if (currentEnvironment !== "fmf") {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

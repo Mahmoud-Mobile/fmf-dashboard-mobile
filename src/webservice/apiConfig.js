@@ -1,4 +1,4 @@
-import { Get, Post } from "./Gate";
+import { Get, Post, GetBinary } from "./Gate";
 import { Platform } from "react-native";
 
 // login apis
@@ -270,6 +270,14 @@ const getExhibitorById = async (eventId, exhibitorId, data = {}) => {
   );
 };
 
+// Get exhibitor dashboard
+const getExhibitorDashboard = async (eventId, exhibitorId, data = {}) => {
+  return await Get(
+    `mobile/ops/events/${eventId}/exhibitors/${exhibitorId}/dashboard`,
+    data
+  );
+};
+
 const verifyCheckin_Area = async (eventId, resourceId, data) => {
   return await Post(
     `mobile/ops/events/${eventId}/resources/${resourceId}/verify`,
@@ -285,6 +293,26 @@ const checkin_Area = async (eventId, resourceId, data) => {
     data,
     "POST",
     true
+  );
+};
+
+// Import purchases from Excel/CSV file
+const importPurchases = async (eventId, exhibitorId, file) => {
+  // File should be in format: { uri: string, name: string, type: string }
+  return await Post(
+    `mobile/ops/events/${eventId}/exhibitors/${exhibitorId}/purchases/import`,
+    { file },
+    "POST",
+    false // multipart/form-data
+  );
+};
+
+// Download purchases template
+const downloadPurchasesTemplate = async (eventId) => {
+  return await GetBinary(
+    `mobile/ops/events/${eventId}/exhibitors/template/purchases`,
+    {},
+    false // don't show alert for download
   );
 };
 
@@ -325,4 +353,7 @@ export {
   createPurchase,
   getExhibitors,
   getExhibitorById,
+  getExhibitorDashboard,
+  importPurchases,
+  downloadPurchasesTemplate,
 };

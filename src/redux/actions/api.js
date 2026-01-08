@@ -14,6 +14,7 @@ import {
   getParticipantById,
   getExhibitors,
   getExhibitorById,
+  getExhibitorDashboard,
 } from "../../webservice/apiConfig";
 
 import {
@@ -34,6 +35,7 @@ import {
   setSelectedParticipant,
   setExhibitors,
   setExhibitor,
+  setExhibitorDashboard,
 } from "../reducers/apiReducer";
 
 // Fetch profile data
@@ -258,6 +260,45 @@ export const fetchExhibitorById =
       throw error;
     } finally {
       dispatch(setLoading(false));
+    }
+  };
+
+// Fetch exhibitor dashboard and store in Redux state
+export const fetchExhibitorDashboard =
+  (eventId, exhibitorId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setLoading());
+    try {
+      const response = await getExhibitorDashboard(
+        eventId,
+        exhibitorId,
+        params
+      );
+      if (response) {
+        dispatch(setExhibitorDashboard(response));
+      }
+      return response;
+    } catch (error) {
+      dispatch(setError("Error fetching exhibitor dashboard"));
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Log and fetch exhibitor dashboard
+export const logExhibitorDashboardEndpoint =
+  (eventId, exhibitorId, params = {}) =>
+  async (dispatch) => {
+    try {
+      const response = await dispatch(
+        fetchExhibitorDashboard(eventId, exhibitorId, params)
+      );
+
+      return response;
+    } catch (error) {
+      console.log("Error logging/fetching dashboard endpoint:", error);
+      throw error;
     }
   };
 
