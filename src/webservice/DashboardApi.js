@@ -10,4 +10,9 @@ const getTopCountries = async (eventId, limit = 20) => {
   return await Get(`events/${eventId}/dashboard/top-countries`, { limit });
 };
 
-export { getDashboardSummary, getTopCountries };
+// Event summary KPIs API
+const getEventSummaryKPIs = async (eventId, data = {}) => {
+  return await Get(`events/${eventId}/dashboard/event-summary-kpis`, data);
+};
+
+export { getDashboardSummary, getTopCountries, getEventSummaryKPIs };

@@ -39,12 +39,10 @@ export const login =
         dispatch({ type: LOGIN_SUCCESS, payload: response });
         dispatch({ type: SET_ROLE_PERMISSION, payload: rolePermission });
 
-        // Store exhibitor if environment is offerHome
         const selectedCategory = await Storage.getItem({
           key: "selected-category",
         });
         if (selectedCategory === "offerHome") {
-          // Store exhibitor object if available
           const exhibitor = response?.exhibitor ?? response?.payload?.exhibitor;
 
           if (exhibitor !== undefined && exhibitor !== null) {

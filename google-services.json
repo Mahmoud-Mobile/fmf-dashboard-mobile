@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "509530112348",
-    "project_id": "lead-ops-82647",
-    "storage_bucket": "lead-ops-82647.firebasestorage.app"
+    "project_number": "947709827272",
+    "project_id": "ops-app-b9335",
+    "storage_bucket": "ops-app-b9335.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:509530112348:android:36337baa57b1c068d80199",
+        "mobilesdk_app_id": "1:947709827272:android:c487f8dc429819146f2dfd",
         "android_client_info": {
           "package_name": "com.lead.fmfmanagement"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA0drjsrKaZBSSdBLzjqvnTje2hUFtF5wc"
+          "current_key": "AIzaSyC-TmI2CDKH8bSO7IATTSAIDxMR2emxT-k"
         }
       ],
       "services": {

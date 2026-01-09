@@ -9,6 +9,9 @@ const dashboardSlice = createSlice({
     topCountries: [],
     topCountriesLoading: false,
     topCountriesError: null,
+    eventSummaryKPIs: null,
+    eventSummaryKPIsLoading: false,
+    eventSummaryKPIsError: null,
   },
   reducers: {
     setDashboardSummary: (state, action) => {
@@ -43,6 +46,22 @@ const dashboardSlice = createSlice({
       state.topCountries = [];
       state.topCountriesError = null;
     },
+    setEventSummaryKPIs: (state, action) => {
+      state.eventSummaryKPIs = action.payload;
+      state.eventSummaryKPIsLoading = false;
+      state.eventSummaryKPIsError = null;
+    },
+    setEventSummaryKPIsLoading: (state, action) => {
+      state.eventSummaryKPIsLoading = action.payload !== undefined ? action.payload : true;
+    },
+    setEventSummaryKPIsError: (state, action) => {
+      state.eventSummaryKPIsError = action.payload;
+      state.eventSummaryKPIsLoading = false;
+    },
+    clearEventSummaryKPIs: (state) => {
+      state.eventSummaryKPIs = null;
+      state.eventSummaryKPIsError = null;
+    },
   },
 });
 
@@ -55,6 +74,10 @@ export const {
   setTopCountriesLoading,
   setTopCountriesError,
   clearTopCountries,
+  setEventSummaryKPIs,
+  setEventSummaryKPIsLoading,
+  setEventSummaryKPIsError,
+  clearEventSummaryKPIs,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
 

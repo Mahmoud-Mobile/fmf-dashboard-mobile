@@ -1,6 +1,7 @@
 import {
   getDashboardSummary,
   getTopCountries,
+  getEventSummaryKPIs,
 } from "../../webservice/DashboardApi";
 import {
   setDashboardSummary,
@@ -9,6 +10,9 @@ import {
   setTopCountries,
   setTopCountriesLoading,
   setTopCountriesError,
+  setEventSummaryKPIs,
+  setEventSummaryKPIsLoading,
+  setEventSummaryKPIsError,
 } from "../reducers/dashboardReducer";
 
 // Fetch dashboard summary
@@ -70,5 +74,24 @@ export const fetchTopCountries =
       console.log("Error fetching top countries: ", error);
     } finally {
       dispatch(setTopCountriesLoading(false));
+    }
+  };
+
+// Fetch event summary KPIs
+export const fetchEventSummaryKPIs =
+  (eventId, params = {}) =>
+  async (dispatch) => {
+    dispatch(setEventSummaryKPIsLoading());
+    try {
+      const response = await getEventSummaryKPIs(eventId, params);
+      if (response) {
+        dispatch(setEventSummaryKPIs(response));
+      }
+      return response;
+    } catch (error) {
+      dispatch(setEventSummaryKPIsError("Error fetching event summary KPIs"));
+      throw error;
+    } finally {
+      dispatch(setEventSummaryKPIsLoading(false));
     }
   };

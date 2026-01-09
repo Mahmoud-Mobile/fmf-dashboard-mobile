@@ -44,7 +44,6 @@ const More = () => {
         });
         setCurrentEnvironment(selectedCategory || "fmf");
       } catch (error) {
-        console.log("Error loading environment:", error);
         setCurrentEnvironment("fmf");
       }
     };

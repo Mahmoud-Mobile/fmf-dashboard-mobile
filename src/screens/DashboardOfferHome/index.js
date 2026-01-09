@@ -6,7 +6,10 @@ import CustomEventHeader from "../../components/CustomEventHeader";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import AdminDashboard from "./components/AdminDashboard";
+import EventSummaryKPIs from "./components/EventSummaryKPIs";
+import AppDownloader from "./components/AppDownloader";
 import { logExhibitorDashboardEndpoint } from "../../redux/actions/api";
+import { fetchEventSummaryKPIs } from "../../redux/actions/dashboardActions";
 
 const DashboardOfferHome = () => {
   const navigation = useNavigation();
@@ -17,10 +20,12 @@ const DashboardOfferHome = () => {
   const exhibitorDashboard = useSelector(
     (state) => state.api.exhibitorDashboard
   );
+  const eventSummaryKPIs = useSelector(
+    (state) => state.dashboard.eventSummaryKPIs
+  );
   const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
   const hasCalledApi = useRef(false);
 
-  // Load environment
   useEffect(() => {
     const loadEnvironment = async () => {
       try {
@@ -48,10 +53,15 @@ const DashboardOfferHome = () => {
       if (currentExhibitorId) {
         hasCalledApi.current = true;
         dispatch(logExhibitorDashboardEndpoint(eventId, currentExhibitorId));
-        console.log("exhibitorDashboard", exhibitorDashboard);
       }
     }
   }, [selectedEvent?.id, exhibitorId, exhibitor, currentEnvironment, dispatch]);
+
+  useEffect(() => {
+    if (selectedEvent?.id && currentEnvironment === "offerHome") {
+      dispatch(fetchEventSummaryKPIs(selectedEvent.id));
+    }
+  }, [selectedEvent?.id, currentEnvironment, dispatch]);
 
   return (
     <View style={styles.container}>
@@ -66,6 +76,8 @@ const DashboardOfferHome = () => {
         showsVerticalScrollIndicator={false}
       >
         <AdminDashboard exhibitorDashboard={exhibitorDashboard} />
+        <EventSummaryKPIs eventSummaryKPIs={eventSummaryKPIs} />
+        <AppDownloader />
       </ScrollView>
     </View>
   );

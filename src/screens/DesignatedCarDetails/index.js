@@ -7,7 +7,10 @@ import { ActionButton } from "../../components/ActionButton";
 import ParticipantInfoCard from "../../components/ParticipantInfoCard";
 import styles from "./Styles";
 import NoShowModal from "../DesignatedCars/components/NoShowModal";
-import { formatDate, getParticipantName } from "./utils/designatedCarDetailsUtils";
+import {
+  formatDate,
+  getParticipantName,
+} from "./utils/designatedCarDetailsUtils";
 import {
   handleMarkNoShow,
   handleMarkPickedUp,
@@ -42,9 +45,7 @@ const DesignatedCarDetails = ({ route }) => {
     if (!selectedCarForNoShow) return;
 
     const { carId, participantId } = selectedCarForNoShow;
-    const carItem = carsList.find(
-      (c) => c.car?.id === carId || c.id === carId
-    );
+    const carItem = carsList.find((c) => c.car?.id === carId || c.id === carId);
     const car = carItem?.car || carItem || {};
 
     if (!carId || !participantId) {
@@ -123,7 +124,9 @@ const DesignatedCarDetails = ({ route }) => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Car Type:</Text>
-            <Text style={styles.value}>{car.carType || car.tripType || "-"}</Text>
+            <Text style={styles.value}>
+              {car.carType || car.tripType || "-"}
+            </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Status:</Text>
@@ -274,4 +277,3 @@ const DesignatedCarDetails = ({ route }) => {
 };
 
 export default DesignatedCarDetails;
-

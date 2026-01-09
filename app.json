@@ -5,6 +5,7 @@
     "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "runtimeVersion": "1.0.0",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "plugins": [
@@ -30,7 +31,6 @@
       "bundleIdentifier": "com.lead.fmfmanagement",
       "buildNumber": "36",
       "googleServicesFile": "./GoogleService-Info.plist",
-
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to location to show your current position and provide directions to event locations.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location to show your current position and provide directions to event locations.",
@@ -63,7 +63,8 @@
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/fcd7859c-877f-4e8f-b6ec-7059a611585e"
     },
     "owner": "valueuro"
   }
