@@ -156,17 +156,22 @@ const MyTabs = () => {
   }, []);
 
   const resolvedTabVisibility = React.useMemo(() => {
-    const defaultVisibility = getDefaultTabVisibility(
-      currentEnvironment,
-      rolePermission
-    );
-
     return allowedTabs.reduce((acc, tab) => {
-      const defaultValue = defaultVisibility[tab.route] ?? true;
-      acc[tab.route] = toBoolean(tabVisibility?.[tab.route], defaultValue);
+      // If tab has explicit visibility setting in Redux, use it
+      if (tabVisibility?.[tab.route] !== undefined) {
+        acc[tab.route] = toBoolean(tabVisibility[tab.route], true);
+      } else {
+        // If tab passed permission check (is in allowedTabs), make it visible by default
+        // Tabs that pass permission checks should be visible unless explicitly hidden
+        acc[tab.route] = true;
+      }
       return acc;
     }, {});
-  }, [tabVisibility, allowedTabs, currentEnvironment, rolePermission, toBoolean]);
+  }, [
+    tabVisibility,
+    allowedTabs,
+    toBoolean,
+  ]);
 
   const visibleRoutes = React.useMemo(() => {
     const forcedVisible = { ...resolvedTabVisibility };

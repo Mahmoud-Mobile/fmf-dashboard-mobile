@@ -46,9 +46,6 @@ export const hasAnyPermission = (userPermissions, requiredPermissions) => {
   );
 };
 
-/**
- * Permission checkers for specific features
- */
 export const createPermissionCheckers = (userPermissions) => {
   const check = (permission) => hasPermission(userPermissions, permission);
   const checkAll = (permissions) =>
@@ -57,8 +54,22 @@ export const createPermissionCheckers = (userPermissions) => {
     hasAnyPermission(userPermissions, permissions);
 
   return {
-    // Trips permissions
-    hasTripsPermission: () => checkAll(["trips:read", "trips:update"]),
+    hasTripsPermission: () => {
+      const hasTripPermission = checkAny([
+        "trips:create",
+        "trips:delete",
+        "trips:update",
+        "trips:read",
+      ]);
+      const hasTransportationPermission = checkAny([
+        "transportation:create",
+        "transportation:read",
+        "transportation:update",
+        "transportation:delete",
+        "transportation:manage",
+      ]);
+      return hasTripPermission || hasTransportationPermission;
+    },
 
     // Hotels permissions
     hasHotelsPermission: () =>

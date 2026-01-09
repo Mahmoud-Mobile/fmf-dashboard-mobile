@@ -14,7 +14,7 @@ const Profile = () => {
   const { profile, loading } = useSelector((state) => state.api);
   const authUser = useSelector((state) => state.auth.user);
   // console.log(authUser?.accessToken);
-
+  // console.log(JSON.stringify(profile, null, 2));
   useEffect(() => {
     if (!profile || Object.keys(profile).length === 0) {
       dispatch(fetchProfile());
@@ -99,9 +99,7 @@ const Profile = () => {
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Email</Text>
-              <Text style={styles.infoValue}>
-                {userInfo.email || "Not provided"}
-              </Text>
+              <Text style={styles.infoValue}>{userInfo.email || " "}</Text>
             </View>
           </View>
 
@@ -113,9 +111,7 @@ const Profile = () => {
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Mobile</Text>
-              <Text style={styles.infoValue}>
-                {userInfo.mobile || "+966 591161089"}
-              </Text>
+              <Text style={styles.infoValue}>{userInfo.mobile || ""}</Text>
             </View>
           </View>
 
@@ -131,9 +127,7 @@ const Profile = () => {
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Address</Text>
-              <Text style={styles.infoValue}>
-                {userInfo.address || "Riyadh "}
-              </Text>
+              <Text style={styles.infoValue}>{userInfo.address || "  "}</Text>
             </View>
           </View>
         </View>
