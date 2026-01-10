@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useMemo,
 } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { Storage } from "expo-storage";
@@ -208,12 +208,29 @@ const CheckInScreen = () => {
         onClearDate={() => setSelectedDate(null)}
       />
 
-      {currentEnvironment !== "offerHome" && categories.length > 1 && (
-        <CustomCategories
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategorySelect={setSelectedCategory}
-        />
+      {categories.length > 1 && (
+        <View style={styles.categoriesContainer}>
+          <CustomCategories
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategorySelect={setSelectedCategory}
+          />
+          {selectedCategory === "resource" && (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("PDFViewer", {
+                  pdfUrl: require("../../Assets/Access.pdf"),
+                  isLocalAsset: true,
+                });
+              }}
+              style={styles.viewAccessResourcesButton}
+            >
+              <Text style={styles.viewAccessResourcesText}>
+                View Access Resources
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
 
       {!hasSubEventsPermission && !hasResourcesPermission ? (

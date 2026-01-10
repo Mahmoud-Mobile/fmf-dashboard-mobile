@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../../Global/colors";
 import { horizontalMargin } from "../../config/metrics";
+import { Fonts } from "../../Global/fonts";
 
 export const styles = StyleSheet.create({
   container: {
@@ -24,5 +25,19 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.DarkGray,
     textAlign: "center",
+  },
+  viewAccessResourcesButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    backgroundColor: Colors.Primary,
+    alignItems: "center",
+    marginHorizontal: horizontalMargin,
+    marginBottom: 10,
+  },
+  viewAccessResourcesText: {
+    color: Colors.White,
+    fontSize: 12,
+    fontFamily: Fonts.FONT_MEDIUM,
   },
 });
