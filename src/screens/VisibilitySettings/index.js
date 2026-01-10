@@ -188,7 +188,7 @@ const VisibilitySettings = () => {
   // Filter tabs based on permissions - always show Dashboard and More
   const TABS_CONFIG = useMemo(() => {
     const allTabs = getTabsForEnvironment(currentEnvironment, rolePermission);
-    const alwaysVisibleTabs = ["Dashboard", "More"];
+    const alwaysVisibleTabs = ["Dashboard", "DashboardOfferHome", "More"];
 
     // Filter tabs: show only if user has permission OR it's Dashboard/More
     const filteredTabs = allTabs.filter((tab) => {
@@ -203,7 +203,7 @@ const VisibilitySettings = () => {
     return filteredTabs.map((tab) => ({
       id: tab.route,
       label: tab.titleText || tab.route,
-      locked: tab.alwaysVisible || false,
+      locked: tab.alwaysVisible || alwaysVisibleTabs.includes(tab.route),
       disabled: isTabDisabled(tab.route),
     }));
   }, [currentEnvironment, rolePermission, isTabDisabled, permissions]);

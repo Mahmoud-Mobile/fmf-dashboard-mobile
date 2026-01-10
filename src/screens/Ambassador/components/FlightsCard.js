@@ -6,8 +6,10 @@ import { commonCardStyle } from "../../../config/metrics";
 import CustomPressable from "../../../components/CustomPressable";
 import ProgressBar from "./ProgressBar";
 import styles from "./CardStyles";
+import { useNavigation } from "@react-navigation/native";
 
 const FlightsCard = ({ flight }) => {
+  const navigation = useNavigation();
   if (!flight) {
     return null;
   }
@@ -135,7 +137,9 @@ const FlightsCard = ({ flight }) => {
 
       <View style={styles.actionButtons}>
         <Pressable
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate("Chat");
+          }}
           style={({ pressed }) => [
             styles.outlineButton,
             styles.button,
@@ -144,11 +148,6 @@ const FlightsCard = ({ flight }) => {
         >
           <Text style={styles.outlineButtonText}>Request Support</Text>
         </Pressable>
-        <CustomPressable
-          onPress={() => {}}
-          title="Change Departure"
-          style={styles.button}
-        />
       </View>
     </View>
   );

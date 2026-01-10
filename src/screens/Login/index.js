@@ -74,7 +74,8 @@ const Login = () => {
         }
         if (finalStatus === "granted") {
           const tokenData = await Notifications.getDevicePushTokenAsync();
-          token = tokenData.data;
+          token = tokenData;
+          console.log("token", token);
           setDeviceToken(token);
         }
       } catch (error) {
@@ -85,12 +86,11 @@ const Login = () => {
     const body = {
       email: email,
       password: password,
-      deviceToken: token || "",
     };
     setLoading(true);
     try {
       const response = await dispatch(login(body, true, token));
-      console.log("response", JSON.stringify(response, null, 2));
+      // console.log("response", JSON.stringify(response, null, 2));
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
           index: 0,

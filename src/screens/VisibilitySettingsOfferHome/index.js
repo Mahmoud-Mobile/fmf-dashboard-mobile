@@ -102,7 +102,7 @@ const VisibilitySettingsOfferHome = () => {
     return filteredTabs.map((tab) => ({
       id: tab.route,
       label: tab.titleText || tab.route,
-      locked: tab.alwaysVisible || false,
+      locked: tab.alwaysVisible || alwaysVisibleTabs.includes(tab.route),
       disabled: isTabDisabled(tab.route),
     }));
   }, [currentEnvironment, rolePermission, isTabDisabled, permissions]);

@@ -53,23 +53,29 @@ export const createPermissionCheckers = (userPermissions) => {
   const checkAny = (permissions) =>
     hasAnyPermission(userPermissions, permissions);
 
+  // Common permission check for trips and transportation (used by both Trips and DesignatedCars)
+  const checkTripsOrTransportationPermission = () => {
+    const hasTripPermission = checkAny([
+      "trips:create",
+      "trips:delete",
+      "trips:update",
+      "trips:read",
+    ]);
+    const hasTransportationPermission = checkAny([
+      "transportation:create",
+      "transportation:read",
+      "transportation:update",
+      "transportation:delete",
+      "transportation:manage",
+    ]);
+    return hasTripPermission || hasTransportationPermission;
+  };
+
   return {
-    hasTripsPermission: () => {
-      const hasTripPermission = checkAny([
-        "trips:create",
-        "trips:delete",
-        "trips:update",
-        "trips:read",
-      ]);
-      const hasTransportationPermission = checkAny([
-        "transportation:create",
-        "transportation:read",
-        "transportation:update",
-        "transportation:delete",
-        "transportation:manage",
-      ]);
-      return hasTripPermission || hasTransportationPermission;
-    },
+    hasTripsPermission: checkTripsOrTransportationPermission,
+
+    // DesignatedCars permissions (uses same permissions as trips/transportation)
+    hasDesignatedCarsPermission: checkTripsOrTransportationPermission,
 
     // Hotels permissions
     hasHotelsPermission: () =>
@@ -102,6 +108,21 @@ export const createPermissionCheckers = (userPermissions) => {
     hasResourcesUpdate: () => check("resources:update"),
     hasResourcesPermission: () =>
       check("resources:read") && check("resources:update"),
+
+    // CheckIn permissions
+    hasCheckInPermission: () =>
+      checkAll([
+        "check-in:read",
+        "dashboard:read_subevents",
+        "events:read",
+        "dashboard:read",
+        "analytics:view",
+        "resources:read",
+        "resources:update",
+        "sub-events:update",
+        "sub-events:read_participants",
+        "sub-events:read",
+      ]),
   };
 };
 
@@ -114,8 +135,7 @@ export const createPermissionCheckers = (userPermissions) => {
 export const isTabAllowed = (tabId, permissions) => {
   // Always allowed tabs (no permission checks)
   // Dashboard is always shown, but sections inside are filtered by permissions
-  // CheckIn is always allowed for FMF environment
-  const alwaysAllowedTabs = ["Dashboard", "CheckIn", "More", "DesignatedCars"];
+  const alwaysAllowedTabs = ["Dashboard", "More"];
   if (alwaysAllowedTabs.includes(tabId)) {
     return true;
   }
@@ -123,8 +143,10 @@ export const isTabAllowed = (tabId, permissions) => {
   // Permission-based tabs
   const tabPermissionMap = {
     Trips: () => permissions.hasTripsPermission(),
+    DesignatedCars: () => permissions.hasDesignatedCarsPermission(),
     Hotels: () => permissions.hasHotelsPermission(),
     Flights: () => permissions.hasFlightsPermission(),
+    CheckIn: () => permissions.hasCheckInPermission(),
   };
 
   const checkPermission = tabPermissionMap[tabId];
@@ -165,6 +187,8 @@ export const isActionButtonDisabled = (category, permissions) => {
     Trips: () => !permissions.hasTripsPermission(),
     Hotels: () => !permissions.hasHotelsPermission(),
     Flights: () => !permissions.hasFlightsPermission(),
+    DesignatedCars: () => !permissions.hasDesignatedCarsPermission(),
+    CheckIn: () => !permissions.hasCheckInPermission(),
   };
 
   const checkDisabled = categoryPermissionMap[category];

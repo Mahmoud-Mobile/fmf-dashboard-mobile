@@ -87,6 +87,7 @@ export const ENVIRONMENT_TABS = {
       titleText: "Dashboard",
       priority: 1,
       defaultVisible: true,
+      alwaysVisible: true,
     },
     {
       route: "CheckIn",
@@ -139,12 +140,7 @@ export const getTabsForEnvironment = (environment, role = null) => {
     const allowedRoutes = {
       organizer: ["DashboardOfferHome", "SelectYourArea", "More"],
       vendor: ["DashboardOfferHome", "Vendors", "More"],
-      admin: [
-        "DashboardOfferHome",
-        "SelectYourArea",
-        "Vendors",
-        "More",
-      ],
+      admin: ["DashboardOfferHome", "SelectYourArea", "Vendors", "More"],
     };
 
     const routesForRole = allowedRoutes[rolePermission] || allowedRoutes.vendor;

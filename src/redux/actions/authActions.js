@@ -17,16 +17,16 @@ export const login =
   (params, showAlert = true, deviceToken = null) =>
   async (dispatch) => {
     try {
-      // Build additional headers for device information
       const additionalHeaders = {
         "X-Device-Token": deviceToken || params.deviceToken || "",
         "X-Device-ID": Device.osBuildId || "",
         "X-Device-Model": Device.modelId || Device.modelName || "",
         "X-OS-Version": Device.osVersion || "",
-        "X-App-Version": "1.0.1",
+        "X-App-Version": "1.0.2",
       };
 
       const response = await loginUser(params, showAlert, additionalHeaders);
+      console.log("response", additionalHeaders);
       const token = response?.access_token;
 
       if (token) {

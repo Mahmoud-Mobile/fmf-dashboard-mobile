@@ -155,10 +155,23 @@ const MyTabs = () => {
     return Boolean(value);
   }, []);
 
+  // Helper to identify Dashboard tab (handles both "Dashboard" and "DashboardOfferHome")
+  const isDashboardTab = React.useCallback((tabRoute) => {
+    return tabRoute === "Dashboard" || tabRoute === "DashboardOfferHome";
+  }, []);
+
+  // Helper to identify More tab
+  const isMoreTab = React.useCallback((tabRoute) => {
+    return tabRoute === "More";
+  }, []);
+
   const resolvedTabVisibility = React.useMemo(() => {
     return allowedTabs.reduce((acc, tab) => {
-      // If tab has explicit visibility setting in Redux, use it
-      if (tabVisibility?.[tab.route] !== undefined) {
+      // Dashboard and More are always visible - ignore tabVisibility for them
+      if (isDashboardTab(tab.route) || isMoreTab(tab.route)) {
+        acc[tab.route] = true;
+      } else if (tabVisibility?.[tab.route] !== undefined) {
+        // If tab has explicit visibility setting in Redux, use it
         acc[tab.route] = toBoolean(tabVisibility[tab.route], true);
       } else {
         // If tab passed permission check (is in allowedTabs), make it visible by default
@@ -167,34 +180,38 @@ const MyTabs = () => {
       }
       return acc;
     }, {});
-  }, [
-    tabVisibility,
-    allowedTabs,
-    toBoolean,
-  ]);
+  }, [tabVisibility, allowedTabs, toBoolean, isDashboardTab, isMoreTab]);
 
   const visibleRoutes = React.useMemo(() => {
-    const forcedVisible = { ...resolvedTabVisibility };
+    // Separate always visible tabs (Dashboard and More) from other tabs
+    const dashboardTab = allowedTabs.find((tab) => isDashboardTab(tab.route));
+    const moreTab = allowedTabs.find((tab) => isMoreTab(tab.route));
+    const otherTabs = allowedTabs.filter(
+      (tab) => !isDashboardTab(tab.route) && !isMoreTab(tab.route)
+    );
 
-    allowedTabs.forEach((tab) => {
-      if (tab.alwaysVisible) {
-        forcedVisible[tab.route] = true;
-      }
-    });
+    // Start with Dashboard and More (always included)
+    const selected = [];
+    if (dashboardTab) {
+      selected.push(dashboardTab.route);
+    }
+    if (moreTab) {
+      selected.push(moreTab.route);
+    }
 
-    const sortedTabs = [...allowedTabs]
-      .filter((tab) => forcedVisible[tab.route])
+    // Sort other tabs by priority and filter by visibility
+    const visibleOtherTabs = otherTabs
+      .filter((tab) => resolvedTabVisibility[tab.route])
       .sort((a, b) => (a.priority || 999) - (b.priority || 999));
 
-    const selected = [];
-    for (const tab of sortedTabs) {
-      if (forcedVisible[tab.route]) {
-        selected.push(tab.route);
-      }
+    // Add other visible tabs until we reach max of 5 total
+    for (const tab of visibleOtherTabs) {
       if (selected.length >= 5) break;
+      selected.push(tab.route);
     }
+
     return new Set(selected);
-  }, [resolvedTabVisibility, allowedTabs]);
+  }, [resolvedTabVisibility, allowedTabs, isDashboardTab, isMoreTab]);
 
   const visibleTabs = allowedTabs.filter((t) => visibleRoutes.has(t.route));
 
