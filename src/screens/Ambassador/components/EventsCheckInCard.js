@@ -1,9 +1,8 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../../Global/colors";
 import { commonCardStyle } from "../../../config/metrics";
-import CustomPressable from "../../../components/CustomPressable";
 import styles from "./CardStyles";
 
 const EventsCheckInCard = () => {
@@ -35,24 +34,6 @@ const EventsCheckInCard = () => {
             ))}
           </View>
         ))}
-      </View>
-
-      <View style={styles.actionButtons}>
-        <Pressable
-          onPress={() => {}}
-          style={({ pressed }) => [
-            styles.outlineButton,
-            styles.button,
-            pressed && styles.buttonPressed,
-          ]}
-        >
-          <Text style={styles.outlineButtonText}>Request Support</Text>
-        </Pressable>
-        <CustomPressable
-          onPress={() => {}}
-          title="Edit Attendees"
-          style={styles.button}
-        />
       </View>
     </View>
   );

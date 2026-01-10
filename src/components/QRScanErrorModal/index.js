@@ -130,7 +130,7 @@ const QRScanErrorModal = forwardRef(
           </View>
 
           <View style={styles.buttonsContainer}>
-            {showManualRegister && onManualRegister && (
+            {/* {showManualRegister && onManualRegister && (
               <TouchableOpacity
                 style={[styles.button, styles.manualRegisterButton]}
                 onPress={handleManualRegister}
@@ -145,7 +145,7 @@ const QRScanErrorModal = forwardRef(
                   Manual Register to Sub-Event
                 </Text>
               </TouchableOpacity>
-            )}
+            )} */}
             <TouchableOpacity
               style={[styles.button, styles.tryAgainButton]}
               onPress={handleTryAgain}

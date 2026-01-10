@@ -27,7 +27,7 @@ export const fetchDashboardSummary =
       }
     } catch (error) {
       dispatch(setDashboardError("Error fetching dashboard summary"));
-      console.log("Error fetching dashboard summary: ", error);
+      // console.log("Error fetching dashboard summary: ", error);
     } finally {
       dispatch(setDashboardLoading(false));
     }

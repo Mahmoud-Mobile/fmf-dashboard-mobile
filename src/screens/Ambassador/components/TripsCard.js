@@ -6,8 +6,9 @@ import { commonCardStyle } from "../../../config/metrics";
 import CustomPressable from "../../../components/CustomPressable";
 import ProgressBar from "./ProgressBar";
 import styles from "./CardStyles";
-
+import { useNavigation } from "@react-navigation/native";
 const TripsCard = () => {
+  const navigation = useNavigation();
   const stages = ["Vehicle Ready", "Guest Picked up", "Trip Completed"];
   const currentStage = 1; // 0-indexed, so 1 means second stage is current
 
@@ -16,7 +17,11 @@ const TripsCard = () => {
       <View style={styles.cardHeaderWithAction}>
         <View style={styles.cardHeader}>
           <View style={styles.iconContainer}>
-            <MaterialIcons name="directions-car" size={16} color={Colors.Primary} />
+            <MaterialIcons
+              name="directions-car"
+              size={16}
+              color={Colors.Primary}
+            />
           </View>
           <Text style={styles.cardTitle}>Trips</Text>
         </View>
@@ -65,7 +70,9 @@ const TripsCard = () => {
 
       <View style={styles.actionButtons}>
         <Pressable
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate("Chat");
+          }}
           style={({ pressed }) => [
             styles.outlineButton,
             styles.button,
@@ -74,15 +81,9 @@ const TripsCard = () => {
         >
           <Text style={styles.outlineButtonText}>Request Support</Text>
         </Pressable>
-        <CustomPressable
-          onPress={() => {}}
-          title="Assign Driver"
-          style={styles.button}
-        />
       </View>
     </View>
   );
 };
 
 export default TripsCard;
-

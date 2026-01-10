@@ -5,6 +5,7 @@ import authReducer from "./authReducer";
 import apiReducer from "./apiReducer";
 import uiReducer from "./uiReducer";
 import dashboardReducer from "./dashboardReducer";
+import meetingsReducer from "./meetingsReducer";
 
 const authPersistConfig = {
   key: "auth",
@@ -23,9 +24,16 @@ const uiPersistConfig = {
   ], // Persist visibility settings and disabled icons state
 };
 
+const meetingsPersistConfig = {
+  key: "meetings",
+  storage: AsyncStorage,
+  whitelist: ["meetings"], // Persist meetings data
+};
+
 export default combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   api: apiReducer,
   ui: persistReducer(uiPersistConfig, uiReducer),
   dashboard: dashboardReducer,
+  meetings: persistReducer(meetingsPersistConfig, meetingsReducer),
 });

@@ -6,8 +6,9 @@ import { commonCardStyle } from "../../../config/metrics";
 import CustomPressable from "../../../components/CustomPressable";
 import ProgressBar from "./ProgressBar";
 import styles from "./CardStyles";
-
+import { useNavigation } from "@react-navigation/native";
 const HotelsCard = ({ accommodation }) => {
+  const navigation = useNavigation();
   if (!accommodation) {
     return null;
   }
@@ -112,7 +113,9 @@ const HotelsCard = ({ accommodation }) => {
 
       <View style={styles.actionButtons}>
         <Pressable
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate("Chat");
+          }}
           style={({ pressed }) => [
             styles.outlineButton,
             styles.button,
@@ -121,15 +124,9 @@ const HotelsCard = ({ accommodation }) => {
         >
           <Text style={styles.outlineButtonText}>Request Support</Text>
         </Pressable>
-        <CustomPressable
-          onPress={() => {}}
-          title="Change Hotel"
-          style={styles.button}
-        />
       </View>
     </View>
   );
 };
 
 export default HotelsCard;
-
