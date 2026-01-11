@@ -11,6 +11,7 @@ import {
   SET_ROLE_PERMISSION,
   SET_EXHIBITOR_ID,
   SET_EXHIBITOR,
+  SET_PARTICIPANT_ID_WITH_ASSIGN_BY_AMBASSADOR,
 } from "./actionTypes";
 
 export const login =
@@ -105,4 +106,9 @@ export const setExhibitorId = (exhibitorId) => ({
 export const setExhibitor = (exhibitor) => ({
   type: SET_EXHIBITOR,
   payload: exhibitor,
+});
+
+export const setParticipantIdWithAssignByAmbassador = (participantId) => ({
+  type: SET_PARTICIPANT_ID_WITH_ASSIGN_BY_AMBASSADOR,
+  payload: participantId,
 });

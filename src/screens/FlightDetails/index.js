@@ -20,7 +20,7 @@ import { formatDateTime } from "../../config/dateUtils";
 
 const FlightDetails = ({ route }) => {
   const { flight, selectedCategory } = route.params;
-  // console.log(flight);
+  console.log(flight);
   const navigation = useNavigation();
 
   const getParticipantName = (participant) => {

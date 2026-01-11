@@ -7,6 +7,7 @@ import {
   SET_ROLE_PERMISSION,
   SET_EXHIBITOR_ID,
   SET_EXHIBITOR,
+  SET_PARTICIPANT_ID_WITH_ASSIGN_BY_AMBASSADOR,
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -18,6 +19,7 @@ const initialState = {
   rolePermission: null,
   exhibitorId: [],
   exhibitor: null,
+  participantIdWithAssignByAmbassador: "73873287328923",
 };
 
 export default function authReducer(state = initialState, action) {
@@ -43,6 +45,7 @@ export default function authReducer(state = initialState, action) {
         rolePermission: null,
         exhibitorId: [],
         exhibitor: null,
+        participantIdWithAssignByAmbassador: null,
       };
     case SET_EMAIL:
       return { ...state, email: action.payload };
@@ -54,6 +57,8 @@ export default function authReducer(state = initialState, action) {
       return { ...state, exhibitorId: action.payload };
     case SET_EXHIBITOR:
       return { ...state, exhibitor: action.payload };
+    case SET_PARTICIPANT_ID_WITH_ASSIGN_BY_AMBASSADOR:
+      return { ...state, participantIdWithAssignByAmbassador: action.payload };
     default:
       return state;
   }

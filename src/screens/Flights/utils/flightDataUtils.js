@@ -175,6 +175,24 @@ export const filterFlightsByType = (flights, selectedFlightType) => {
   }
 
   return flights.filter((flight) => {
+    // Handle completion status filters
+    if (selectedFlightType === "ARRIVAL_COMPLETE") {
+      return flight.flightType === "ARRIVAL" && flight.isParticipantArrived === true;
+    }
+    
+    if (selectedFlightType === "DEPARTURE_COMPLETE") {
+      return flight.flightType === "DEPARTURE" && flight.isParticipantDeparted === true;
+    }
+    
+    // Handle regular type filters - exclude complete flights
+    if (selectedFlightType === "ARRIVAL") {
+      return flight.flightType === "ARRIVAL" && flight.isParticipantArrived !== true;
+    }
+    
+    if (selectedFlightType === "DEPARTURE") {
+      return flight.flightType === "DEPARTURE" && flight.isParticipantDeparted !== true;
+    }
+    
     return flight.flightType === selectedFlightType;
   });
 };

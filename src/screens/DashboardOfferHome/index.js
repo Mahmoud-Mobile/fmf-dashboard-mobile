@@ -75,6 +75,8 @@ const DashboardOfferHome = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* {console.log(JSON.stringify(exhibitorDashboard, null, 2))}
+        {console.log(JSON.stringify(eventSummaryKPIs, null, 2))} */}
         <AdminDashboard exhibitorDashboard={exhibitorDashboard} />
         <EventSummaryKPIs eventSummaryKPIs={eventSummaryKPIs} />
         <AppDownloader />

@@ -10,7 +10,7 @@ import meetingsReducer from "./meetingsReducer";
 const authPersistConfig = {
   key: "auth",
   storage: AsyncStorage,
-  whitelist: ["user", "isLoggedIn", "rolePermission", "exhibitorId"],
+  whitelist: ["user", "isLoggedIn", "rolePermission", "exhibitorId", "participantIdWithAssignByAmbassador"],
 };
 
 const uiPersistConfig = {

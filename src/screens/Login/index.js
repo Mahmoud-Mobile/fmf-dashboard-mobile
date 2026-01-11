@@ -14,7 +14,11 @@ import { useNavigation } from "@react-navigation/native";
 import CustomInput from "../../components/CustomInput";
 import CustomPressable from "../../components/CustomPressable";
 import EnvironmentSelector from "./components/EnvironmentSelector";
-import { setEmail, setPassword } from "../../redux/actions/authActions";
+import {
+  setEmail,
+  setPassword,
+  setParticipantIdWithAssignByAmbassador,
+} from "../../redux/actions/authActions";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/actions/authActions";
 import * as Notifications from "expo-notifications";
@@ -91,6 +95,12 @@ const Login = () => {
     try {
       const response = await dispatch(login(body, true, token));
       // console.log("response", JSON.stringify(response, null, 2));
+      // Store participant ID assigned by ambassador (temporary value until backend returns actual ID)
+      dispatch(
+        setParticipantIdWithAssignByAmbassador(
+          "38a0689a-7852-4b87-8f52-8534c7cf8c7c"
+        )
+      );
       if (response.type === "LOGIN_SUCCESS") {
         navigation.reset({
           index: 0,

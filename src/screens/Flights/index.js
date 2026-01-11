@@ -35,7 +35,6 @@ const Flights = () => {
   const { flights, loading } = useSelector((state) => state.api);
   const { selectedEvent } = useSelector((state) => state.api);
   const navigation = useNavigation();
-
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedFlightType, setSelectedFlightType] = useState("ARRIVAL");
   const [refreshing, setRefreshing] = useState(false);
@@ -119,7 +118,17 @@ const Flights = () => {
 
   const flightTypeCategories = [
     { id: "ARRIVAL", label: "Arrival", key: "ARRIVAL" },
+    {
+      id: "ARRIVAL_COMPLETE",
+      label: "Arrival Complete",
+      key: "ARRIVAL_COMPLETE",
+    },
     { id: "DEPARTURE", label: "Departure", key: "DEPARTURE" },
+    {
+      id: "DEPARTURE_COMPLETE",
+      label: "Departure Complete",
+      key: "DEPARTURE_COMPLETE",
+    },
   ];
 
   const filteredFlights = useMemo(() => {
@@ -305,7 +314,7 @@ const Flights = () => {
     <View style={styles.container}>
       <CustomEventHeader
         event={selectedEvent}
-        onLeftButtonPress={() => navigation.goBack()}
+        // onLeftButtonPress={() => navigation.goBack()}
         onRightButtonPress={() => navigation.navigate("NotificationScreen")}
       />
 

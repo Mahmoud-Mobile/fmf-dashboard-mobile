@@ -12,8 +12,8 @@ import { Fonts } from "../../../Global/fonts";
 import { horizontalMargin, commonCardStyle } from "../../../config/metrics";
 
 const AppDownloader = () => {
-  const iosDownloads = 2682;
-  const androidDownloads = 140;
+  const iosDownloads = 3427;
+  const androidDownloads = 600;
 
   const handleIOSDownload = () => {
     console.log("iOS download clicked");
