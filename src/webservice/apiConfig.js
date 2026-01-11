@@ -39,17 +39,50 @@ const getEventById = async (id, data) => {
 };
 
 // flights apis
-const flights = async (eventId, data) => {
-  return await Get(`mobile/ops/events/${eventId}/flights`, data);
+const flights = async (eventId, data, participantId = null) => {
+  if (participantId) {
+    return await Get(
+      `mobile/ops/events/${eventId}/participants/${participantId}/flights`,
+      data
+    );
+  } else {
+    return await Get(`mobile/ops/events/${eventId}/flights`, data);
+  }
 };
-// trips apis
-const trips = async (eventId, data) => {
-  return await Get(`events/${eventId}/transportation/trips`, data);
+
+// Create trip
+const createTrip = async (eventId, participantId, data) => {
+  if (participantId) {
+    return await Post(
+      `mobile/ops/events/${eventId}/participants/${participantId}/transportation/trips`,
+      data,
+      "POST",
+      true
+    );
+  }
 };
 
 // Get trips participants
-const getTripsParticipants = async (eventId, data) => {
-  return await Get(`mobile/ops/events/${eventId}/transport/participants`, data);
+const getTripsParticipants = async (eventId, data, participantId = null) => {
+  if (participantId) {
+    return await Get(
+      `mobile/ops/events/${eventId}/participants/${participantId}/transportation/trips`,
+      data
+    );
+  } else {
+    return await Get(
+      `mobile/ops/events/${eventId}/transport/participants`,
+      data
+    );
+  }
+};
+
+// Get designated cars
+const getDesignatedCars = async (eventId, data) => {
+  return await Get(
+    `mobile/ops/events/${eventId}/transport/trips/designated`,
+    data
+  );
 };
 
 // Mark trip participant as no-show
@@ -312,7 +345,7 @@ const downloadPurchasesTemplate = async (eventId) => {
   return await GetBinary(
     `mobile/ops/events/${eventId}/exhibitors/template/purchases`,
     {},
-    false // don't show alert for download
+    false
   );
 };
 
@@ -324,8 +357,9 @@ export {
   events,
   getEventById,
   flights,
-  trips,
+  createTrip,
   getTripsParticipants,
+  getDesignatedCars,
   getSubEvents,
   getSubEventById,
   getResources,

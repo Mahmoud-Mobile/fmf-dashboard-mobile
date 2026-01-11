@@ -1,7 +1,15 @@
 import React, { useState, useCallback } from "react";
-import { View, FlatList, RefreshControl } from "react-native";
-import { useDispatch } from "react-redux";
+import {
+  View,
+  FlatList,
+  RefreshControl,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialIcons } from "@expo/vector-icons";
 import CustomEventHeader from "../../components/CustomEventHeader";
 import SearchActionRow from "../../components/SearchActionRow";
 import LoadingModal from "../../components/LoadingModal";
@@ -25,6 +33,8 @@ import { TRIPS_CATEGORIES } from "./constants/tripsCategories";
 const Trips = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const { user } = useSelector((state) => state.auth);
+  const participantId = user?.user?.assignedParticipants?.[0]?.participantId;
   const [searchText, setSearchText] = useState("");
   const [viewMode, setViewMode] = useState("list");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -110,7 +120,6 @@ const Trips = () => {
 
   const handleTripPress = useCallback(
     (item) => {
-      // If participant has multiple trips, pass all trips data
       if (item.hasMultipleTrips && item.allTrips) {
         navigation.navigate("TripsDetails", {
           trip: item,
@@ -230,6 +239,24 @@ const Trips = () => {
         onSubmit={onNoShowSubmit}
         onClose={handleNoShowModalClose}
       />
+
+      {participantId && (
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => navigation.navigate("CreateTripe", { participantId })}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={Colors.PrimaryGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.floatingButtonGradient}
+          >
+            <MaterialIcons name="add" size={24} color={Colors.White} />
+            <Text style={styles.floatingButtonText}>Create new trip</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

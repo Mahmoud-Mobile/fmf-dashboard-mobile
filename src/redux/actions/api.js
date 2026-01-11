@@ -3,8 +3,8 @@ import {
   events,
   getEventById,
   flights,
-  trips,
   getTripsParticipants,
+  getDesignatedCars,
   getSubEvents,
   getSubEventById,
   getResources,
@@ -24,7 +24,6 @@ import {
   setEvents,
   setSelectedEvent,
   setFlights,
-  setTrips,
   setSubEvents,
   setSelectedSubEvent,
   setResources,
@@ -32,6 +31,7 @@ import {
   setSeatingPlans,
   setAccommodation,
   setTripsParticipants,
+  setDesignatedCars,
   setSelectedParticipant,
   setExhibitors,
   setExhibitor,
@@ -77,10 +77,12 @@ export const fetchEventById =
   };
 
 // Fetch flights for an event
-export const fetchFlights = (eventId, params) => async (dispatch) => {
+export const fetchFlights = (eventId, params) => async (dispatch, getState) => {
   dispatch(setLoading());
   try {
-    const response = await flights(eventId, params);
+    const state = getState();
+    const participantId = state?.auth?.participantIdWithAssignByAmbassador;
+    const response = await flights(eventId, params, participantId);
     dispatch(setFlights(response));
   } catch (error) {
     dispatch(setError("Error fetching flights"));
@@ -89,28 +91,38 @@ export const fetchFlights = (eventId, params) => async (dispatch) => {
   }
 };
 
-// Fetch trips for an event
-export const fetchTrips = (eventId, params) => async (dispatch) => {
-  dispatch(setLoading());
-  try {
-    const response = await trips(eventId, params);
-    dispatch(setTrips(response));
-  } catch (error) {
-    console.log("Error in fetchTrips:", error);
-    dispatch(setError("Error fetching trips"));
-  }
-};
-
 // Fetch trips participants for an event
-export const fetchTripsParticipants = (eventId, params) => async (dispatch) => {
+export const fetchTripsParticipants =
+  (eventId, params) => async (dispatch, getState) => {
+    dispatch(setLoading());
+    try {
+      const state = getState();
+      const participantId = state?.auth?.participantIdWithAssignByAmbassador;
+      const response = await getTripsParticipants(
+        eventId,
+        params,
+        participantId || null
+      );
+      if (response) {
+        dispatch(setTripsParticipants(response));
+      }
+    } catch (error) {
+      dispatch(setError("Error fetching trips participants"));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Fetch designated cars for an event
+export const fetchDesignatedCars = (eventId, params) => async (dispatch) => {
   dispatch(setLoading());
   try {
-    const response = await getTripsParticipants(eventId, params);
+    const response = await getDesignatedCars(eventId, params);
     if (response) {
-      dispatch(setTripsParticipants(response));
+      dispatch(setDesignatedCars(response));
     }
   } catch (error) {
-    dispatch(setError("Error fetching trips participants"));
+    dispatch(setError("Error fetching designated cars"));
   } finally {
     dispatch(setLoading(false));
   }

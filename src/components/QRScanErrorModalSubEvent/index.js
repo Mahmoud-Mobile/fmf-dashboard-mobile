@@ -3,8 +3,9 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useRef,
+  useState,
 } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -12,6 +13,7 @@ import BottomSheet, {
 import { Colors } from "../../Global/colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "./Styles";
+import { subEvent_ManualRegister } from "../../webservice/apiConfig";
 
 const QRScanErrorModalSubEvent = forwardRef(
   (
@@ -20,10 +22,14 @@ const QRScanErrorModalSubEvent = forwardRef(
       errorMessage = "This QR code does not have access to this sub-event.",
       onManualRegister,
       showManualRegister = false,
+      eventId,
+      subEventId,
+      qrCode,
     },
     ref
   ) => {
     const bottomSheetRef = useRef(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useImperativeHandle(ref, () => ({
       open: () => {
@@ -81,12 +87,64 @@ const QRScanErrorModalSubEvent = forwardRef(
       // onTryAgain will be called via handleSheetChanges when modal closes
     };
 
-    const handleManualRegister = () => {
-      bottomSheetRef.current?.close();
-      if (onManualRegister) {
-        onManualRegister();
+    const handleManualRegister = useCallback(async () => {
+      if (!eventId || !subEventId || !qrCode) {
+        Alert.alert(
+          "Error",
+          "Missing required information for manual registration."
+        );
+        return;
       }
-    };
+
+      Alert.alert(
+        "Manual Register",
+        "Are you sure you want to manually register this guest to the sub-event?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Confirm",
+            onPress: async () => {
+              setIsLoading(true);
+              try {
+                const payload = {
+                  qrCode: qrCode,
+                };
+                await subEvent_ManualRegister(eventId, subEventId, payload);
+                bottomSheetRef.current?.close();
+                Alert.alert(
+                  "Success",
+                  "Guest has been successfully registered to the sub-event.",
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => {
+                        if (onManualRegister) {
+                          onManualRegister();
+                        }
+                      },
+                    },
+                  ]
+                );
+              } catch (error) {
+                const errorData = error?.response?.data || error?.data || {};
+                const errorMsg =
+                  errorData?.message ||
+                  error?.message ||
+                  errorData?.error ||
+                  "Failed to register. Please try again.";
+                Alert.alert("Registration Failed", errorMsg);
+              } finally {
+                setIsLoading(false);
+              }
+            },
+          },
+        ],
+        { cancelable: true }
+      );
+    }, [eventId, subEventId, qrCode, onManualRegister]);
 
     return (
       <BottomSheet
@@ -130,7 +188,7 @@ const QRScanErrorModalSubEvent = forwardRef(
           </View>
 
           <View style={styles.buttonsContainer}>
-            {/* {showManualRegister && onManualRegister && (
+            {showManualRegister && onManualRegister && (
               <TouchableOpacity
                 style={[styles.button, styles.manualRegisterButton]}
                 onPress={handleManualRegister}
@@ -145,7 +203,7 @@ const QRScanErrorModalSubEvent = forwardRef(
                   Manual Register to Sub-Event
                 </Text>
               </TouchableOpacity>
-            )} */}
+            )}
             <TouchableOpacity
               style={[styles.button, styles.tryAgainButton]}
               onPress={handleTryAgain}

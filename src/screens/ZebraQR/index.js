@@ -431,6 +431,9 @@ const ZebraQR = () => {
               !!errorMessage &&
               mode !== "checkout"
             }
+            eventId={eventId}
+            subEventId={subEventId}
+            qrCode={scannedData}
           />
         </>
       ) : resourceId ? (

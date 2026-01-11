@@ -34,7 +34,7 @@ const Login = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [categoryError, setCategoryError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("fmf");
   const [deviceToken, setDeviceToken] = useState(null);
 
   const validateInputs = () => {
@@ -95,13 +95,15 @@ const Login = () => {
     try {
       const response = await dispatch(login(body, true, token));
       // console.log("response", JSON.stringify(response, null, 2));
-      // Store participant ID assigned by ambassador (temporary value until backend returns actual ID)
-      dispatch(
-        setParticipantIdWithAssignByAmbassador(
-          "38a0689a-7852-4b87-8f52-8534c7cf8c7c"
-        )
-      );
+
       if (response.type === "LOGIN_SUCCESS") {
+        // Extract participant ID from assignedParticipants
+        const participantId =
+          response.payload?.user?.assignedParticipants?.[0]?.participantId;
+        // const participantId = "null";
+        if (participantId) {
+          dispatch(setParticipantIdWithAssignByAmbassador(participantId));
+        }
         navigation.reset({
           index: 0,
           routes: [{ name: "MainEvent" }],

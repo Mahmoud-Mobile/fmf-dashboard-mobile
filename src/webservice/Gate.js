@@ -252,7 +252,9 @@ async function Get(url = "", data = {}, showAlert = false) {
 // GetBinary - for downloading binary files (Excel, CSV, etc.)
 async function GetBinary(url = "", data = {}, showAlert = false) {
   const baseURL = await getEnvVars("apiUrl");
-  const fullUrl = `${baseURL}${url}${buildQueryParams(data) ? `?${buildQueryParams(data)}` : ""}`;
+  const fullUrl = `${baseURL}${url}${
+    buildQueryParams(data) ? `?${buildQueryParams(data)}` : ""
+  }`;
 
   console.log("GetBinary Request", fullUrl);
 

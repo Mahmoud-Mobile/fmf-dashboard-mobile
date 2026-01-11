@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { Storage } from "expo-storage";
 import styles from "./EnvironmentSelectorStyles";
 
 const EnvironmentSelector = ({ onCategoryChange, error, onErrorChange }) => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("fmf");
+
+  useEffect(() => {
+    if (onCategoryChange) {
+      onCategoryChange("fmf");
+    }
+  }, []);
 
   const categories = [
     { label: "FMF", value: "fmf" },

@@ -26,6 +26,7 @@ import About from "../screens/About";
 import FAQ from "../screens/FAQ";
 import ContactUs from "../screens/ContactUs";
 import TripsDetails from "../screens/TripsDetails";
+import CreateTripe from "../screens/CreateTripe";
 import SubEventDetails from "../screens/SubEventDetails";
 import ResourceDetails from "../screens/ResourceDetails";
 import VisibilitySettings from "../screens/VisibilitySettings";
@@ -250,6 +251,13 @@ const NavStack = () => {
       <Stack.Screen
         name="TripsDetails"
         component={TripsDetails}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="CreateTripe"
+        component={CreateTripe}
         options={{
           headerShown: false,
         }}

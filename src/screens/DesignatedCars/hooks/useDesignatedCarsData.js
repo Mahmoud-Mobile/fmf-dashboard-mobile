@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTripsParticipants } from "../../../redux/actions/api";
+import { fetchDesignatedCars } from "../../../redux/actions/api";
 import { setIconDisabled } from "../../../redux/reducers/uiReducer";
 
 export const useDesignatedCarsData = (selectedCategory) => {
   const dispatch = useDispatch();
-  const { selectedEvent, tripsParticipants, loading } = useSelector(
+  const { selectedEvent, designatedCars, loading } = useSelector(
     (state) => state.api
   );
   const [designatedCarsData, setDesignatedCarsData] = useState([]);
@@ -13,24 +13,22 @@ export const useDesignatedCarsData = (selectedCategory) => {
 
   useEffect(() => {
     if (
-      tripsParticipants &&
-      tripsParticipants.participants &&
-      tripsParticipants.participants.length > 0
+      designatedCars &&
+      designatedCars.participants &&
+      designatedCars.participants.length > 0
     ) {
-      // Flatten the nested structure: each participant can have multiple cars
       const transformedData = [];
-      tripsParticipants.participants.forEach((participantItem) => {
+      designatedCars.participants.forEach((participantItem) => {
         const participant = participantItem.participant || {};
-        const cars = participantItem.trips || []; // Using trips structure for now
+        const cars = participantItem.trips || [];
         const hasMultipleCars = cars.length > 1;
 
-        // Create a separate entry for each car, but include all cars info
         cars.forEach((carItem) => {
-          const car = carItem.trip || {}; // Using trip structure for now
+          const car = carItem.trip || {};
           const vehicle = carItem.vehicle || {};
           const driver = carItem.driver || null;
           const driverShift = carItem.driverShift || null;
-          const participantCar = carItem.participantTrip || {}; // Using participantTrip structure
+          const participantCar = carItem.participantTrip || {};
 
           transformedData.push({
             participant,
@@ -76,16 +74,15 @@ export const useDesignatedCarsData = (selectedCategory) => {
     } else {
       setDesignatedCarsData([]);
     }
-  }, [tripsParticipants, dispatch]);
+  }, [designatedCars, dispatch]);
 
   const fetchDesignatedCarsData = useCallback(() => {
     if (selectedEvent?.id) {
       const params = {
         page: 1,
-        limit: 1000,
-        ...(selectedCategory !== "all" && { tripType: selectedCategory }),
+        limit: 500,
       };
-      dispatch(fetchTripsParticipants(selectedEvent.id, params));
+      dispatch(fetchDesignatedCars(selectedEvent.id, params));
     }
   }, [selectedEvent?.id, dispatch, selectedCategory]);
 
@@ -109,7 +106,7 @@ export const useDesignatedCarsData = (selectedCategory) => {
         limit: 1000,
         ...(selectedCategory !== "all" && { tripType: selectedCategory }),
       };
-      dispatch(fetchTripsParticipants(selectedEvent.id, params)).finally(() => {
+      dispatch(fetchDesignatedCars(selectedEvent.id, params)).finally(() => {
         setRefreshing(false);
       });
     }
@@ -124,4 +121,3 @@ export const useDesignatedCarsData = (selectedCategory) => {
     loading,
   };
 };
-
