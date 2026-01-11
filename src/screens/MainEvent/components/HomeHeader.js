@@ -1,4 +1,4 @@
-import React, { Profiler, useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
-import { Storage } from "expo-storage";
 import { logout } from "../../../redux/actions/authActions";
 import { persistor } from "../../../redux/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,22 +23,6 @@ const HomeHeader = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const userInfo = useSelector((state) => state.auth.user);
-  const [currentEnvironment, setCurrentEnvironment] = useState("fmf");
-
-  // Load environment
-  useEffect(() => {
-    const loadEnvironment = async () => {
-      try {
-        const selectedCategory = await Storage.getItem({
-          key: "selected-category",
-        });
-        setCurrentEnvironment(selectedCategory || "fmf");
-      } catch (error) {
-        setCurrentEnvironment("fmf");
-      }
-    };
-    loadEnvironment();
-  }, []);
 
   const profileData = useMemo(() => {
     const profile = userInfo?.user ?? userInfo ?? {};
@@ -119,14 +102,6 @@ const HomeHeader = () => {
           </View>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          {currentEnvironment !== "offerHome" && (
-            <TouchableOpacity
-              style={styles.notificationContainer}
-              onPress={() => navigation.navigate("Ambassador")}
-            >
-              <Ionicons name="people-outline" size={20} color="white" />
-            </TouchableOpacity>
-          )}
           <TouchableOpacity
             style={styles.notificationContainer}
             onPress={() => navigation.navigate("NotificationScreen")}
