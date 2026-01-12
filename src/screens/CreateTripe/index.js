@@ -15,10 +15,12 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomHeader from "../../components/CustomHeader";
 import CustomPressable from "../../components/CustomPressable";
 import LoadingModal from "../../components/LoadingModal";
+import VehicleSelectionModal from "../../components/VehicleSelectionModal";
 import { Colors } from "../../Global/colors";
-import { createTrip } from "../../webservice/apiConfig";
+import { createTrip, getVehicles } from "../../webservice/apiConfig";
 import styles from "./Styles";
 import moment from "moment";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const CreateTripe = () => {
   const navigation = useNavigation();
@@ -43,6 +45,12 @@ const CreateTripe = () => {
   const [showDropoffDatePicker, setShowDropoffDatePicker] = useState(false);
   const [pickupPickerMode, setPickupPickerMode] = useState("date");
   const [dropoffPickerMode, setDropoffPickerMode] = useState("date");
+
+  const [vehicleId, setVehicleId] = useState(null);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [vehicles, setVehicles] = useState([]);
+  const [showVehicleModal, setShowVehicleModal] = useState(false);
+  const [vehiclesLoading, setVehiclesLoading] = useState(false);
 
   const tripTypeOptions = [
     { value: "PICKUP", label: "Pickup" },
@@ -143,6 +151,50 @@ const CreateTripe = () => {
     return moment(date).format("MMM DD, YYYY HH:mm");
   };
 
+  const fetchVehicles = async () => {
+    if (!selectedEvent?.id) {
+      return;
+    }
+
+    setVehiclesLoading(true);
+    try {
+      const response = await getVehicles(selectedEvent.id);
+
+      if (!response) {
+        setVehicles([]);
+        return;
+      }
+
+      if (response.vehicles && Array.isArray(response.vehicles)) {
+        setVehicles(response.vehicles);
+      } else if (Array.isArray(response)) {
+        setVehicles(response);
+      } else if (response.data && Array.isArray(response.data)) {
+        setVehicles(response.data);
+      } else {
+        setVehicles([]);
+      }
+    } catch (error) {
+      setVehicles([]);
+      Alert.alert(
+        "Error",
+        error?.errorMessage || error?.message || "Failed to load vehicles"
+      );
+    } finally {
+      setVehiclesLoading(false);
+    }
+  };
+
+  const handleVehicleModalOpen = async () => {
+    setShowVehicleModal(true);
+    await fetchVehicles();
+  };
+
+  const handleVehicleSelect = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setVehicleId(vehicle.id);
+  };
+
   const handleSubmit = async () => {
     if (!title.trim()) {
       Alert.alert("Validation Error", "Please enter a title");
@@ -174,6 +226,7 @@ const CreateTripe = () => {
         scheduledDropoff: scheduledDropoff.toISOString(),
         specialInstructions: specialInstructions.trim(),
         notes: notes.trim(),
+        ...(vehicleId && { vehicleId: vehicleId }),
       };
 
       const response = await createTrip(
@@ -218,7 +271,6 @@ const CreateTripe = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Trip Type */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Trip Type *</Text>
             <View style={styles.optionContainer}>
@@ -245,7 +297,6 @@ const CreateTripe = () => {
             </View>
           </View>
 
-          {/* Title */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Title *</Text>
             <TextInput
@@ -257,7 +308,6 @@ const CreateTripe = () => {
             />
           </View>
 
-          {/* Description */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Description</Text>
             <TextInput
@@ -272,7 +322,6 @@ const CreateTripe = () => {
             />
           </View>
 
-          {/* Pickup Location */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Pickup Location *</Text>
             <TextInput
@@ -284,7 +333,6 @@ const CreateTripe = () => {
             />
           </View>
 
-          {/* Pickup Address */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Pickup Address</Text>
             <TextInput
@@ -296,7 +344,6 @@ const CreateTripe = () => {
             />
           </View>
 
-          {/* Dropoff Location */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Dropoff Location *</Text>
             <TextInput
@@ -308,7 +355,6 @@ const CreateTripe = () => {
             />
           </View>
 
-          {/* Dropoff Address */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Dropoff Address</Text>
             <TextInput
@@ -320,7 +366,6 @@ const CreateTripe = () => {
             />
           </View>
 
-          {/* Scheduled Pickup */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Scheduled Pickup</Text>
             <TouchableOpacity
@@ -347,7 +392,6 @@ const CreateTripe = () => {
             )}
           </View>
 
-          {/* Scheduled Dropoff */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Scheduled Dropoff</Text>
             <TouchableOpacity
@@ -374,7 +418,33 @@ const CreateTripe = () => {
             )}
           </View>
 
-          {/* Special Instructions */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Vehicle</Text>
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={handleVehicleModalOpen}
+            >
+              <View style={styles.vehicleButtonContent}>
+                <MaterialIcons
+                  name="directions-car"
+                  size={18}
+                  color={Colors.Primary}
+                  style={styles.vehicleIcon}
+                />
+                <Text
+                  style={[
+                    styles.dateButtonText,
+                    !selectedVehicle && styles.placeholderText,
+                  ]}
+                >
+                  {selectedVehicle
+                    ? `${selectedVehicle.vehicleNumber} - ${selectedVehicle.model}`
+                    : "Select a vehicle"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Special Instructions</Text>
             <TextInput
@@ -389,7 +459,6 @@ const CreateTripe = () => {
             />
           </View>
 
-          {/* Notes */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Notes</Text>
             <TextInput
@@ -413,6 +482,15 @@ const CreateTripe = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <VehicleSelectionModal
+        visible={showVehicleModal}
+        onClose={() => setShowVehicleModal(false)}
+        onVehicleSelect={handleVehicleSelect}
+        selectedVehicleId={vehicleId}
+        vehicles={vehicles}
+        loading={vehiclesLoading}
+      />
     </View>
   );
 };

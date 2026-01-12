@@ -50,6 +50,11 @@ const flights = async (eventId, data, participantId = null) => {
   }
 };
 
+// Get vehicles
+const getVehicles = async (eventId, data = {}) => {
+  return await Get(`mobile/ops/events/${eventId}/transport/vehicles`, data);
+};
+
 // Create trip
 const createTrip = async (eventId, participantId, data) => {
   if (participantId) {
@@ -357,6 +362,7 @@ export {
   events,
   getEventById,
   flights,
+  getVehicles,
   createTrip,
   getTripsParticipants,
   getDesignatedCars,

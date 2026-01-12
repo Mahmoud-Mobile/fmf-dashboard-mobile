@@ -84,6 +84,16 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FONT_REGULAR,
     color: Colors.PrimaryText,
   },
+  vehicleButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  vehicleIcon: {
+    marginRight: 8,
+  },
+  placeholderText: {
+    color: Colors.SecondaryText,
+  },
   submitContainer: {
     marginTop: 8,
     marginBottom: 20,
