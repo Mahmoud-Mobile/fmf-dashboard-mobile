@@ -28,10 +28,7 @@ const PDFViewer = () => {
           setLoading(false);
         }
       } else {
-        setPdfUri(
-          pdfSource ||
-            "https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf"
-        );
+        setPdfUri(pdfSource || "");
         setLoading(false);
       }
     };

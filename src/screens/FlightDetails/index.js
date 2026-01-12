@@ -20,7 +20,6 @@ import { formatDateTime } from "../../config/dateUtils";
 
 const FlightDetails = ({ route }) => {
   const { flight, selectedCategory } = route.params;
-  // console.log(flight);
   const navigation = useNavigation();
 
   const getParticipantName = (participant) => {
@@ -254,11 +253,11 @@ const FlightDetails = ({ route }) => {
             <View style={styles.documentsContainer}>
               {flight.documents.map((document) => (
                 <TouchableOpacity
-                  key={document.id || document.fileUrl}
+                  key={document.id || document.url}
                   style={styles.pdfButton}
                   onPress={() =>
                     navigation.navigate("PDFViewer", {
-                      pdfUrl: document.fileUrl,
+                      pdfUrl: document.url || document.fileUrl,
                     })
                   }
                   activeOpacity={0.8}
@@ -269,7 +268,7 @@ const FlightDetails = ({ route }) => {
                     color={Colors.White}
                   />
                   <Text style={styles.pdfButtonText}>
-                    {document.fileName || "View Document"}
+                    {document.name || document.fileName || "View Document"}
                   </Text>
                 </TouchableOpacity>
               ))}
