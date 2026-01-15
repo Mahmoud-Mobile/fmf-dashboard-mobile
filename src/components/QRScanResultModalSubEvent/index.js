@@ -210,7 +210,7 @@ const QRScanResultModalSubEvent = forwardRef(
               />
               <Text style={styles.buttonText}>Scan Another</Text>
             </TouchableOpacity>
-            {userInfo?.participant && (
+            {/* {userInfo?.participant && (
               <>
                 <TouchableOpacity
                   style={[styles.button, styles.showSeatsButton]}
@@ -225,7 +225,7 @@ const QRScanResultModalSubEvent = forwardRef(
                   <Text style={styles.buttonText}>Show Seats</Text>
                 </TouchableOpacity>
               </>
-            )}
+            )} */}
           </View>
         </BottomSheetScrollView>
       </BottomSheet>

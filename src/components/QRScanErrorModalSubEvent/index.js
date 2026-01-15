@@ -121,9 +121,9 @@ const QRScanErrorModalSubEvent = forwardRef(
                     {
                       text: "OK",
                       onPress: () => {
-                        if (onManualRegister) {
-                          onManualRegister();
-                        }
+                        // if (onManualRegister) {
+                        //   onManualRegister();
+                        // }
                       },
                     },
                   ]

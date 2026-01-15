@@ -100,6 +100,37 @@ export const parseSeatingData = (seatingPlans) => {
     }
   });
 
+  // Calculate actual bounds from all elements to ensure all seats are visible
+  let maxX = canvasWidth;
+  let maxY = canvasHeight;
+  let minX = 0;
+  let minY = 0;
+
+  layoutElements.forEach((element) => {
+    if (
+      typeof element.x === "number" &&
+      !isNaN(element.x) &&
+      typeof element.y === "number" &&
+      !isNaN(element.y)
+    ) {
+      const elementWidth = element.width || 40;
+      const elementHeight = element.height || 40;
+      const rightEdge = element.x + elementWidth;
+      const bottomEdge = element.y + elementHeight;
+
+      if (rightEdge > maxX) maxX = rightEdge;
+      if (bottomEdge > maxY) maxY = bottomEdge;
+      if (element.x < minX) minX = element.x;
+      if (element.y < minY) minY = element.y;
+    }
+  });
+
+  // Use the maximum of plan canvas size and actual element bounds
+  // Add some padding to ensure elements aren't cut off
+  const padding = 50;
+  const actualCanvasWidth = Math.max(canvasWidth, maxX - minX + padding);
+  const actualCanvasHeight = Math.max(canvasHeight, maxY - minY + padding);
+
   // Log for debugging
   console.log("Total layout elements after flattening:", layoutElements.length);
   console.log("Element types count:", {
@@ -112,6 +143,7 @@ export const parseSeatingData = (seatingPlans) => {
     ).length,
   });
   console.log("Total seats in seatsMap:", Object.keys(seatsMap).length);
+  console.log(`Canvas bounds - Plan: ${canvasWidth}x${canvasHeight}, Actual: ${actualCanvasWidth}x${actualCanvasHeight}, Elements: ${minX},${minY} to ${maxX},${maxY}`);
 
   // Debug: Check position data for first few chairs
   const chairs = layoutElements.filter((el) => el.type === "chair");
@@ -154,7 +186,7 @@ export const parseSeatingData = (seatingPlans) => {
   return {
     layoutElements,
     seatsMap,
-    canvasWidth,
-    canvasHeight,
+    canvasWidth: actualCanvasWidth,
+    canvasHeight: actualCanvasHeight,
   };
 };

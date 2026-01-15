@@ -42,12 +42,8 @@ const SeatingElement = ({
   };
 
   const handlePress = () => {
-    // Only allow interaction in manual register mode
-    if (!isManualRegisterMode) {
-      return;
-    }
-
-    // If onSeatPress is provided and it's a chair, use it for manual registration
+    // Allow interaction in both manual register mode and preview mode
+    // If onSeatPress is provided and it's a chair, call it
     if (onSeatPress && type === "chair") {
       // Prioritize seat.id (UUID) for API, fallback to seatIdentifier or element id
       const seatId = seat?.id || seat?.seatIdentifier || id;
@@ -77,16 +73,7 @@ const SeatingElement = ({
     const seatStatus = seat?.status || "AVAILABLE";
     const seatColor = getSeatColor(seatStatus);
 
-    // In preview mode, seats are not clickable
-    if (!isManualRegisterMode) {
-      return (
-        <View key={id} style={elementStyle}>
-          <MaterialIcons name="event-seat" size={iconSize} color={seatColor} />
-        </View>
-      );
-    }
-
-    // In manual register mode, seats are clickable
+    // Seats are clickable in both preview mode and manual register mode
     return (
       <TouchableOpacity
         key={id}

@@ -18,6 +18,7 @@ const SeatingCanvas = ({
   const scaledWidth = canvasWidth * scale;
   const scaledHeight = canvasHeight * scale;
 
+  // Ensure content is at least as large as the scaled canvas
   const contentWidth = Math.max(scaledWidth, SCREEN_WIDTH);
   const contentHeight = Math.max(scaledHeight, SCREEN_HEIGHT - HEADER_HEIGHT);
 
@@ -31,6 +32,7 @@ const SeatingCanvas = ({
   console.log(
     `Rendering ${validElements.length} of ${layoutElements.length} elements with valid positions`
   );
+  console.log(`Canvas size: ${canvasWidth}x${canvasHeight}, Scaled: ${scaledWidth}x${scaledHeight}, Content: ${contentWidth}x${contentHeight}`);
 
   return (
     <View style={styles.scrollContainer}>
@@ -38,18 +40,21 @@ const SeatingCanvas = ({
         horizontal
         showsHorizontalScrollIndicator={true}
         style={styles.scrollView}
-        contentContainerStyle={styles.horizontalScrollContent}
+        contentContainerStyle={{
+          width: Math.max(scaledWidth, SCREEN_WIDTH),
+          minHeight: contentHeight,
+        }}
+        bounces={false}
       >
         <ScrollView
           showsVerticalScrollIndicator={true}
           style={styles.scrollView}
-          contentContainerStyle={[
-            styles.verticalScrollContent,
-            {
-              width: contentWidth,
-              height: contentHeight,
-            },
-          ]}
+          contentContainerStyle={{
+            width: scaledWidth,
+            height: Math.max(scaledHeight, contentHeight),
+            minHeight: contentHeight,
+          }}
+          bounces={false}
         >
           <View
             style={[

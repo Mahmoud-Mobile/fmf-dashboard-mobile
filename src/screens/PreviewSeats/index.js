@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { styles } from "./Styles";
 import { fetchSeatingPlans } from "../../redux/actions/api";
 import { SeatingCanvas, ErrorState, ManualRegisterModal } from "./components";
+import SeatDetailsModal from "./components/SeatDetailsModal";
 import { parseSeatingData } from "./utils/parseSeatingData";
 import { calculateScale } from "./utils/calculateScale";
 import { subEvent_ManualRegister } from "../../webservice/apiConfig";
@@ -27,12 +28,14 @@ const SeatingPlanPreview = ({ route }) => {
   const { seatingPlans, loading, error } = useSelector((state) => state.api);
   const [isRegistering, setIsRegistering] = useState(false);
   const [selectedSeatId, setSelectedSeatId] = useState(null);
+  const [selectedSeatInfo, setSelectedSeatInfo] = useState(null);
   const manualRegisterModalRef = useRef(null);
+  const seatDetailsModalRef = useRef(null);
 
   useEffect(() => {
     if (eventId && subEventID) {
       dispatch(fetchSeatingPlans(eventId, subEventID));
-      console.log("seatingPlans", seatingPlans);
+      // console.log("seatingPlans", seatingPlans);
     }
   }, [eventId, subEventID, dispatch]);
 
@@ -42,13 +45,33 @@ const SeatingPlanPreview = ({ route }) => {
 
   const handleSeatSelection = useCallback(
     (seatId, seatInfo) => {
-      if (!manualRegisterMode || !qrCode || !seatId) {
+      if (!seatId) {
         return;
       }
-      setSelectedSeatId(seatId);
-      manualRegisterModalRef.current?.open();
+
+      // Get seat info from seatsMap if not provided
+      const fullSeatInfo = seatInfo || seatsMap[seatId] || { id: seatId };
+
+      // In manual register mode, show registration modal
+      if (manualRegisterMode && qrCode) {
+        setSelectedSeatId(seatId);
+        manualRegisterModalRef.current?.open();
+      } else {
+        // In preview mode, show seat details modal
+        // Find assignments for this seat
+        const seatAssignments =
+          seatingPlans?.assignments?.filter(
+            (assignment) => assignment.seatId === seatId
+          ) || [];
+
+        setSelectedSeatInfo({
+          ...fullSeatInfo,
+          assignments: seatAssignments,
+        });
+        seatDetailsModalRef.current?.open();
+      }
     },
-    [manualRegisterMode, qrCode]
+    [manualRegisterMode, qrCode, seatsMap, seatingPlans]
   );
 
   const handleManualRegister = useCallback(
@@ -93,6 +116,10 @@ const SeatingPlanPreview = ({ route }) => {
     setSelectedSeatId(null);
   }, []);
 
+  const handleCloseSeatDetails = useCallback(() => {
+    setSelectedSeatInfo(null);
+  }, []);
+
   // Parse seating data
   const { layoutElements, seatsMap, canvasWidth, canvasHeight } =
     useMemo(() => {
@@ -115,12 +142,8 @@ const SeatingPlanPreview = ({ route }) => {
   const hasSeatingPlan = seatingPlans?.seatingPlan;
 
   const renderContent = () => {
-    // if (hasMissingParams) {
-    //   return <ErrorState message="Event ID or Subevent ID is missing" />;
-    // }
-
     if (error) {
-      return <ErrorState message={error} />;
+      return <ErrorState message="" />;
     }
 
     if (!hasSeatingPlan) {
@@ -169,7 +192,7 @@ const SeatingPlanPreview = ({ route }) => {
           canvasWidth={canvasWidth}
           canvasHeight={canvasHeight}
           scale={scale}
-          onSeatPress={manualRegisterMode ? handleSeatSelection : undefined}
+          onSeatPress={handleSeatSelection}
           isManualRegisterMode={manualRegisterMode}
         />
         {manualRegisterMode && (
@@ -179,6 +202,13 @@ const SeatingPlanPreview = ({ route }) => {
             seatId={selectedSeatId}
             onRegister={handleManualRegister}
             onCancel={handleCancelRegister}
+          />
+        )}
+        {!manualRegisterMode && (
+          <SeatDetailsModal
+            ref={seatDetailsModalRef}
+            seatInfo={selectedSeatInfo}
+            onClose={handleCloseSeatDetails}
           />
         )}
       </>

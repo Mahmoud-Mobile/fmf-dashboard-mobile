@@ -224,7 +224,7 @@ const QRScanResultModal = forwardRef(
             </TouchableOpacity>
             {userInfo?.participant?.name && (
               <>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={[styles.button, styles.showSeatsButton]}
                   onPress={handleShowSeats}
                   activeOpacity={0.7}
@@ -235,7 +235,7 @@ const QRScanResultModal = forwardRef(
                     color={Colors.White}
                   />
                   <Text style={styles.buttonText}>Show Seats</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity
                   style={[styles.button, styles.showProfileButton]}
